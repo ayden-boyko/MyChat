@@ -1,0 +1,26 @@
+The following routes will be used for chatroom funtionality, addition routes may be needed
+
+Signing in/out
+
+"/sign-in", "/sign-out"
+
+Creating/DeletingS accounts
+
+"/account/create", "/account/delete" MUST REQUIRE AUTHORIZATION TO DELETE ACCOUNT, THEN REQUEST CANT BE SPOOFED
+
+Message routes
+
+direct: "/user/message"
+group: "group/message"
+
+User routes
+
+update info: "/account/update" updates user_name and/or user_profile
+block/unblock person: "/user/block", "/user/unblock"
+send friend request: "/user/friend", "/user/unfriend"
+join/leave group: "/group/join", "/group/leave"
+create/delete group: "/group/create", "/group/delete"
+
+
+IMPORTANT:
+When doing something to someone (blocking/adding/etc...) it requires their id, ids are displayed under usernames, like IG handles
