@@ -3,7 +3,8 @@ import "./output.css";
 //import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import HomePage from "./routes/homepage.tsx";
-import LoginPage from "./routes/login.tsx";
+import LoginPage from "./routes/loginpage.tsx";
+import SettingsPage from "./routes/settingspage.tsx";
 
 // interface User {
 //   user_num: number;
@@ -78,7 +79,8 @@ function App() {
     <div className="App">
       <Routes>
         <Route path="/" element={<LoginPage />} />
-        <Route path="/sign-up" element={<HomePage />} />
+        <Route path="/home" element={<HomePage />} />
+        <Route path="/settings" element={<SettingsPage />} />
       </Routes>
     </div>
   );

@@ -1,58 +1,73 @@
 import { useState } from "react";
-import { X } from "lucide-react";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/src/components/ui/avatar";
-import { Button } from "@/src/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/src/components/ui/card";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/src/components/ui/alert-dialog";
-import React from "react";
+import { X, UserPlus, UserMinus, Ban, UserCheck } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Button } from "../ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+// import {
+//   AlertDialog,
+//   AlertDialogAction,
+//   AlertDialogCancel,
+//   AlertDialogContent,
+//   AlertDialogDescription,
+//   AlertDialogFooter,
+//   AlertDialogHeader,
+//   AlertDialogTitle,
+//   AlertDialogTrigger,
+// } from "../ui/alert-dialog";
+import { useToast } from "../../hooks/use-toast";
 
 interface Friend {
   id: number;
+  username: string;
   name: string;
   status: string;
   bio: string;
+  avatarUrl: string;
 }
 
 interface FriendProfilePopupProps {
   friend: Friend;
   onClose: () => void;
-  onBlock: (friendId: number) => void;
+  isFriend: boolean;
+  isBlocked: boolean;
 }
 
 export default function FriendProfilePopup({
   friend,
   onClose,
-  onBlock,
+  isFriend,
+  isBlocked,
 }: FriendProfilePopupProps) {
-  const [isMessageVisible, setIsMessageVisible] = useState(false);
+  const [friendStatus, setFriendStatus] = useState(isFriend);
+  const [blockedStatus, setBlockedStatus] = useState(isBlocked);
+  const { toast } = useToast();
 
-  const handleSendMessage = () => {
-    setIsMessageVisible(true);
-    setTimeout(() => setIsMessageVisible(false), 3000);
+  const handleFriendAction = () => {
+    setFriendStatus(!friendStatus);
+    toast({
+      title: friendStatus ? "Friend Removed" : "Friend Added",
+      description: friendStatus
+        ? `You have removed ${friend.name} from your friends list.`
+        : `You have added ${friend.name} to your friends list.`,
+    });
   };
 
-  const handleBlockUser = () => {
-    onBlock(friend.id);
-    onClose();
+  const handleBlockAction = () => {
+    setBlockedStatus(!blockedStatus);
+    toast({
+      title: blockedStatus ? "User Unblocked" : "User Blocked",
+      description: blockedStatus
+        ? `You have unblocked ${friend.name}.`
+        : `You have blocked ${friend.name}.`,
+    });
+  };
+
+  const handleInviteToGroup = () => {
+    // This would typically open a group selection dialog
+    toast({
+      title: "Invite Sent",
+      description: `You have invited ${friend.name} to join a group.`,
+    });
   };
 
   return (
@@ -70,13 +85,14 @@ export default function FriendProfilePopup({
           </Button>
           <div className="flex items-center space-x-4">
             <Avatar className="h-20 w-20">
-              <AvatarImage
-                src={`https://api.dicebear.com/6.x/initials/svg?seed=${friend.name}`}
-              />
+              <AvatarImage src={friend.avatarUrl} />
               <AvatarFallback>{friend.name[0]}</AvatarFallback>
             </Avatar>
             <div>
               <CardTitle>{friend.name}</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                @{friend.username}
+              </p>
               <p className="text-sm text-muted-foreground">{friend.status}</p>
             </div>
           </div>
@@ -87,36 +103,43 @@ export default function FriendProfilePopup({
               <h3 className="font-semibold">Bio</h3>
               <p className="text-sm">{friend.bio}</p>
             </div>
-            <Button className="w-full" onClick={handleSendMessage}>
-              Send Message
+            <div className="flex space-x-2">
+              <Button
+                onClick={handleFriendAction}
+                variant={friendStatus ? "destructive" : "default"}
+              >
+                {friendStatus ? (
+                  <>
+                    <UserMinus className="mr-2 h-4 w-4" /> Unfriend
+                  </>
+                ) : (
+                  <>
+                    <UserPlus className="mr-2 h-4 w-4" /> Add Friend
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={handleBlockAction}
+                variant={blockedStatus ? "outline" : "secondary"}
+              >
+                {blockedStatus ? (
+                  <>
+                    <UserCheck className="mr-2 h-4 w-4" /> Unblock
+                  </>
+                ) : (
+                  <>
+                    <Ban className="mr-2 h-4 w-4" /> Block
+                  </>
+                )}
+              </Button>
+            </div>
+            <Button
+              onClick={handleInviteToGroup}
+              variant="outline"
+              className="w-full"
+            >
+              Invite to Group
             </Button>
-            {isMessageVisible && (
-              <p className="text-sm text-green-600 text-center">
-                Message sent to {friend.name}!
-              </p>
-            )}
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive" className="w-full">
-                  Block User
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This will block {friend.name}. You won't be able to send or
-                    receive messages from them.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleBlockUser}>
-                    Block User
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
           </div>
         </CardContent>
       </Card>
