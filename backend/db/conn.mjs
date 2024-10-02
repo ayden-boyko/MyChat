@@ -1,24 +1,34 @@
-// import the MongoClient class from the mongodb module
-import { MongoClient } from "mongodb";
+// Import mongoose
+import mongoose from "mongoose";
 
-// get the connection string from the environment variable
-// if it's not set, use an empty string
+// Get the connection string from the environment variable
+// If it's not set, use an empty string
 const connectionString = process.env.ATLAS_URI || "";
 
-// create a new MongoClient instance with the connection string
+// Function to connect to the MongoDB database
+async function connectToDatabase() {
+  try {
+    // Connect to the database using Mongoose
+    await mongoose.connect(connectionString, {
+      dbName: "Chatroom",
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("Connected to MongoDB successfully");
 
-const client = new MongoClient(connectionString);
+    // Optionally, you can access the default connection
+    const db = mongoose.connection;
 
-// try to connect to the database
-try {
-  await client.connect();
-} catch (e) {
-  console.error(e);
+    // You can also set up event listeners for error handling, etc.
+    db.on("error", console.error.bind(console, "MongoDB connection error:"));
+
+    return db; // Return the connection for further use
+  } catch (error) {
+    console.error("Error connecting to MongoDB:", error);
+  }
 }
 
-let db;
-
-// get a reference to the "sample_training" database
-db = client.db("Chatroom");
+// Call the function to connect to the database
+const db = await connectToDatabase();
 
 export default db;

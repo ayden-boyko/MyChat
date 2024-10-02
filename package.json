@@ -7,10 +7,12 @@
     "client": "cd chatroom && npm run dev"
   },
   "devDependencies": {
-    "concurrently": "^7.6.0"
+    "concurrently": "^7.6.0",
+    "nodemon": "^3.1.7"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
-    "mongodb": "^6.9.0"
+    "mongodb": "^6.9.0",
+    "mongoose": "^8.7.0"
   }
 }

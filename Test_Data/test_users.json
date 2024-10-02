@@ -1,0 +1,42 @@
+[
+  {
+    "user_num": 1,
+    "name": "Ayden Boyko",
+    "user_name": "bbtornado",
+    "password": "",
+    "user_profile": "",
+    "friends": [],
+    "blocked": [],
+    "groups": []
+  },
+  {
+    "user_num": 2,
+    "name": "Justin Detran",
+    "user_name": "Gnarfle",
+    "password": "",
+    "user_profile": "",
+    "friends": [],
+    "blocked": [],
+    "groups": []
+  },
+  {
+    "user_num": 3,
+    "name": "Matthew Mauro",
+    "user_name": "Hax Activated",
+    "password": "",
+    "user_profile": "",
+    "friends": [],
+    "blocked": [],
+    "groups": []
+  },
+  {
+    "user_num": 4,
+    "name": "Jaden Rivera",
+    "user_name": "Maard Beet",
+    "password": "",
+    "user_profile": "",
+    "friends": [],
+    "blocked": [],
+    "groups": []
+  }
+]

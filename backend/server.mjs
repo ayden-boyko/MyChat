@@ -3,45 +3,6 @@ import express from "express";
 import "./loadEnviroment.mjs"; // Load environment variables
 import db from "./db/conn.mjs";
 
-const test_data = [
-  {
-    user_num: 1,
-    name: "Ayden Boyko",
-    user_name: "bbtornado",
-    user_profile: "",
-    friends: [],
-    blocked: [],
-    groups: [],
-  },
-  {
-    user_num: 2,
-    name: "Justin Detran",
-    user_name: "Gnarfle",
-    user_profile: "",
-    friends: [],
-    blocked: [],
-    groups: [],
-  },
-  {
-    user_num: 3,
-    name: "Matthew Mauro",
-    user_name: "Hax Activated",
-    user_profile: "",
-    friends: [],
-    blocked: [],
-    groups: [],
-  },
-  {
-    user_num: 4,
-    name: "Jaden Rivera",
-    user_name: "Maard Beet",
-    user_profile: "",
-    friends: [],
-    blocked: [],
-    groups: [],
-  },
-];
-
 const PORT = process.env.PORT || 8000;
 
 const app = express();
