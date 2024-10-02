@@ -2,10 +2,24 @@
 import express from "express";
 import "./loadEnviroment.mjs"; // Load environment variables
 import db from "./db/conn.mjs";
+import userRoutes from "./routes/account.mjs";
+import cors from "cors";
 
 const PORT = process.env.PORT || 8000;
 
 const app = express();
+
+app.use(express.json());
+app.use(cors());
+
+// Set CORS headers for all responses
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  next();
+});
+
+// Use the user routes
+app.use("/api/users", userRoutes);
 
 app.get("/", async (req, res) => {
   try {

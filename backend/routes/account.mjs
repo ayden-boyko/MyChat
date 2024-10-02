@@ -1,7 +1,7 @@
-// routes/users.js
+// routes/account.js
 import express from "express";
-import User from "../models/User.js"; // Import the User model
-import db from "./db/conn.mjs";
+import User from "../model/User.mjs"; // Import the User model
+import db from "../db/conn.mjs";
 
 const router = express.Router();
 
@@ -16,7 +16,7 @@ router.get("/get/all", async (req, res) => {
 });
 
 // GET a user by ID
-router.get("/get/:id", async (req, res) => {
+router.get("/get/:user_num", async (req, res) => {
   try {
     const user = await db
       .collection("Users")
@@ -69,7 +69,7 @@ router.post("/create", async (req, res) => {
 });
 
 // DELETE user
-router.delete("/delete/:id", async (req, res) => {
+router.delete("/delete/:user_num", async (req, res) => {
   try {
     const result = await db
       .collection("Users")
