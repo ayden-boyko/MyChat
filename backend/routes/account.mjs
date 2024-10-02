@@ -45,7 +45,6 @@ router.post("/create", async (req, res) => {
     }
 
     const newUser = new User({
-      user_num: test_data[0].user_num,
       name: test_data[0].name,
       user_name: test_data[0].user_name,
       password: test_data[0].password,
