@@ -11,7 +11,7 @@ Creating/DeletingS accounts
 Message routes
 
 direct: "/user/message"
-group: "group/message"
+group: "/group/message"
 
 User routes
 

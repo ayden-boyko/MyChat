@@ -29,5 +29,5 @@ groupSchema.methods.addMessage = function (messageId, messageContent) {
   this.chat.set(messageId, messageContent); // Add the new message
 };
 
-const Group = model("Group", groupSchema);
+const Group = model("Groups", groupSchema);
 export default Group;

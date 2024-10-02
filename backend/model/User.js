@@ -10,5 +10,5 @@ const userSchema = new Schema({
   blocked: [Number],
   groups: [Number],
 });
-const User = model("User", userSchema);
+const User = model("Users", userSchema);
 export default User;
