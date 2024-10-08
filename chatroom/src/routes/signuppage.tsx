@@ -11,9 +11,11 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { Icons } from "../components/ui/icons.tsx";
+import { useNavigate } from "react-router-dom";
 
 export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -21,7 +23,7 @@ export default function SignUpPage() {
 
     // Send the data to the server
     const result = await fetch(
-      `${process.env.BACKEND_API_URL}/api/users/create`,
+      `${import.meta.env.VITE_BACKEND_API_URL}/api/users/create`,
       {
         method: "POST",
         headers: {
@@ -35,7 +37,16 @@ export default function SignUpPage() {
       }
     );
     const data = await result.json();
-    console.log(data);
+    if (result.ok && data.email && data.username) {
+      console.log(data); // Log user data for debugging
+      navigate("/home"); // Redirect to HomePage on success
+    }
+    // Check for specific error message
+    else if (data.error === "An internal server error occurred") {
+      console.error("Error creating account:", data.error);
+    } else {
+      console.error("Unexpected response:", data);
+    }
   };
 
   return (

@@ -2,6 +2,7 @@
 import express from "express";
 import User from "../model/User.mjs"; // Import the User model
 import db from "../db/conn.mjs";
+import crypto from "crypto";
 
 const userRoutes = express.Router();
 
@@ -29,8 +30,9 @@ userRoutes.get("/get/:user_num", async (req, res) => {
 
 // POST new users
 userRoutes.post("/create", async (req, res) => {
+  console.log("starting");
   try {
-    console.log(req.body); // Log the user data
+    //console.log("body", req.body); // Log the user data
 
     const { email, username, password } = req.body;
 
@@ -52,6 +54,7 @@ userRoutes.post("/create", async (req, res) => {
       "sha256",
       async (err, hashedPassword) => {
         if (err) {
+          console.error("Error hashing password:", err);
           return res
             .status(500)
             .json({ error: "An error occurred while hashing the password" });
@@ -70,7 +73,8 @@ userRoutes.post("/create", async (req, res) => {
 
         // Save the user to the database
         await newUser.save();
-        res.status(201).json({ message: "User created successfully!" });
+        //console.log(`User created: ${newUser}`);
+        res.status(201).json(newUser);
       }
     );
   } catch (error) {

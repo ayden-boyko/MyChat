@@ -25,7 +25,7 @@ app.use((req, res, next) => {
 // Express session setup
 app.use(
   session({
-    secret: proccess.env.SESSION_SECRET, //signs the session ID cookie
+    secret: process.env.SESSION_SECRET_KEY, //signs the session ID cookie
     resave: false, //tells express to save session even if it wasnt modified
     saveUninitialized: false, //When false, it avoids storing sessions that haven’t been modified (user isn’t logged in).
     cookie: {
@@ -33,7 +33,7 @@ app.use(
       maxAge: 1000 * 60 * 60 * 24, // expires in 1 day
     },
     store: new mongoStore({
-      mongoUrl: db.asPromise(),
+      mongoUrl: process.env.ATLAS_URI,
       collection: "sessions",
     }),
   })
