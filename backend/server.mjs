@@ -5,6 +5,8 @@ import db from "./db/conn.mjs";
 import userRoutes from "./routes/account.mjs";
 import loginRoutes from "./routes/login.mjs";
 import cors from "cors";
+import session from "express-session";
+import mongoStore from "connect-mongo";
 
 const PORT = process.env.PORT || 8000;
 
@@ -18,6 +20,23 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   next();
 });
+
+// Express session setup
+app.use(
+  session({
+    secret: proccess.env.SESSION_SECRET, //signs the session ID cookie
+    resave: false, //tells express to save session even if it wasnt modified
+    saveUninitialized: false, //When false, it avoids storing sessions that haven’t been modified (user isn’t logged in).
+    cookie: {
+      //options for the session cookie
+      maxAge: 1000 * 60 * 60 * 24, // expires in 1 day
+    },
+    store: new mongoStore({
+      mongoUrl: process.env.ATLAS_URI || "",
+      collection: "sessions",
+    }),
+  })
+);
 
 // Use the user routes
 app.use("/api/users", userRoutes);

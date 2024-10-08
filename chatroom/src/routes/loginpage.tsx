@@ -90,14 +90,12 @@ export default function LoginPage() {
                       ) as HTMLImageElement;
                       // Toggles between 'open eye' and 'closed eye'
                       if (icon.src.includes("closed")) {
-                        console.log(icon.src);
                         icon.src = "./src/assets/eye_open.svg";
                         icon.alt = "closed eye";
                         icon.parentElement
                           ?.querySelector("input")
                           ?.setAttribute("type", "text");
                       } else {
-                        console.log(icon.src);
                         icon.setAttribute("src", "./src/assets/eye_closed.svg");
                         icon.alt = "open eye";
                         icon.parentElement
@@ -121,7 +119,7 @@ export default function LoginPage() {
           </Button>
           <p className="text-sm text-center text-gray-600">
             Don't have an account?{" "}
-            <a href="/sign-up" className="text-blue-600 hover:underline">
+            <a href="/sign_up" className="text-blue-600 hover:underline">
               Sign up
             </a>
           </p>

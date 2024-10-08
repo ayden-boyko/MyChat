@@ -5,6 +5,7 @@ import { Routes, Route } from "react-router-dom";
 import HomePage from "./routes/homepage.tsx";
 import LoginPage from "./routes/loginpage.tsx";
 import SettingsPage from "./routes/settingspage.tsx";
+import SignUpPage from "./routes/signuppage.tsx";
 
 // interface User {
 //   user_num: number;
@@ -25,6 +26,7 @@ function App() {
         <Route path="/" element={<LoginPage />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/sign_up" element={<SignUpPage />} />
       </Routes>
     </div>
   );
