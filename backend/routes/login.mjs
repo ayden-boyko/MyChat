@@ -59,10 +59,13 @@ passport.deserializeUser((user, done) => {
   });
 });
 
-loginRoutes.post("/password", passport.authenticate("local"), {
-  successRedirect: "/home",
-  failureRedirect: "/login",
-});
+loginRoutes.post(
+  "/password",
+  passport.authenticate("local", {
+    successRedirect: "/home",
+    failureRedirect: "/login",
+  })
+);
 
 loginRoutes.post("/sign_out", (req, res, next) => {
   req.logout((err) => {
