@@ -72,7 +72,41 @@ export default function LoginPage() {
                 >
                   Password
                 </label>
-                <Input id="password" type="password" required />
+                <div className="relative w-full">
+                  <Input
+                    id="password"
+                    type="password"
+                    required
+                    className="w-full pr-10"
+                  />
+                  <img
+                    src="./src/assets/eye_closed.svg"
+                    alt="open eye"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer h-full"
+                    id="toggle-password"
+                    onClick={() => {
+                      const icon = document.getElementById(
+                        "toggle-password"
+                      ) as HTMLImageElement;
+                      // Toggles between 'open eye' and 'closed eye'
+                      if (icon.src.includes("closed")) {
+                        console.log(icon.src);
+                        icon.src = "./src/assets/eye_open.svg";
+                        icon.alt = "closed eye";
+                        icon.parentElement
+                          ?.querySelector("input")
+                          ?.setAttribute("type", "text");
+                      } else {
+                        console.log(icon.src);
+                        icon.setAttribute("src", "./src/assets/eye_closed.svg");
+                        icon.alt = "open eye";
+                        icon.parentElement
+                          ?.querySelector("input")
+                          ?.setAttribute("type", "password");
+                      }
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </form>
