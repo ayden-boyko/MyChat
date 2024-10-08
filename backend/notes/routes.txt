@@ -4,9 +4,8 @@ Signing in/out
 
 "/sign-in", "/sign-out"
 
-Creating/DeletingS accounts
-
-"/account/create", "/account/delete" MUST REQUIRE AUTHORIZATION TO DELETE ACCOUNT, THEN REQUEST CANT BE SPOOFED
+Creating/Deleting accounts
+"̶/̶a̶c̶c̶o̶u̶n̶t̶/̶c̶r̶e̶a̶t̶e̶"̶,̶ "̶/̶a̶c̶c̶o̶u̶n̶t̶/̶d̶e̶l̶e̶t̶e̶"̶ MUST REQUIRE AUTHORIZATION TO DELETE ACCOUNT, THEN REQUEST CANT BE SPOOFED
 
 Message routes
 

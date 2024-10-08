@@ -3,10 +3,10 @@ import express from "express";
 import User from "../model/User.mjs"; // Import the User model
 import db from "../db/conn.mjs";
 
-const router = express.Router();
+const userRoutes = express.Router();
 
 // GET all users
-router.get("/get/all", async (req, res) => {
+userRoutes.get("/get/all", async (req, res) => {
   try {
     const users = await db.collection("Users").find({}).toArray();
     res.json(users);
@@ -16,7 +16,7 @@ router.get("/get/all", async (req, res) => {
 });
 
 // GET a user by ID
-router.get("/get/:user_num", async (req, res) => {
+userRoutes.get("/get/:user_num", async (req, res) => {
   try {
     const user = await db
       .collection("Users")
@@ -28,7 +28,7 @@ router.get("/get/:user_num", async (req, res) => {
 });
 
 // POST new users
-router.post("/create", async (req, res) => {
+userRoutes.post("/create", async (req, res) => {
   try {
     const test_data = req.body; // Assume this is an array of user objects
 
@@ -67,8 +67,9 @@ router.post("/create", async (req, res) => {
   }
 });
 
+// ! MUST HAVE PROPER AUTHORIZATION TO DELETE USER
 // DELETE user
-router.delete("/delete/:user_num", async (req, res) => {
+userRoutes.delete("/delete/:user_num", async (req, res) => {
   try {
     const result = await db
       .collection("Users")
@@ -79,4 +80,28 @@ router.delete("/delete/:user_num", async (req, res) => {
   }
 });
 
-export default router;
+userRoutes.put(
+  "/update/:user_num/:user_name/:user_profile",
+  async (req, res) => {
+    // * empty values assume no change to that field
+    console.log("Received PUT request with params:", req.params); // Log parameters
+    try {
+      const result = await db.collection("Users").updateOne(
+        { user_num: parseInt(req.params.user_num) },
+        //updates name if it is not empty
+        req.params.user_name != ""
+          ? { $set: { user_name: req.params.user_name } }
+          : {},
+        //updates profile if it is not empty
+        req.params.user_profile != ""
+          ? { $set: { user_profile: req.params.user_profile } }
+          : {}
+      );
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "An error occurred" });
+    }
+  }
+);
+
+export default userRoutes;

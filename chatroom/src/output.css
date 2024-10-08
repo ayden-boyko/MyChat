@@ -171,6 +171,11 @@ html,
   /* 7 */
 }
 
+html,
+body {
+  @apply overflow-hidden;
+}
+
 /*
 1. Remove the margin in all browsers.
 2. Inherit line-height from `html` so users can set them as a class directly on the `html` element.

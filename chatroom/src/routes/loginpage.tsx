@@ -11,6 +11,12 @@ import {
 import React from "react";
 
 export default function LoginPage() {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault(); // Prevent default form submission behavior if you need to perform custom logic
+    const loginForm = event.currentTarget; // Get the current form element
+    loginForm.submit(); // Submit the form
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <Card className="w-full max-w-md">
@@ -23,7 +29,12 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form
+            id="login-form"
+            action="/login/password"
+            method="post"
+            onSubmit={handleSubmit}
+          >
             <div className="space-y-4">
               <div className="space-y-2">
                 <label
@@ -32,7 +43,27 @@ export default function LoginPage() {
                 >
                   Email
                 </label>
-                <Input id="email" type="email" placeholder="test@example.com" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="test@example.com"
+                  required
+                  autoFocus
+                />
+              </div>
+              <div className="space-y-2">
+                <label
+                  htmlFor="username"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  User Name
+                </label>
+                <Input
+                  id="username"
+                  type="text" // Changed from 'username' to 'text'
+                  placeholder="User123"
+                  required
+                />
               </div>
               <div className="space-y-2">
                 <label
@@ -41,13 +72,19 @@ export default function LoginPage() {
                 >
                   Password
                 </label>
-                <Input id="password" type="password" />
+                <Input id="password" type="password" required />
               </div>
             </div>
           </form>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
-          <Button className="w-full">Login</Button>
+          <Button
+            type="submit"
+            className="w-full hover:bg-gray-300"
+            form="login-form"
+          >
+            Login
+          </Button>
           <p className="text-sm text-center text-gray-600">
             Don't have an account?{" "}
             <a href="/sign-up" className="text-blue-600 hover:underline">

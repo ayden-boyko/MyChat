@@ -3,6 +3,7 @@ import express from "express";
 import "./loadEnviroment.mjs"; // Load environment variables
 import db from "./db/conn.mjs";
 import userRoutes from "./routes/account.mjs";
+import loginRoutes from "./routes/login.mjs";
 import cors from "cors";
 
 const PORT = process.env.PORT || 8000;
@@ -20,6 +21,9 @@ app.use((req, res, next) => {
 
 // Use the user routes
 app.use("/api/users", userRoutes);
+
+// Use the login routes
+app.use("/api/login", loginRoutes);
 
 app.get("/", async (req, res) => {
   try {
