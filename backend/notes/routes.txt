@@ -14,7 +14,7 @@ group: "/group/message"
 
 User routes
 
-update info: "/account/update" updates user_name and/or user_profile
+update info: "/account/update" updates username and/or user_profile
 block/unblock person: "/user/block", "/user/unblock"
 send friend request: "/user/friend", "/user/unfriend"
 join/leave group: "/group/join", "/group/leave"

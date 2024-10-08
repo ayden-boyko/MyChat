@@ -7,6 +7,7 @@ import loginRoutes from "./routes/login.mjs";
 import cors from "cors";
 import session from "express-session";
 import mongoStore from "connect-mongo";
+import passport from "passport";
 
 const PORT = process.env.PORT || 8000;
 
@@ -32,11 +33,14 @@ app.use(
       maxAge: 1000 * 60 * 60 * 24, // expires in 1 day
     },
     store: new mongoStore({
-      mongoUrl: process.env.ATLAS_URI || "",
+      mongoUrl: db.asPromise(),
       collection: "sessions",
     }),
   })
 );
+
+//authenticates session
+app.use(passport.authenticate("session"));
 
 // Use the user routes
 app.use("/api/users", userRoutes);

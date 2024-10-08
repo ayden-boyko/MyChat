@@ -11,25 +11,31 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { Icons } from "../components/ui/icons.tsx";
-import { useToast } from "../hooks/use-toast";
 
 export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsLoading(true);
 
-    // Here you would typically send the form data to your backend
-    // This is a mock API call
-    setTimeout(() => {
-      setIsLoading(false);
-      toast({
-        title: "Account created",
-        description: "You have successfully created an account.",
-      });
-    }, 2000);
+    // Send the data to the server
+    const result = await fetch(
+      `${process.env.BACKEND_API_URL}/api/users/create`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: event.currentTarget.username.value,
+          email: event.currentTarget.email.value,
+          password: event.currentTarget.password.value,
+        }),
+      }
+    );
+    const data = await result.json();
+    console.log(data);
   };
 
   return (
@@ -67,7 +73,11 @@ export default function SignUpPage() {
                 <Label htmlFor="confirm-password">Confirm Password</Label>
                 <Input id="confirm-password" type="password" required />
               </div>
-              <Button className="w-full" type="submit" disabled={isLoading}>
+              <Button
+                className="w-full hover:bg-gray-300"
+                type="submit"
+                disabled={isLoading}
+              >
                 {isLoading && (
                   <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
                 )}

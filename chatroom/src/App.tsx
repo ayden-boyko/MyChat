@@ -10,7 +10,7 @@ import SignUpPage from "./routes/signuppage.tsx";
 // interface User {
 //   user_num: number;
 //   name: string;
-//   user_name: string;
+//   username: string;
 //   user_profile: string;
 //   friends: number[];
 //   blocked: number[];
@@ -62,7 +62,7 @@ export default App;
 //       {
 //         user_num: 0,
 //         name: "DUPLICATE USERS",
-//         user_name: "",
+//         username: "",
 //         user_profile: "",
 //         friends: [],
 //         blocked: [],

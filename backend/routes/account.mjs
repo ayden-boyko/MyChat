@@ -30,40 +30,52 @@ userRoutes.get("/get/:user_num", async (req, res) => {
 // POST new users
 userRoutes.post("/create", async (req, res) => {
   try {
-    const test_data = req.body; // Assume this is an array of user objects
+    console.log(req.body); // Log the user data
 
-    const existingUsers = await db
-      .collection("Users")
-      .find({ user_num: { $in: test_data.map((user) => user.user_num) } })
-      .toArray();
+    const { email, username, password } = req.body;
 
-    if (existingUsers.length > 0) {
-      return res.status(409).json({
-        error: "Duplicate users found",
-        duplicates: existingUsers.map((user) => user.id),
-      });
+    // Check if user already exists
+    const existingUser = await db.collection("Users").findOne({ email: email });
+    if (existingUser) {
+      return res
+        .status(409)
+        .json({ error: "User with this email already exists." });
     }
 
-    const newUser = new User({
-      name: test_data[0].name,
-      user_name: test_data[0].user_name,
-      password: test_data[0].password,
-      user_profile: test_data[0].user_profile,
-      friends: test_data[0].friends,
-      blocked: test_data[0].blocked,
-      groups: test_data[0].groups,
-    });
+    // Generate salt and hash the password
+    const salt = crypto.randomBytes(16).toString("hex");
+    crypto.pbkdf2(
+      password,
+      salt,
+      310000,
+      32,
+      "sha256",
+      async (err, hashedPassword) => {
+        if (err) {
+          return res
+            .status(500)
+            .json({ error: "An error occurred while hashing the password" });
+        }
 
-    // Insert new users
-    await newUser.save();
-    const insertResult = await db
-      .collection("Users")
-      .find({ user_num: { $in: newUser.user_num } })
-      .toArray();
+        // Create a new user object
+        const newUser = new User({
+          email: email,
+          username: username,
+          password: hashedPassword.toString("hex"), // Store the hashed password as a string
+          user_profile: "",
+          friends: [],
+          blocked: [],
+          groups: [],
+        });
 
-    res.json(insertResult);
+        // Save the user to the database
+        await newUser.save();
+        res.status(201).json({ message: "User created successfully!" });
+      }
+    );
   } catch (error) {
-    res.status(500).json({ error: "An error occurred" });
+    console.error("Error creating user:", error);
+    res.status(500).json({ error: "An internal server error occurred" });
   }
 });
 
@@ -81,7 +93,7 @@ userRoutes.delete("/delete/:user_num", async (req, res) => {
 });
 
 userRoutes.put(
-  "/update/:user_num/:user_name/:user_profile",
+  "/update/:user_num/:username/:user_profile",
   async (req, res) => {
     // * empty values assume no change to that field
     console.log("Received PUT request with params:", req.params); // Log parameters
@@ -89,8 +101,8 @@ userRoutes.put(
       const result = await db.collection("Users").updateOne(
         { user_num: parseInt(req.params.user_num) },
         //updates name if it is not empty
-        req.params.user_name != ""
-          ? { $set: { user_name: req.params.user_name } }
+        req.params.username != ""
+          ? { $set: { username: req.params.username } }
           : {},
         //updates profile if it is not empty
         req.params.user_profile != ""

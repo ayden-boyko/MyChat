@@ -1,7 +1,7 @@
 [
   {
     "name": "Ayden Boyko",
-    "user_name": "bbtornado",
+    "username": "bbtornado",
     "password": "",
     "user_profile": "",
     "friends": [],
@@ -10,7 +10,7 @@
   },
   {
     "name": "Justin Detran",
-    "user_name": "Gnarfle",
+    "username": "Gnarfle",
     "password": "",
     "user_profile": "",
     "friends": [],
@@ -19,7 +19,7 @@
   },
   {
     "name": "Matthew Mauro",
-    "user_name": "Hax Activated",
+    "username": "Hax Activated",
     "password": "",
     "user_profile": "",
     "friends": [],
@@ -28,7 +28,7 @@
   },
   {
     "name": "Jaden Rivera",
-    "user_name": "Maard Beet",
+    "username": "Maard Beet",
     "password": "",
     "user_profile": "",
     "friends": [],

@@ -14,7 +14,7 @@ passport.use(
   new LocalStrategy(async (username, password, done) => {
     const user = await db
       .collection("Users")
-      .findOne({ user_name: username, password: password });
+      .findOne({ username: username, password: password });
     if (user) {
       return done(null, user);
     }
@@ -47,11 +47,30 @@ passport.use(
   })
 );
 
+passport.serializeUser((user, done) => {
+  process.nextTick(function () {
+    done(null, { id: user.id, username: user.username });
+  });
+});
+
+passport.deserializeUser((user, done) => {
+  process.nextTick(function () {
+    return done(null, user);
+  });
+});
+
 loginRoutes.post("/password", passport.authenticate("local"), {
   successRedirect: "/home",
   failureRedirect: "/login",
 });
 
-loginRoutes.get("/sign_out", (req, res) => {});
+loginRoutes.post("/sign_out", (req, res, next) => {
+  req.logout((err) => {
+    if (err) {
+      return next(err);
+    }
+    res.redirect("/");
+  });
+});
 
 export default loginRoutes;
