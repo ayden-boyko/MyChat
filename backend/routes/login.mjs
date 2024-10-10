@@ -12,12 +12,7 @@ const loginRoutes = express.Router();
 passport.use(
   //checks if users exists in database
   new LocalStrategy(async (username, password, done) => {
-    const user = await db
-      .collection("Users")
-      .findOne({ username: username, password: password });
-    if (user) {
-      return done(null, user);
-    }
+    const user = await db.collection("users").findOne({ username: username });
     if (!user) {
       return done(null, false, { message: "Incorrect username or password" });
     }
@@ -25,20 +20,24 @@ passport.use(
       //checks if password is correct
       crypto.pbkdf2(
         password,
-        row.salt,
+        user.salt,
         310000,
         32,
         "sha256",
         function (err, hashedPassword) {
           if (err) {
-            return cb(err);
+            return done(err);
           }
-          if (!crypto.timingSafeEqual(row.hashed_password, hashedPassword)) {
-            return cb(null, false, {
+
+          const storedHashedPassword = Buffer.from(user.hashed_password, "hex");
+
+          // Compare the hashed password with the stored hash
+          if (!crypto.timingSafeEqual(storedHashedPassword, hashedPassword)) {
+            return done(null, false, {
               message: "Incorrect username or password.",
             });
           }
-          return cb(null, row);
+          return done(null, user);
         }
       );
     } catch (error) {
@@ -59,13 +58,28 @@ passport.deserializeUser((user, done) => {
   });
 });
 
-loginRoutes.post(
-  "/password",
-  passport.authenticate("local", {
-    successRedirect: "/home",
-    failureRedirect: "/login",
-  })
-);
+loginRoutes.post("/password", (req, res, next) => {
+  passport.authenticate("local", (err, user, info) => {
+    if (err) {
+      return res
+        .status(500)
+        .json({ message: "An error occurred during authentication" });
+    }
+    if (!user) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+    req.logIn(user, async (err) => {
+      if (err) {
+        return res.status(500).json({ message: "Error during login" });
+      }
+      let pulledUser = await db
+        .collection("users")
+        .findOne({ email: user.email });
+      console.log("logged in"); // Log after successful login
+      res.status(200).json(pulledUser);
+    });
+  })(req, res, next);
+});
 
 loginRoutes.post("/sign_out", (req, res, next) => {
   req.logout((err) => {

@@ -55,7 +55,7 @@ app.get("/", async (req, res) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
 
     // Fetch data from the database
-    const result = await db.collection("Users").find({}).toArray();
+    const result = await db.collection("users").find({}).toArray();
 
     // Send data as JSON (automatically sets Content-Type and ends the response)
     res.json(result);
@@ -73,7 +73,7 @@ app.post("/", async (req, res) => {
 
     // Check if there are any existing users with matching IDs in test_data
     const existingUsers = await db
-      .collection("Users")
+      .collection("users")
       .find({ id: { $in: test_data.map((user) => user.id) } })
       .toArray();
 
@@ -86,11 +86,11 @@ app.post("/", async (req, res) => {
     }
 
     // If no duplicates are found, proceed with the insertion
-    const insertResult = await db.collection("Users").insertMany(test_data);
+    const insertResult = await db.collection("users").insertMany(test_data);
     console.log("Data inserted", insertResult);
 
     // Fetch and return the updated list of users
-    const updatedResult = await db.collection("Users").find({}).toArray();
+    const updatedResult = await db.collection("users").find({}).toArray();
     res.json(updatedResult);
   } catch (error) {
     console.error("Error occurred:", error);

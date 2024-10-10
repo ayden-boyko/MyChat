@@ -9,7 +9,7 @@ const userRoutes = express.Router();
 // GET all users
 userRoutes.get("/get/all", async (req, res) => {
   try {
-    const users = await db.collection("Users").find({}).toArray();
+    const users = await db.collection("users").find({}).toArray();
     res.json(users);
   } catch (error) {
     res.status(500).json({ error: "An error occurred" });
@@ -20,7 +20,7 @@ userRoutes.get("/get/all", async (req, res) => {
 userRoutes.get("/get/:user_num", async (req, res) => {
   try {
     const user = await db
-      .collection("Users")
+      .collection("users")
       .findOne({ user_num: parseInt(req.params.user_num) });
     res.json(user);
   } catch (error) {
@@ -37,7 +37,7 @@ userRoutes.post("/create", async (req, res) => {
     const { email, username, password } = req.body;
 
     // Check if user already exists
-    const existingUser = await db.collection("Users").findOne({ email: email });
+    const existingUser = await db.collection("users").findOne({ email: email });
     if (existingUser) {
       return res
         .status(409)
@@ -64,7 +64,8 @@ userRoutes.post("/create", async (req, res) => {
         const newUser = new User({
           email: email,
           username: username,
-          password: hashedPassword.toString("hex"), // Store the hashed password as a string
+          hashed_password: hashedPassword.toString("hex"), // Store the hashed password as a string
+          salt: salt,
           user_profile: "",
           friends: [],
           blocked: [],
@@ -88,7 +89,7 @@ userRoutes.post("/create", async (req, res) => {
 userRoutes.delete("/delete/:user_num", async (req, res) => {
   try {
     const result = await db
-      .collection("Users")
+      .collection("users")
       .deleteOne({ user_num: parseInt(req.params.user_num) });
     res.json(result);
   } catch (error) {
@@ -96,13 +97,14 @@ userRoutes.delete("/delete/:user_num", async (req, res) => {
   }
 });
 
+// ! MUST HAVE PROPER AUTHORIZATION TO UPDATE USER
 userRoutes.put(
   "/update/:user_num/:username/:user_profile",
   async (req, res) => {
     // * empty values assume no change to that field
     console.log("Received PUT request with params:", req.params); // Log parameters
     try {
-      const result = await db.collection("Users").updateOne(
+      const result = await db.collection("users").updateOne(
         { user_num: parseInt(req.params.user_num) },
         //updates name if it is not empty
         req.params.username != ""

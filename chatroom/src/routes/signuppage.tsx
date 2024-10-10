@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
@@ -12,14 +12,44 @@ import {
 } from "../components/ui/card";
 import { Icons } from "../components/ui/icons.tsx";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "../lib/UserContext.ts";
 
 export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  const context = useContext(UserContext);
+
+  // Check if the context is defined
+  if (!context) {
+    // Handle the case where the component is rendered outside the provider
+    throw new Error("SomeChildComponent must be used within a UserProvider");
+  }
+
+  const { user, setUser } = context;
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsLoading(true);
+
+    const formdata = {
+      username: event.currentTarget.username.value,
+      email: event.currentTarget.email.value,
+      password: event.currentTarget.password.value,
+    };
+
+    if (
+      event.currentTarget.password.value !==
+      event.currentTarget.confirmedpassword.value
+    ) {
+      console.error("Passwords do not match");
+      alert("Passwords do not match");
+      setIsLoading(false);
+      //clear passwords when passwords do not match
+      event.currentTarget.password.value = "";
+      event.currentTarget.confirmedpassword.value = "";
+      return;
+    }
 
     // Send the data to the server
     const result = await fetch(
@@ -29,16 +59,14 @@ export default function SignUpPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          username: event.currentTarget.username.value,
-          email: event.currentTarget.email.value,
-          password: event.currentTarget.password.value,
-        }),
+        body: JSON.stringify(formdata),
       }
     );
+
     const data = await result.json();
     if (result.ok && data.email && data.username) {
       console.log(data); // Log user data for debugging
+      setUser({ ...user, ...data });
       navigate("/home"); // Redirect to HomePage on success
     }
     // Check for specific error message
@@ -81,8 +109,8 @@ export default function SignUpPage() {
                 <Input id="password" type="password" required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirm-password">Confirm Password</Label>
-                <Input id="confirm-password" type="password" required />
+                <Label htmlFor="confirmedpassword">Confirm Password</Label>
+                <Input id="confirmedpassword" type="password" required />
               </div>
               <Button
                 className="w-full hover:bg-gray-300"

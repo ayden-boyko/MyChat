@@ -11,44 +11,62 @@ import {
   Search,
   Send,
 } from "lucide-react";
-import React from "react";
+import React, { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "../lib/UserContext";
 
 export default function HomePage() {
+  const context = useContext(UserContext);
+  const navigate = useNavigate();
+
+  if (!context) {
+    // Handle the case where the component is rendered outside the provider
+    throw new Error("SomeChildComponent must be used within a UserProvider");
+  }
+
+  const { user, setUser } = context;
+
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Settings Sidebar */}
       <aside className="w-16 bg-gray-800 text-white p-4 flex flex-col items-center justify-between">
         <div className="space-y-4">
           <button
-            className="p-2 rounded-md hover:bg-gray-700"
+            className="p-2 rounded-md bg-gray-500 hover:bg-gray-700"
             aria-label="Settings"
+            onClick={() => navigate("/settings")}
           >
             <Settings />
           </button>
           <button
-            className="p-2 rounded-md hover:bg-gray-700"
+            className="p-2 rounded-md bg-gray-500 hover:bg-gray-700"
             aria-label="Messages"
           >
             <MessageSquare />
           </button>
           <button
-            className="p-2 rounded-md hover:bg-gray-700"
-            aria-label="Users"
+            className="p-2 rounded-md bg-gray-500 hover:bg-gray-700"
+            aria-label="users"
           >
             <Users />
           </button>
           <button
-            className="p-2 rounded-md hover:bg-gray-700"
+            className="p-2 rounded-md bg-gray-500 hover:bg-gray-700"
             aria-label="Search"
           >
             <Search />
           </button>
         </div>
         <button
-          className="p-2 rounded-md hover:bg-gray-700"
+          className="p-2 rounded-md bg-gray-500 hover:bg-gray-700"
           aria-label="Logout"
         >
-          <LogOut />
+          <LogOut
+            onClick={() => {
+              setUser(null);
+              navigate("/");
+            }}
+          />
         </button>
       </aside>
 
@@ -58,30 +76,30 @@ export default function HomePage() {
           <div className="p-4">
             <h2 className="text-lg font-semibold mb-2">Groups</h2>
             <ul className="space-y-2">
-              {["General", "Random", "Tech Talk"].map((group, index) => (
+              {user?.groups.map((group, index) => (
                 <li key={index}>
-                  <Button variant="ghost" className="w-full justify-start">
+                  <Button variant="ghost" className="w-full justify-start ">
                     # {group}
                   </Button>
                 </li>
-              ))}
+              )).length === 0 && <p>No groups found</p>}
             </ul>
             <Separator className="my-4" />
             <h2 className="text-lg font-semibold mb-2">Direct Messages</h2>
             <ul className="space-y-2">
-              {["Alice", "Bob", "Charlie"].map((user, index) => (
+              {user?.friends.map((friend, index) => (
                 <li key={index}>
                   <Button variant="ghost" className="w-full justify-start">
                     <Avatar className="w-6 h-6 mr-2">
                       <AvatarImage
-                        src={`https://api.dicebear.com/6.x/initials/svg?seed=${user}`}
+                        src={`https://api.dicebear.com/6.x/initials/svg?seed=${friend}`}
                       />
-                      <AvatarFallback>{user[0]}</AvatarFallback>
+                      <AvatarFallback>{"USER"}</AvatarFallback>
                     </Avatar>
-                    {user}
+                    {friend}
                   </Button>
                 </li>
-              ))}
+              )).length === 0 && <p>No direct messages found</p>}
             </ul>
           </div>
         </ScrollArea>
@@ -90,7 +108,7 @@ export default function HomePage() {
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col">
         <header className="bg-white border-b p-4">
-          <h1 className="text-xl font-semibold"># General</h1>
+          <h1 className="text-xl font-semibold">GROUP THATS BEEN SELECTED</h1>
         </header>
         <ScrollArea className="flex-1 p-4">
           <div className="space-y-4">

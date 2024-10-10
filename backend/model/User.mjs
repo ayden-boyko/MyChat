@@ -10,7 +10,8 @@ const userSchema = new Schema({
     type: String,
     default: "",
   },
-  password: String,
+  hashed_password: String,
+  salt: String,
   user_profile: String,
   friends: { type: [Number], default: [] },
   blocked: { type: [Number], default: [] },
@@ -34,5 +35,5 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-const User = model("Users", userSchema);
+const User = model("users", userSchema);
 export default User;

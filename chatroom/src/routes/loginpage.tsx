@@ -8,13 +8,56 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import React from "react";
+import React, { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "../lib/UserContext";
 
 export default function LoginPage() {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault(); // Prevent default form submission behavior if you need to perform custom logic
-    const loginForm = event.currentTarget; // Get the current form element
-    loginForm.submit(); // Submit the form
+  const context = useContext(UserContext);
+  const navigate = useNavigate();
+
+  if (!context) {
+    // Handle the case where the component is rendered outside the provider
+    throw new Error("SomeChildComponent must be used within a UserProvider");
+  }
+
+  const { user, setUser } = context;
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault(); // Prevent default form submission behavior
+
+    const formData = new FormData(event.currentTarget); // Get form data
+
+    const data = {
+      username: formData.get("username"),
+      email: formData.get("email"),
+      password: formData.get("password"),
+    };
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_API_URL}/api/login/password`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log(result); // Success message
+        // Redirect to the home page upon successful login
+        setUser({ ...user, ...result.user });
+        navigate("/home");
+      } else {
+        const error = await response.json();
+        console.error(error.message); // Show error message
+      }
+    } catch (err) {
+      console.error("An error occurred:", err);
+    }
   };
 
   return (
@@ -31,7 +74,7 @@ export default function LoginPage() {
         <CardContent>
           <form
             id="login-form"
-            action="/login/password"
+            action="api/login/password"
             method="post"
             onSubmit={handleSubmit}
           >
@@ -46,6 +89,7 @@ export default function LoginPage() {
                 <Input
                   id="email"
                   type="email"
+                  name="email"
                   placeholder="test@example.com"
                   required
                   autoFocus
@@ -60,6 +104,7 @@ export default function LoginPage() {
                 </label>
                 <Input
                   id="username"
+                  name="username"
                   type="text" // Changed from 'username' to 'text'
                   placeholder="User123"
                   required
@@ -76,6 +121,7 @@ export default function LoginPage() {
                   <Input
                     id="password"
                     type="password"
+                    name="password"
                     required
                     className="w-full pr-10"
                   />
