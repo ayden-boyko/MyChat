@@ -1,5 +1,8 @@
 version: "3"
 
+# TODO implement enviroment variables for the front and backend
+#* https://www.milanwittpohl.com/projects/tutorials/full-stack-web-app/dockerizing-our-front-and-backend
+
 services:
   frontend:
     build: ./chatroom

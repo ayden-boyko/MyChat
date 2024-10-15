@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 const { Schema, model } = mongoose;
 
+//TODO must change the way groups are stored (maybe) group stored by group_id, the group schema must change too.
+
 const groupSchema = new Schema({
   group_num: Number,
   group_name: String,
@@ -17,7 +19,6 @@ const groupSchema = new Schema({
     },
   },
 });
-
 // Method to add a message to the chat
 groupSchema.methods.addMessage = function (messageId, messageContent) {
   if (this.chat.size >= 50) {

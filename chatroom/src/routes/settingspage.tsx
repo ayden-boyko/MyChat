@@ -60,6 +60,8 @@ export default function SettingsPage() {
     });
   };
 
+  // TODO implement settings page and functionality
+
   return (
     <div className="container mx-auto py-10">
       <Card className="max-w-2xl mx-auto">

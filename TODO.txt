@@ -1,7 +1,0 @@
-THE FOLLOWING IS FOR HomePage
-1. implement enviroment variables in the docker file https://www.milanwittpohl.com/projects/tutorials/full-stack-web-app/dockerizing-our-front-and-backend
-2. implement settings page and functionality
-3. implement user list, must change the way friends are stored, must contain name, profile, user_num(?)
-4. implement group list, must change the way groups are stored (maybe) group stored by group_id, the group schema must change too.
-5. implement user search for adding friends, just search, nothing else
- 

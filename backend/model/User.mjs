@@ -13,6 +13,7 @@ const userSchema = new Schema({
   hashed_password: String,
   salt: String,
   user_profile: String,
+  // TODO must change the way friends are stored, must contain name, profile, user_num(?)
   friends: { type: [Number], default: [] },
   blocked: { type: [Number], default: [] },
   groups: { type: [Number], default: [] },
