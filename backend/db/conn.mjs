@@ -28,7 +28,6 @@ async function connectToDatabase() {
   }
 }
 
-// Call the function to connect to the database
 const db = await connectToDatabase();
 
 export default db;

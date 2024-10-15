@@ -1,5 +1,5 @@
 # Use an official Node.js runtime as a parent image
-FROM node:14
+FROM node:16
 
 # Set the working directory in the container
 WORKDIR /app
@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Expose the port the web app will run on
-EXPOSE 3000
+EXPOSE 5173
 
 # Run the command to start the web app when the container launches
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "dev", "--", "--host"]
