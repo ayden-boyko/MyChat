@@ -76,30 +76,40 @@ export default function HomePage() {
           <div className="p-4">
             <h2 className="text-lg font-semibold mb-2">Groups</h2>
             <ul className="space-y-2">
-              {user?.groups.map((group, index) => (
-                <li key={index}>
-                  <Button variant="ghost" className="w-full justify-start ">
-                    # {group}
-                  </Button>
-                </li>
-              )).length === 0 && <p>No groups found</p>}
+              {/* Render the list of groups here, if none render "No groups found" */}
+              {user?.groups === undefined ? (
+                <p>No groups found</p>
+              ) : (
+                user?.groups.map((group, index) => (
+                  <li key={index}>
+                    <Button variant="ghost" className="w-full justify-start ">
+                      # {group}
+                    </Button>
+                  </li>
+                ))
+              )}
             </ul>
             <Separator className="my-4" />
             <h2 className="text-lg font-semibold mb-2">Direct Messages</h2>
             <ul className="space-y-2">
-              {user?.friends.map((friend, index) => (
-                <li key={index}>
-                  <Button variant="ghost" className="w-full justify-start">
-                    <Avatar className="w-6 h-6 mr-2">
-                      <AvatarImage
-                        src={`https://api.dicebear.com/6.x/initials/svg?seed=${friend}`}
-                      />
-                      <AvatarFallback>{"USER"}</AvatarFallback>
-                    </Avatar>
-                    {friend}
-                  </Button>
-                </li>
-              )).length === 0 && <p>No direct messages found</p>}
+              {/* Render the list of direct messages here, if none render "No direct messages found" */}
+              {user?.friends === undefined ? (
+                <p>No direct messages found</p>
+              ) : (
+                user?.friends.map((friend, index) => (
+                  <li key={index}>
+                    <Button variant="ghost" className="w-full justify-start">
+                      <Avatar className="w-6 h-6 mr-2">
+                        <AvatarImage
+                          src={`https://api.dicebear.com/6.x/initials/svg?seed=${friend}`}
+                        />
+                        <AvatarFallback>{"USER"}</AvatarFallback>
+                      </Avatar>
+                      {friend}
+                    </Button>
+                  </li>
+                ))
+              )}
             </ul>
           </div>
         </ScrollArea>
