@@ -24,10 +24,11 @@ import {
 import { UserContext } from "../lib/UserContext";
 import { useContext } from "react";
 import { User } from "../interfaces/userinterface";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function SettingsPage() {
   const context = useContext(UserContext);
+  const navigate = useNavigate();
 
   if (!context) {
     // Handle the case where the component is rendered outside the provider
@@ -76,7 +77,7 @@ export default function SettingsPage() {
           ?.value,
         user_profile: changedProfile,
       } as User);
-      Navigate("/home");
+      navigate("/home");
     } else {
       alert("Failed to save changes.");
     }
