@@ -45,8 +45,7 @@ userRoutes.get("/get/all", async (req, res) => {
   }
 });
 
-// TODO implement user search for adding friends by username, returns results closest to name
-userRoutes.get("/get/id/:username", async (req, res) => {
+userRoutes.get("/get/:username", async (req, res) => {
   // TODO implement logic that retrives usernames close to entered name if none exist, maybe 5-10?
   try {
     const user = await db
@@ -59,7 +58,7 @@ userRoutes.get("/get/id/:username", async (req, res) => {
 });
 
 // GET a user by ID
-userRoutes.get("/get/id/:user_num", async (req, res) => {
+userRoutes.get("/get/:user_num", async (req, res) => {
   try {
     const user = await db
       .collection("users")
@@ -148,11 +147,11 @@ userRoutes.put("/update/:user_num", checkRights, async (req, res) => {
       { user_num: parseInt(req.params.user_num) },
       //updates name if it is not empty
       req.params.username != ""
-        ? { $set: { username: req.params.username } }
+        ? { $set: { username: req.body.username } }
         : {},
       //updates profile if it is not empty
       req.params.user_profile != ""
-        ? { $set: { user_profile: req.params.user_profile } }
+        ? { $set: { user_profile: req.body.user_profile } }
         : {}
     );
     res.json(result);

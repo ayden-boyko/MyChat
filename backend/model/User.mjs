@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import MiniUser from "../interfaces/friend.mjs";
+
 const { Schema, model } = mongoose;
 const userSchema = new Schema({
   user_num: {
@@ -13,8 +15,7 @@ const userSchema = new Schema({
   hashed_password: String,
   salt: String,
   user_profile: String,
-  // TODO must change the way friends are stored, must contain name, profile, user_num(?)
-  friends: { type: [Number], default: [] },
+  friends: { type: [MiniUser], default: [] },
   blocked: { type: [Number], default: [] },
   groups: { type: [Number], default: [] },
 });

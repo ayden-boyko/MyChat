@@ -11,8 +11,6 @@ import {
 import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../lib/UserContext";
-import { User } from "../interfaces/userinterface";
-
 export default function LoginPage() {
   const context = useContext(UserContext);
   const navigate = useNavigate();
@@ -22,7 +20,7 @@ export default function LoginPage() {
     throw new Error("SomeChildComponent must be used within a UserProvider");
   }
 
-  const { user, setUser } = context;
+  const { setUser } = context;
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault(); // Prevent default form submission behavior
@@ -56,6 +54,7 @@ export default function LoginPage() {
       } else {
         const error = await response.json();
         console.error(error.message); // Show error message
+        alert("Invalid email or password");
       }
     } catch (err) {
       console.error("An error occurred:", err);

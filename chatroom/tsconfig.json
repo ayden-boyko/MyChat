@@ -10,5 +10,6 @@
       "@lib/*": ["src/lib/*"], // Alias for lib directory
       "@/*": ["src/*"] // General alias for src directory
     }
-  }
+  },
+  "include": ["backend/**/*"]
 }

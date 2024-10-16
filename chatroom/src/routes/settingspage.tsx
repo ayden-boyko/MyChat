@@ -51,6 +51,9 @@ export default function SettingsPage() {
   };
 
   const handleSaveChanges = async () => {
+    console.log(
+      (document.getElementById("username") as HTMLInputElement)?.value
+    );
     const result = await fetch(
       `${import.meta.env.VITE_BACKEND_API_URL}/api/users/update/${
         user?.user_num

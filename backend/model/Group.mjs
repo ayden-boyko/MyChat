@@ -1,33 +1,31 @@
 import mongoose from "mongoose";
-const { Schema, model } = mongoose;
+import MiniUser from "../interfaces/userinterface";
 
-//TODO must change the way groups are stored (maybe) group stored by group_id, the group schema must change too.
+const { Schema, model } = mongoose;
 
 const groupSchema = new Schema({
   group_num: Number,
   group_name: String,
   group_profile: String,
-  members: [Number],
+  members: { type: [MiniUser], default: [] }, // [MiniUser],
   chat: {
-    type: Map,
-    of: String,
+    type: [{ sender: MiniUser, message: String }],
     validate: {
       validator: function (v) {
-        return v.size <= 50; // Limit to 50 elements
+        return v.length <= 100; // Limit to 100 elements
       },
-      message: "Chat History is limited to 50 messages",
+      message: "Chat History is limited to 100 messages",
     },
   },
 });
 // Method to add a message to the chat
-groupSchema.methods.addMessage = function (messageId, messageContent) {
-  if (this.chat.size >= 50) {
-    // Remove the oldest message (first inserted)
-    const firstKey = Array.from(this.chat.keys())[0]; // Get the first key
-    this.chat.delete(firstKey); // Delete the oldest message
+groupSchema.methods.addMessage = function (messageId, messageContent, sender) {
+  if (this.chat.length >= 100) {
+    // Remove the oldest message (first element in the array)
+    this.chat.shift();
   }
-
-  this.chat.set(messageId, messageContent); // Add the new message
+  // Add the new message
+  this.chat.push({ sender, message: messageContent });
 };
 
 const Group = model("Groups", groupSchema);
