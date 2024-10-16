@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
@@ -22,45 +21,83 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "../components/ui/alert-dialog";
-import { toast } from "../hooks/use-toast";
+import { UserContext } from "../lib/UserContext";
+import { useContext } from "react";
+import { User } from "../interfaces/userinterface";
+import { Navigate } from "react-router-dom";
 
 export default function SettingsPage() {
-  const [username, setUsername] = useState("JohnDoe");
-  const [avatarUrl, setAvatarUrl] = useState("https://github.com/shadcn.png");
+  const context = useContext(UserContext);
 
-  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUsername(e.target.value);
-  };
+  if (!context) {
+    // Handle the case where the component is rendered outside the provider
+    throw new Error("SomeChildComponent must be used within a UserProvider");
+  }
+  const { user, setUser } = context;
+
+  let changedProfile = "";
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setAvatarUrl(reader.result as string);
+        reader.readAsDataURL(file);
+        changedProfile = reader.result as string;
       };
-      reader.readAsDataURL(file);
+    }
+    e.preventDefault();
+  };
+
+  const handleSaveChanges = async () => {
+    const result = await fetch(
+      `${import.meta.env.VITE_BACKEND_API_URL}/api/users/update/${
+        user?.user_num
+      }`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: (user as unknown as { _id: string })?._id,
+          username: (document.getElementById("username") as HTMLInputElement)
+            ?.value,
+          user_profile: changedProfile,
+        }),
+      }
+    );
+
+    if (result.ok) {
+      alert("Your changes have been saved.");
+      setUser({
+        ...user,
+        username: (document.getElementById("username") as HTMLInputElement)
+          ?.value,
+        user_profile: changedProfile,
+      } as User);
+      Navigate("/home");
+    } else {
+      alert("Failed to save changes.");
     }
   };
 
-  const handleSaveChanges = () => {
-    // Here you would typically send the updated data to your backend
-    toast({
-      title: "Settings updated",
-      description: "Your profile has been updated successfully.",
+  const handleDeleteAccount = async () => {
+    const result = await fetch(`/api/users/delete:${user?.user_num}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ user_num: user?.user_num }),
     });
-  };
 
-  const handleDeleteAccount = () => {
-    // Here you would typically send a request to delete the account
-    toast({
-      title: "Account deleted",
-      description: "Your account has been permanently deleted.",
-      variant: "destructive",
-    });
+    if (result.ok) {
+      setUser(null);
+      alert("Your account has been deleted.");
+    } else {
+      alert("Failed to delete account.");
+    }
   };
-
-  // TODO implement settings page and functionality
 
   return (
     <div className="container mx-auto py-10">
@@ -76,8 +113,8 @@ export default function SettingsPage() {
             <Label htmlFor="avatar">Profile Picture</Label>
             <div className="flex items-center space-x-4">
               <Avatar className="w-20 h-20">
-                <AvatarImage src={avatarUrl} alt={username} />
-                <AvatarFallback>{username[0]}</AvatarFallback>
+                <AvatarImage src={user?.user_profile} alt={user?.username} />
+                <AvatarFallback>{"NONE"}</AvatarFallback>
               </Avatar>
               <Input
                 id="avatar"
@@ -89,11 +126,7 @@ export default function SettingsPage() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="username">Username</Label>
-            <Input
-              id="username"
-              value={username}
-              onChange={handleUsernameChange}
-            />
+            <Input id="username" defaultValue={user?.username} />
           </div>
         </CardContent>
         <CardFooter className="flex justify-between">

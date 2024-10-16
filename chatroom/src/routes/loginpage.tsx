@@ -11,6 +11,7 @@ import {
 import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../lib/UserContext";
+import { User } from "../interfaces/userinterface";
 
 export default function LoginPage() {
   const context = useContext(UserContext);
@@ -47,9 +48,10 @@ export default function LoginPage() {
 
       if (response.ok) {
         const result = await response.json();
-        console.log(result); // Success message
         // Redirect to the home page upon successful login
-        setUser({ ...user, ...result.user });
+        setUser(result);
+        console.log(result);
+
         navigate("/home");
       } else {
         const error = await response.json();

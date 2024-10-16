@@ -11,7 +11,7 @@ import {
   Search,
   Send,
 } from "lucide-react";
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../lib/UserContext";
 
@@ -25,6 +25,8 @@ export default function HomePage() {
   }
 
   const { user, setUser } = context;
+
+  console.log("USER-HOME", user);
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -78,7 +80,7 @@ export default function HomePage() {
             <ul className="space-y-2">
               {/* Render the list of groups here, if none render "No groups found" */}
               {user?.groups === undefined ? (
-                <p>No groups found</p>
+                <li>No groups found</li>
               ) : (
                 user?.groups.map((group, index) => (
                   <li key={index}>
@@ -94,7 +96,7 @@ export default function HomePage() {
             <ul className="space-y-2">
               {/* Render the list of direct messages here, if none render "No direct messages found" */}
               {user?.friends === undefined ? (
-                <p>No direct messages found</p>
+                <li>No direct messages found</li>
               ) : (
                 user?.friends.map((friend, index) => (
                   <li key={index}>

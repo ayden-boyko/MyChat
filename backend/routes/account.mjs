@@ -6,6 +6,35 @@ import crypto from "crypto";
 
 const userRoutes = express.Router();
 
+async function checkRights(req, res, next) {
+  try {
+    // Ensure req.user is defined
+    if (!req.params || !req.body) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    // Fetch the user from the database
+    const userFromDb = await db
+      .collection("users")
+      .findOne({ user_num: parseInt(req.params.user_num) });
+
+    // Ensure user exists in the database
+    if (!userFromDb) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    // Compare the IDs
+    if (req.body.id === userFromDb._id.toString()) {
+      return next(); // User has access, proceed to the next middleware
+    } else {
+      return res.status(403).json({ message: "Access denied" });
+    }
+  } catch (error) {
+    console.error("Error checking rights:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
 // GET all users
 userRoutes.get("/get/all", async (req, res) => {
   try {
@@ -99,7 +128,7 @@ userRoutes.post("/create", async (req, res) => {
 
 // ! MUST HAVE PROPER AUTHORIZATION TO DELETE USER
 // DELETE user
-userRoutes.delete("/delete/:user_num", async (req, res) => {
+userRoutes.delete("/delete/:user_num", checkRights, async (req, res) => {
   try {
     const result = await db
       .collection("users")
@@ -111,28 +140,25 @@ userRoutes.delete("/delete/:user_num", async (req, res) => {
 });
 
 // ! MUST HAVE PROPER AUTHORIZATION TO UPDATE USER
-userRoutes.put(
-  "/update/:user_num/:username/:user_profile",
-  async (req, res) => {
-    // * empty values assume no change to that field
-    console.log("Received PUT request with params:", req.params); // Log parameters
-    try {
-      const result = await db.collection("users").updateOne(
-        { user_num: parseInt(req.params.user_num) },
-        //updates name if it is not empty
-        req.params.username != ""
-          ? { $set: { username: req.params.username } }
-          : {},
-        //updates profile if it is not empty
-        req.params.user_profile != ""
-          ? { $set: { user_profile: req.params.user_profile } }
-          : {}
-      );
-      res.json(result);
-    } catch (error) {
-      res.status(500).json({ error: "An error occurred" });
-    }
+userRoutes.put("/update/:user_num", checkRights, async (req, res) => {
+  // * empty values assume no change to that field
+  console.log("Received PUT request with params:", req.params); // Log parameters
+  try {
+    const result = await db.collection("users").updateOne(
+      { user_num: parseInt(req.params.user_num) },
+      //updates name if it is not empty
+      req.params.username != ""
+        ? { $set: { username: req.params.username } }
+        : {},
+      //updates profile if it is not empty
+      req.params.user_profile != ""
+        ? { $set: { user_profile: req.params.user_profile } }
+        : {}
+    );
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: "An error occurred" });
   }
-);
+});
 
 export default userRoutes;
