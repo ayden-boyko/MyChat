@@ -15,6 +15,8 @@ import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../lib/UserContext";
 
+// TODO USE PAGINATION WHEN SERVING CHAT MESSAGES TO 10 PER
+
 export default function HomePage() {
   const context = useContext(UserContext);
   const navigate = useNavigate();
