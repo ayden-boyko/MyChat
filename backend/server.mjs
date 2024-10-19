@@ -2,8 +2,8 @@
 import express from "express";
 import "./loadEnviroment.mjs"; // Load environment variables
 import db from "./db/conn.mjs";
-import userRoutes from "./routes/account.mjs";
-import loginRoutes from "./routes/login.mjs";
+import userController from "./controllers/account.mjs";
+import loginController from "./controllers/login.mjs";
 import cors from "cors";
 import session from "express-session";
 import mongoStore from "connect-mongo";
@@ -43,10 +43,10 @@ app.use(
 app.use(passport.authenticate("session"));
 
 // Use the user routes
-app.use("/api/users", userRoutes);
+app.use("/api/users", userController);
 
 // Use the login routes
-app.use("/api/login", loginRoutes);
+app.use("/api/login", loginController);
 
 app.get("/", async (req, res) => {
   try {

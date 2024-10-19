@@ -1,6 +1,6 @@
 // routes/login.js
 import express from "express";
-import User from "../model/User.mjs"; // Import the User model
+//import User from "../schemas/User.mjs"; // Import the User schema
 import db from "../db/conn.mjs";
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local"; //middleware for authentication
