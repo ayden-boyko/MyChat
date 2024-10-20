@@ -26,6 +26,8 @@ import { useContext } from "react";
 import { User } from "../interfaces/userinterface";
 import { useNavigate } from "react-router-dom";
 
+// TODO MAKE ALL TEXT BALCK SO IT CAN BE SEEN ON FIREFOX
+
 export default function SettingsPage() {
   const context = useContext(UserContext);
   const navigate = useNavigate();

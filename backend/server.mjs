@@ -9,6 +9,8 @@ import session from "express-session";
 import mongoStore from "connect-mongo";
 import passport from "passport";
 
+// TODO SET UP SOCKET.IO SERVERS
+
 const PORT = process.env.PORT || 8000;
 
 const app = express();

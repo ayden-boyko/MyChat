@@ -13,6 +13,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { useToast } from "../hooks/use-toast";
 import { X, Upload } from "lucide-react";
 
+// TODO MAKE ALL TEXT BALCK SO IT CAN BE SEEN ON FIREFOX
+
 interface Friend {
   id: number;
   name: string;

@@ -12,6 +12,8 @@ import SignUpPage from "./routes/signuppage.tsx";
 import { User } from "./interfaces/userinterface.ts";
 //const API = "http://localhost:8000/";
 
+// TODO IMPLEMENT DARK MODE
+
 function App() {
   const [user, setUser] = useState<User | null>({
     user_uuid: null,
