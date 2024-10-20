@@ -24,7 +24,6 @@ export default function LoginPage() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault(); // Prevent default form submission behavior
-    console.log("Form submitted");
     const formData = new FormData(event.currentTarget); // Get form data
 
     const data = {
