@@ -56,7 +56,7 @@ export default function SettingsPage() {
     );
     const result = await fetch(
       `${import.meta.env.VITE_BACKEND_API_URL}/api/users/update/${
-        user?.user_num
+        user?.user_uuid
       }`,
       {
         method: "PUT",
@@ -87,12 +87,12 @@ export default function SettingsPage() {
   };
 
   const handleDeleteAccount = async () => {
-    const result = await fetch(`/api/users/delete:${user?.user_num}`, {
+    const result = await fetch(`/api/users/delete:${user?.user_uuid}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ user_num: user?.user_num }),
+      body: JSON.stringify({ user_uuid: user?.user_uuid }),
     });
 
     if (result.ok) {

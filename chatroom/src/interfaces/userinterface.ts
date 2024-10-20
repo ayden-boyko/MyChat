@@ -1,5 +1,5 @@
 export interface User {
-  user_num: number | null;
+  user_uuid: number | null;
   email: string;
   username: string;
   hashed_password: string;

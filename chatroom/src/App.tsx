@@ -14,7 +14,7 @@ import { User } from "./interfaces/userinterface.ts";
 
 function App() {
   const [user, setUser] = useState<User | null>({
-    user_num: null,
+    user_uuid: null,
     email: "",
     username: "",
     hashed_password: "",

@@ -11,12 +11,13 @@ async function checkRights(req, res, next) {
     // Ensure req.user is defined
     if (!req.params || !req.body) {
       return res.status(403).json({ message: "Access denied" });
+      w;
     }
 
     // Fetch the user from the database
     const userFromDb = await db
       .collection("users")
-      .findOne({ user_num: parseInt(req.params.user_num) });
+      .findOne({ user_uuid: parseInt(req.params.user_uuid) });
 
     // Ensure user exists in the database
     if (!userFromDb) {
@@ -58,11 +59,11 @@ userRoutes.get("/get/:username", async (req, res) => {
 });
 
 // GET a user by ID
-userRoutes.get("/get/:user_num", async (req, res) => {
+userRoutes.get("/get/:user_uuid", async (req, res) => {
   try {
     const user = await db
       .collection("users")
-      .findOne({ user_num: parseInt(req.params.user_num) });
+      .findOne({ user_uuid: parseInt(req.params.user_uuid) });
     res.json(user);
   } catch (error) {
     res.status(500).json({ error: "An error occurred" });
@@ -127,11 +128,11 @@ userRoutes.post("/create", async (req, res) => {
 
 // ! MUST HAVE PROPER AUTHORIZATION TO DELETE USER
 // DELETE user
-userRoutes.delete("/delete/:user_num", checkRights, async (req, res) => {
+userRoutes.delete("/delete/:user_uuid", checkRights, async (req, res) => {
   try {
     const result = await db
       .collection("users")
-      .deleteOne({ user_num: parseInt(req.params.user_num) });
+      .deleteOne({ user_uuid: parseInt(req.params.user_uuid) });
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: "An error occurred" });
@@ -139,12 +140,12 @@ userRoutes.delete("/delete/:user_num", checkRights, async (req, res) => {
 });
 
 // ! MUST HAVE PROPER AUTHORIZATION TO UPDATE USER
-userRoutes.put("/update/:user_num", checkRights, async (req, res) => {
+userRoutes.put("/update/:user_uuid", checkRights, async (req, res) => {
   // * empty values assume no change to that field
   console.log("Received PUT request with params:", req.params); // Log parameters
   try {
     const result = await db.collection("users").updateOne(
-      { user_num: parseInt(req.params.user_num) },
+      { user_uuid: parseInt(req.params.user_uuid) },
       //updates name if it is not empty
       req.params.username != ""
         ? { $set: { username: req.body.username } }

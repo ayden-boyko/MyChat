@@ -1,6 +1,6 @@
 users will have profiles of the following format
 USER
-user_num: int
+user_uuid: int
 name: string (this is their name associated with gmail)
 username: string (their name as it appears to other users)
 password: HASHED PASSWORD (unhashed and compared to submitted password)

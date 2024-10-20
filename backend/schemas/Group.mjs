@@ -4,7 +4,7 @@ import MiniUser from "../interfaces/userinterface";
 const { Schema, model } = mongoose;
 
 const groupSchema = new Schema({
-  group_num: Number,
+  group_num: String,
   group_name: String,
   group_profile: String,
   members: { type: [MiniUser], default: [] }, // [MiniUser],
@@ -28,5 +28,5 @@ groupSchema.methods.addMessage = function (messageId, messageContent, sender) {
   this.chat.push({ sender, message: messageContent });
 };
 
-const Group = model("Groups", groupSchema);
+const Group = model("groups", groupSchema);
 export default Group;

@@ -1,11 +1,12 @@
 import mongoose from "mongoose";
 import MiniUser from "../interfaces/friend.mjs";
+import { v4 as uuidv4 } from "uuid";
 
 const { Schema, model } = mongoose;
 const userSchema = new Schema({
-  user_num: {
-    type: Number,
-    unique: true, // Ensure user_num is unique
+  user_uuid: {
+    type: String,
+    unique: true, // Ensure user_uuid is unique
   },
   email: String,
   username: {
@@ -21,18 +22,16 @@ const userSchema = new Schema({
 });
 
 // Static method to get the next user number
-userSchema.statics.getNextUserNum = async function () {
-  const lastUser = await this.findOne({}, { user_num: 1 }).sort({
-    user_num: -1,
-  });
-  return lastUser ? lastUser.user_num + 1 : 1; // Start from 1 if no users exist
+userSchema.statics.getNextUserUuid = async function () {
+  const lastUser = `U${uuidv4()}`;
+  return lastUser;
 };
 
-// Pre-save hook to set user_num
+// Pre-save hook to set user_uuid
 userSchema.pre("save", async function (next) {
   if (this.isNew) {
-    // Only set user_num for new users
-    this.user_num = await this.constructor.getNextUserNum();
+    // Only set user_uuid for new users
+    this.user_uuid = await this.constructor.getNextUserUuid();
   }
   next();
 });
