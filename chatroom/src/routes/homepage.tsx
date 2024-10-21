@@ -3,14 +3,7 @@ import { Input } from "../components/ui/input";
 import { ScrollArea } from "../components/ui/scroll-area";
 import { Separator } from "../components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
-import {
-  Settings,
-  MessageSquare,
-  Users,
-  LogOut,
-  Search,
-  Send,
-} from "lucide-react";
+import { Settings, LogOut, Search, Send } from "lucide-react";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../lib/UserContext";
@@ -45,19 +38,8 @@ export default function HomePage() {
           </button>
           <button
             className="p-2 rounded-md bg-gray-500 hover:bg-gray-700"
-            aria-label="Messages"
-          >
-            <MessageSquare />
-          </button>
-          <button
-            className="p-2 rounded-md bg-gray-500 hover:bg-gray-700"
-            aria-label="users"
-          >
-            <Users />
-          </button>
-          <button
-            className="p-2 rounded-md bg-gray-500 hover:bg-gray-700"
             aria-label="Search"
+            onClick={() => navigate("/search")}
           >
             <Search />
           </button>

@@ -56,7 +56,7 @@ export default function SignUpPage() {
 
     // Send the data to the server
     const result = await fetch(
-      `${import.meta.env.VITE_BACKEND_API_URL}/api/users/create`,
+      `${import.meta.env.VITE_BACKEND_API_URL}api/users/create`,
       {
         method: "POST",
         headers: {

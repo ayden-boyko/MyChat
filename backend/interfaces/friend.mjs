@@ -1,5 +1,5 @@
 const MiniUser = {
-  MU_Num: Number,
+  MU_Num: String,
   Username: String,
   AvatarUrl: String,
 };

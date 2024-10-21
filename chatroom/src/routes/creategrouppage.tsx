@@ -10,23 +10,19 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
-import { useToast } from "../hooks/use-toast";
 import { X, Upload } from "lucide-react";
 
-// TODO MAKE ALL TEXT BALCK SO IT CAN BE SEEN ON FIREFOX
-
-interface Friend {
-  id: number;
-  name: string;
-  avatarUrl: string;
+interface MiniUser {
+  MU_Num: string;
+  Username: string;
+  AvatarUrl: string;
 }
 
-export default function CreateGroupPage() {
+export default function SearchPage() {
   const [groupName, setGroupName] = useState("");
   const [groupDescription, setGroupDescription] = useState("");
   const [groupIcon, setGroupIcon] = useState<string | null>(null);
-  const [invitedFriends, setInvitedFriends] = useState<Friend[]>([]);
-  const { toast } = useToast();
+  const [invitedFriends, setInvitedFriends] = useState<MiniUser[]>([]);
 
   const handleIconUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -41,26 +37,23 @@ export default function CreateGroupPage() {
 
   const handleCreateGroup = () => {
     // Here you would typically send the group data to your backend
-    toast({
-      title: "Group Created",
-      description: `Your group "${groupName}" has been created successfully.`,
-    });
+    alert(`Your group "${groupName}" has been created successfully.`);
   };
 
   const handleInviteFriend = () => {
     // This would typically open a friend selection dialog
-    const newFriend: Friend = {
-      id: invitedFriends.length + 1,
-      name: `Friend ${invitedFriends.length + 1}`,
-      avatarUrl: `https://api.dicebear.com/6.x/initials/svg?seed=Friend${
-        invitedFriends.length + 1
-      }`,
-    };
-    setInvitedFriends([...invitedFriends, newFriend]);
+    // const newFriend: MiniUser = {
+    //   MU_Num: invitedFriends.length + 1,
+    //   Username: `Friend ${invitedFriends.length + 1}`,
+    //   AvatarUrl: `https://api.dicebear.com/6.x/initials/svg?seed=Friend${
+    //     invitedFriends.length + 1
+    //   }`,
+    // };
+    // setInvitedFriends([...invitedFriends, newFriend]);
   };
 
-  const handleRemoveFriend = (id: number) => {
-    setInvitedFriends(invitedFriends.filter((friend) => friend.id !== id));
+  const handleRemoveFriend = (id: string) => {
+    setInvitedFriends(invitedFriends.filter((friend) => friend.MU_Num !== id));
   };
 
   return (
@@ -119,19 +112,19 @@ export default function CreateGroupPage() {
             <div className="flex flex-wrap gap-2">
               {invitedFriends.map((friend) => (
                 <div
-                  key={friend.id}
+                  key={friend.MU_Num}
                   className="flex items-center bg-secondary rounded-full pl-1 pr-2 py-1"
                 >
                   <Avatar className="w-6 h-6 mr-1">
-                    <AvatarImage src={friend.avatarUrl} alt={friend.name} />
-                    <AvatarFallback>{friend.name[0]}</AvatarFallback>
+                    <AvatarImage src={friend.AvatarUrl} alt={friend.Username} />
+                    <AvatarFallback>{friend.Username[0]}</AvatarFallback>
                   </Avatar>
-                  <span className="text-sm mr-1">{friend.name}</span>
+                  <span className="text-sm mr-1">{friend.Username}</span>
                   <Button
                     variant="ghost"
                     size="sm"
                     className="h-5 w-5 p-0"
-                    onClick={() => handleRemoveFriend(friend.id)}
+                    onClick={() => handleRemoveFriend(friend.MU_Num)}
                   >
                     <X className="h-3 w-3" />
                   </Button>

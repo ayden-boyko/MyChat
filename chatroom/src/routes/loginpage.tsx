@@ -33,7 +33,7 @@ export default function LoginPage() {
     };
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}/api/login/password`,
+        `${import.meta.env.VITE_BACKEND_API_URL}api/login/password`,
         {
           method: "POST",
           headers: {

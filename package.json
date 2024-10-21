@@ -15,6 +15,7 @@
     "dotenv": "^16.4.5",
     "mongodb": "^6.9.0",
     "mongoose": "^8.7.0",
+    "MyChat": "file:",
     "passport": "^0.7.0",
     "socket.io": "^4.8.0"
   }

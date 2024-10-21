@@ -47,11 +47,28 @@ userRoutes.get("/get/all", async (req, res) => {
 });
 
 userRoutes.get("/get/:username", async (req, res) => {
-  // TODO implement logic that retrives usernames close to entered name if none exist, maybe 5-10?
   try {
+    // Search for users that utilizes fuzzy search for usernames
     const user = await db
       .collection("users")
-      .findOne({ username: parseInt(req.params.username) });
+      .aggregate([
+        {
+          $search: {
+            index: "usernameSearchIndex",
+            text: {
+              query: req.params.username,
+              path: "username",
+              fuzzy: {
+                maxEdits: 2, // Allow up to 2 changes (insertion, deletion, substitution)
+                prefixLength: 2, // Require at least 2 starting characters to match
+                maxExpansions: 100, // Limit the number of expansions for the fuzzy search
+              },
+            },
+          },
+        },
+      ])
+      .toArray();
+    //console.log("users", user);
     res.json(user);
   } catch (error) {
     res.status(500).json({ error: "An error occurred" });

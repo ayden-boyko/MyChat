@@ -9,6 +9,7 @@ import HomePage from "./routes/homepage.tsx";
 import LoginPage from "./routes/loginpage.tsx";
 import SettingsPage from "./routes/settingspage.tsx";
 import SignUpPage from "./routes/signuppage.tsx";
+import SearchPage from "./routes/searchpage.tsx";
 import { User } from "./interfaces/userinterface.ts";
 //const API = "http://localhost:8000/";
 
@@ -35,6 +36,7 @@ function App() {
           <Route path="/home" element={<HomePage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/sign_up" element={<SignUpPage />} />
+          <Route path="/search" element={<SearchPage />} />
         </Routes>
       </UserContext.Provider>
     </div>
