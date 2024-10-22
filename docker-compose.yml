@@ -7,6 +7,8 @@ services:
       - "5173:5173"
     depends_on:
       - backend
+    env_file:
+      - .env.docker
 
   backend:
     build: ./backend

@@ -13,6 +13,9 @@ RUN npm install
 # Copy the application code to the working directory
 COPY . .
 
+# Copy the environment file for Vite to access it
+COPY .env.docker ./.env 
+
 # Expose the port the web app will run on
 EXPOSE 5173
 

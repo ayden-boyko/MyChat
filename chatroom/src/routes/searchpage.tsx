@@ -49,7 +49,7 @@ export default function SearchPage() {
     console.log("preparing search", searchQuery);
 
     const result = await fetch(
-      `${import.meta.env.VITE_BACKEND_API_URL}api/users/get/${searchQuery}`,
+      `${import.meta.env.VITE_BACKEND_API_URL}/api/users/get/${searchQuery}`,
       {
         method: "GET",
         headers: {
