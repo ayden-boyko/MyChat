@@ -1,4 +1,4 @@
-import { Key, useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import {
@@ -84,7 +84,11 @@ export default function SearchPage() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ user_uuid: user?.user_uuid }),
+          body: JSON.stringify({
+            user_uuid: user?.user_uuid,
+            username: user?.username,
+            avatarUrl: user?.user_profile,
+          }),
         }
       );
       console.log(result.json());
