@@ -1,9 +1,0 @@
-[
-  {
-    "group_num": 1,
-    "group_name": "College Boys",
-    "group_profile": "",
-    "members": [1, 2, 3, 4],
-    "chat": { "1": "testing 123", "2": "message received" }
-  }
-]
