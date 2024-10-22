@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 import MiniUser from "../interfaces/friend.mjs";
 import { v4 as uuidv4 } from "uuid";
 
+// TODO IMPLEMENT USER PROFILES IMAGES, MULTER?
+
 const { Schema, model } = mongoose;
 const userSchema = new Schema({
   user_uuid: {
@@ -19,6 +21,7 @@ const userSchema = new Schema({
   friends: { type: [MiniUser], default: [] },
   blocked: { type: [Number], default: [] },
   groups: { type: [Number], default: [] },
+  requests: { type: [MiniUser], default: [] },
 });
 
 // Static method to get the next user number

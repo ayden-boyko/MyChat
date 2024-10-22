@@ -4,12 +4,14 @@ import "./loadEnviroment.mjs"; // Load environment variables
 import db from "./db/conn.mjs";
 import userController from "./controllers/account.mjs";
 import loginController from "./controllers/login.mjs";
+import friendController from "./controllers/friend.mjs";
 import cors from "cors";
 import session from "express-session";
 import mongoStore from "connect-mongo";
 import passport from "passport";
 
 // TODO SET UP SOCKET.IO SERVERS
+// TODO USE JWT FOR AUTHORIZATION
 
 const PORT = process.env.PORT || 8000;
 
@@ -44,11 +46,14 @@ app.use(
 //authenticates session
 app.use(passport.authenticate("session"));
 
-// Use the user routes
+// Use the user controller
 app.use("/api/users", userController);
 
-// Use the login routes
+// Use the login controller
 app.use("/api/login", loginController);
+
+// Use the friend controller
+app.use("/api/friend", friendController);
 
 app.get("/", async (req, res) => {
   try {

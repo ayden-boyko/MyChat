@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Key, useContext, useState } from "react";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import {
@@ -16,31 +16,26 @@ import {
 } from "../components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { ScrollArea } from "../components/ui/scroll-area";
-import { Search, Users, Hash } from "lucide-react";
-
-interface Person {
-  id: string;
-  username: string;
-  avatarUrl: string;
-}
-
-interface Group {
-  id: string;
-  name: string;
-  memberCount: number;
-  avatarUrl: string;
-}
+import { Search } from "lucide-react";
+import { MiniUser } from "../interfaces/miniuser";
+import { Group } from "../interfaces/group";
+import UserProfilePopup from "../components/pop-ups/UserProfilePopup";
+import { UserContext } from "../lib/UserContext";
 
 export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [collection, setCollection] = useState("user");
   const [searchResults, setSearchResults] = useState<{
-    people: Person[];
+    people: MiniUser[];
     groups: Group[];
   }>({
     people: [],
     groups: [],
   });
+  const [selectedUser, setSelectedUser] = useState<MiniUser | null>(null);
+  const context = useContext(UserContext);
+
+  const user = context?.user;
 
   // TODO SET UP GROUP SERACH LOGIC, ONLY USER EXISTS RN
   const handleSearch = async () => {
@@ -66,6 +61,38 @@ export default function SearchPage() {
       setSearchResults({ people: data, groups: [] });
     } else {
       setSearchResults({ people: [], groups: data });
+    }
+  };
+
+  const handleUserClick = (user: MiniUser) => {
+    setSelectedUser(user);
+  };
+
+  const handleClose = () => {
+    setSelectedUser(null);
+  };
+
+  const handleSendFriendRequest = async () => {
+    try {
+      console.log(user?.user_uuid);
+      const result = await fetch(
+        `${import.meta.env.VITE_BACKEND_API_URL}api/friend/request/${
+          selectedUser?.user_uuid
+        }`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ user_uuid: user?.user_uuid }),
+        }
+      );
+      console.log(result.json());
+      if (result.ok) {
+        alert("Friend request sent");
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -104,34 +131,38 @@ export default function SearchPage() {
             <TabsContent value="people">
               <ScrollArea className="h-[400px] w-full rounded-md border p-4">
                 {searchResults.people.length > 0 ? (
-                  searchResults.people.map((person, index) => (
+                  searchResults.people.map((user, index) => (
                     <div
                       key={index}
                       className="flex items-center space-x-4 mb-4"
                     >
                       <Avatar>
-                        <AvatarImage
-                          src={person.avatarUrl}
-                          alt={person.username}
-                        />
-                        <AvatarFallback>{person.username[0]}</AvatarFallback>
+                        <AvatarImage src={user.avatarUrl} alt={user.username} />
+                        <AvatarFallback>{user.username[0]}</AvatarFallback>
                       </Avatar>
-                      <div>
+                      <div onClick={() => handleUserClick(user)}>
                         <p className="text-sm font-medium leading-none">
-                          {person.username}
+                          {user.username}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          @{person.username}
+                          @{user.user_uuid.slice(0, 9)}
                         </p>
                       </div>
                     </div>
                   ))
                 ) : (
                   <p className="text-center text-muted-foreground">
-                    {searchResults.people.length === 0
-                      ? "No results found"
-                      : "Loading"}
+                    No users found
                   </p>
+                )}
+
+                {/* User Profile Popup */}
+                {selectedUser && (
+                  <UserProfilePopup
+                    user={selectedUser}
+                    onClose={handleClose}
+                    onSendFriendRequest={handleSendFriendRequest}
+                  />
                 )}
               </ScrollArea>
             </TabsContent>

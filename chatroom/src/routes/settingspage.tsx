@@ -57,7 +57,7 @@ export default function SettingsPage() {
       (document.getElementById("username") as HTMLInputElement)?.value
     );
     const result = await fetch(
-      `${import.meta.env.VITE_BACKEND_API_URL}/api/users/update/${
+      `${import.meta.env.VITE_BACKEND_API_URL}api/users/update/${
         user?.user_uuid
       }`,
       {

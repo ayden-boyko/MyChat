@@ -1,10 +1,10 @@
-// routes/account.js
+// controllers/account.js
 import express from "express";
 import User from "../schemas/User.mjs"; // Import the User schema
 import db from "../db/conn.mjs";
 import crypto from "crypto";
 
-const userRoutes = express.Router();
+const userController = express.Router();
 
 async function checkRights(req, res, next) {
   try {
@@ -37,7 +37,7 @@ async function checkRights(req, res, next) {
 }
 
 // GET all users
-userRoutes.get("/get/all", async (req, res) => {
+userController.get("/get/all", async (req, res) => {
   try {
     const users = await db.collection("users").find({}).toArray();
     res.json(users);
@@ -46,7 +46,8 @@ userRoutes.get("/get/all", async (req, res) => {
   }
 });
 
-userRoutes.get("/get/:username", async (req, res) => {
+// GET a user by USERNAME
+userController.get("/get/:username", async (req, res) => {
   try {
     // Search for users that utilizes fuzzy search for usernames
     const user = await db
@@ -76,7 +77,7 @@ userRoutes.get("/get/:username", async (req, res) => {
 });
 
 // GET a user by ID
-userRoutes.get("/get/:user_uuid", async (req, res) => {
+userController.get("/get/:user_uuid", async (req, res) => {
   try {
     const user = await db
       .collection("users")
@@ -87,8 +88,8 @@ userRoutes.get("/get/:user_uuid", async (req, res) => {
   }
 });
 
-// POST new users
-userRoutes.post("/create", async (req, res) => {
+// POST create new users
+userController.post("/create", async (req, res) => {
   console.log("starting");
   try {
     //console.log("body", req.body); // Log the user data
@@ -144,8 +145,8 @@ userRoutes.post("/create", async (req, res) => {
 });
 
 // ! MUST HAVE PROPER AUTHORIZATION TO DELETE USER
-// DELETE user
-userRoutes.delete("/delete/:user_uuid", checkRights, async (req, res) => {
+// DELETE user (may have parameters change after JWT is implemented)
+userController.delete("/delete/:user_uuid", checkRights, async (req, res) => {
   try {
     const result = await db
       .collection("users")
@@ -157,7 +158,8 @@ userRoutes.delete("/delete/:user_uuid", checkRights, async (req, res) => {
 });
 
 // ! MUST HAVE PROPER AUTHORIZATION TO UPDATE USER
-userRoutes.put("/update/:user_uuid", checkRights, async (req, res) => {
+// PUT update username/profile (may have parameters change after JWT is implemented)
+userController.put("/update/:user_uuid", checkRights, async (req, res) => {
   // * empty values assume no change to that field
   console.log("Received PUT request with params:", req.params); // Log parameters
   try {
@@ -178,4 +180,6 @@ userRoutes.put("/update/:user_uuid", checkRights, async (req, res) => {
   }
 });
 
-export default userRoutes;
+// TODO PUT update password/ reset mith email?
+
+export default userController;

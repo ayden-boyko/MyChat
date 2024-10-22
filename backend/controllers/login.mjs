@@ -6,7 +6,7 @@ import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local"; //middleware for authentication
 import crypto from "crypto";
 
-const loginRoutes = express.Router();
+const loginController = express.Router();
 
 //configuring local strategy
 passport.use(
@@ -58,7 +58,7 @@ passport.deserializeUser((user, done) => {
   });
 });
 
-loginRoutes.post("/password", (req, res, next) => {
+loginController.post("/password", (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) {
       return res
@@ -81,7 +81,7 @@ loginRoutes.post("/password", (req, res, next) => {
   })(req, res, next);
 });
 
-loginRoutes.post("/sign_out", (req, res, next) => {
+loginController.post("/sign_out", (req, res, next) => {
   req.logout((err) => {
     if (err) {
       return next(err);
@@ -90,4 +90,4 @@ loginRoutes.post("/sign_out", (req, res, next) => {
   });
 });
 
-export default loginRoutes;
+export default loginController;
