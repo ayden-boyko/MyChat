@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { UserContext } from "../lib/UserContext";
 
 // TODO USE PAGINATION WHEN SERVING CHAT MESSAGES TO 10 PER
-// TODO MAKE ALL TEXT BALCK SO IT CAN BE SEEN ON FIREFOX
+// TODO MAKE ALL TEXT BLACK SO IT CAN BE SEEN ON FIREFOX
 
 export default function HomePage() {
   const context = useContext(UserContext);

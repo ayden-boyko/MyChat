@@ -1,7 +1,8 @@
 // routes/account.js
 import express from "express";
-import User from "../schemas/User.mjs"; // Import the User schema
 import db from "../db/conn.mjs";
+
+import MiniUser from "../schemas/MiniUser.mjs";
 
 const friendController = express.Router();
 
@@ -9,12 +10,18 @@ const friendController = express.Router();
 // TODO MAKE SURE IF THE REQUEST HAS BEEN SENT, THEN IT CANNOT BE SENT AGAIN
 friendController.put("/request/:user_uuid", async (req, res) => {
   try {
-    const result = await db
-      .collection("users")
-      .updateOne(
-        { user_uuid: req.params.user_uuid },
-        { $addToSet: { requests: req.body.user_uuid } }
-      );
+    const newFriend = new MiniUser(req.body.mini_user); //create new friend object based on MiniUser schema
+
+    const result = await db.collection("users").updateOne(
+      { user_uuid: req.params.user_uuid },
+      {
+        $addToSet: {
+          requests: {
+            newFriend,
+          },
+        },
+      }
+    );
     res.status(200).json(result);
   } catch (error) {
     console.error("Error sending friend request: ", error);

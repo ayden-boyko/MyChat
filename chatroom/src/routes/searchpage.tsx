@@ -37,14 +37,14 @@ export default function SearchPage() {
 
   const user = context?.user;
 
-  // TODO SET UP GROUP SERACH LOGIC, ONLY USER EXISTS RN
+  // TODO SET UP GROUP SEARCH LOGIC, ONLY USER EXISTS RN
   const handleSearch = async () => {
     if (!searchQuery) alert("Please enter a search query");
 
     console.log("preparing search", searchQuery);
 
     const result = await fetch(
-      `${import.meta.env.VITE_BACKEND_API_URL}/api/users/get/${searchQuery}`,
+      `${import.meta.env.VITE_BACKEND_API_URL}api/users/get/${searchQuery}`,
       {
         method: "GET",
         headers: {

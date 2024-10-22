@@ -31,6 +31,8 @@ interface Notification {
 
 type NotificationsPageProps = object;
 
+// TODO ENABLE SORTING OF NOTIFICATIONS BY TYPE: 1, 2, 3, 4
+
 // eslint-disable-next-line no-empty-pattern
 const NotificationPage = ({}: NotificationsPageProps) => {
   const { toast } = useToast();

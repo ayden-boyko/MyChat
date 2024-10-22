@@ -1,8 +1,10 @@
 import mongoose from "mongoose";
-import MiniUser from "../interfaces/friend.mjs";
 import { v4 as uuidv4 } from "uuid";
 
-// TODO IMPLEMENT USER PROFILES IMAGES, MULTER?
+import MiniUser from "./MiniUser.mjs";
+import Notifications from "./Notifications.mjs";
+
+// TODO IMPLEMENT USER PROFILES IMAGES, USE MULTER?
 
 const { Schema, model } = mongoose;
 const userSchema = new Schema({
@@ -22,6 +24,8 @@ const userSchema = new Schema({
   blocked: { type: [Number], default: [] },
   groups: { type: [Number], default: [] },
   requests: { type: [MiniUser], default: [] },
+  notifications: { type: [Notifications], default: [] },
+  online: { type: Boolean, default: false },
 });
 
 // Static method to get the next user number

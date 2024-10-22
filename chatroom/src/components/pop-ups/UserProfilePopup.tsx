@@ -2,7 +2,6 @@ import { X, UserPlus } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { useToast } from "../hooks/use-toast";
 import { MiniUser } from "../../interfaces/miniuser";
 
 interface UserProfilePopupProps {

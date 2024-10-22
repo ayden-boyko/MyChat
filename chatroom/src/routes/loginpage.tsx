@@ -11,6 +11,8 @@ import {
 import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../lib/UserContext";
+
+// TODO WHEN A SER LOGS IN SET ONLINE TO TRUE
 export default function LoginPage() {
   const context = useContext(UserContext);
   const navigate = useNavigate();
@@ -33,7 +35,7 @@ export default function LoginPage() {
     };
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}/api/login/password`,
+        `${import.meta.env.VITE_BACKEND_API_URL}api/login/password`,
         {
           method: "POST",
           headers: {
