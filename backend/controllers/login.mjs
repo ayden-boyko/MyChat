@@ -78,7 +78,9 @@ loginController.post("/password", (req, res, next) => {
         .collection("users")
         .findOne({ email: user.email });
 
-      User.updateOne(
+      console.log(pulledUser);
+
+      await User.updateOne(
         { user_uuid: pulledUser.user_uuid },
         { $set: { online: true } }
       );
@@ -89,14 +91,12 @@ loginController.post("/password", (req, res, next) => {
   })(req, res, next);
 });
 
-// TODO WHEN A USER LOGS OUT SET THE ONLINE STATUS TO OFFLINE
 loginController.post("/sign_out", (req, res, next) => {
-  console.log(req.body);
-  req.logout((err) => {
+  req.logout(async (err) => {
     if (err) {
       return next(err);
     }
-    User.updateOne(
+    await User.updateOne(
       { user_uuid: req.body.user_uuid },
       { $set: { online: false } }
     );

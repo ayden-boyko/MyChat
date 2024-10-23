@@ -28,7 +28,7 @@ export default function HomePage() {
   const logout = async (user: User | null) => {
     try {
       const result = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}api/logout`,
+        `${import.meta.env.VITE_BACKEND_API_URL}api/login/sign_out`,
         {
           method: "POST",
           headers: {
@@ -38,6 +38,7 @@ export default function HomePage() {
         }
       );
       console.log("LOGOUT", result);
+      navigate("/");
     } catch (error) {
       console.error("Error during logout:", error);
     }
