@@ -7,6 +7,7 @@ import { Settings, LogOut, Search, Send, Bell } from "lucide-react";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../lib/UserContext";
+import { User } from "../interfaces/userinterface";
 
 // TODO USE PAGINATION WHEN SERVING CHAT MESSAGES TO 10 PER
 // TODO MAKE ALL TEXT BLACK SO IT CAN BE SEEN ON FIREFOX
@@ -23,6 +24,24 @@ export default function HomePage() {
   const { user, setUser } = context;
 
   console.log("USER-HOME", user);
+
+  const logout = async (user: User | null) => {
+    try {
+      const result = await fetch(
+        `${import.meta.env.VITE_BACKEND_API_URL}api/logout`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ user_uuid: user?.user_uuid }),
+        }
+      );
+      console.log("LOGOUT", result);
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -57,8 +76,8 @@ export default function HomePage() {
         >
           <LogOut
             onClick={() => {
+              logout(user);
               setUser(null);
-              navigate("/");
             }}
           />
         </button>

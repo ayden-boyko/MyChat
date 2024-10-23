@@ -5,6 +5,8 @@ import db from "../db/conn.mjs";
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local"; //middleware for authentication
 import crypto from "crypto";
+import User from "../schemas/User.mjs";
+import { register } from "module";
 
 const loginController = express.Router();
 
@@ -75,17 +77,29 @@ loginController.post("/password", (req, res, next) => {
       let pulledUser = await db
         .collection("users")
         .findOne({ email: user.email });
+
+      User.updateOne(
+        { user_uuid: pulledUser.user_uuid },
+        { $set: { online: true } }
+      );
+
       console.log("logged in"); // Log after successful login
       res.status(200).json(pulledUser);
     });
   })(req, res, next);
 });
 
+// TODO WHEN A USER LOGS OUT SET THE ONLINE STATUS TO OFFLINE
 loginController.post("/sign_out", (req, res, next) => {
+  console.log(req.body);
   req.logout((err) => {
     if (err) {
       return next(err);
     }
+    User.updateOne(
+      { user_uuid: req.body.user_uuid },
+      { $set: { online: false } }
+    );
     res.redirect("/");
   });
 });

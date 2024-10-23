@@ -6,6 +6,7 @@ import crypto from "crypto";
 
 const userController = express.Router();
 
+// TODO USE JWT FOR AUTHORIZATION
 async function checkRights(req, res, next) {
   try {
     // Ensure req.user is defined
@@ -180,6 +181,43 @@ userController.put("/update/:user_uuid", checkRights, async (req, res) => {
   }
 });
 
-// TODO PUT update password/ reset mith email?
+// TODO reset mith email? theres gotta be a better way, checkrights needs to implement JWT
+// PUT update password
+userController.put(
+  "/update/password/:user_uuid",
+  checkRights,
+  async (req, res) => {
+    try {
+      const salt = crypto.randomBytes(16).toString("hex");
+      crypto.pbkdf2(
+        req.body.password,
+        salt,
+        310000,
+        32,
+        "sha256",
+        async (err, hashedPassword) => {
+          if (err) {
+            console.error("Error hashing password:", err);
+            return res
+              .status(500)
+              .json({ error: "An error occurred while hashing the password" });
+          }
+          const result = await db.collection("users").updateOne(
+            { user_uuid: parseInt(req.params.user_uuid) },
+            {
+              $set: {
+                hashed_password: hashedPassword.toString("hex"),
+                salt: salt,
+              },
+            }
+          );
+          res.json(result);
+        }
+      );
+    } catch (error) {
+      res.status(500).json({ error: "An error occurred" });
+    }
+  }
+);
 
 export default userController;
