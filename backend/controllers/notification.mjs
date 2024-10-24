@@ -1,19 +1,27 @@
-import User from "../schemas/User.mjs"; // Assuming you already have User schema with notifications embedded
-import Notifications from "../schemas/Notifications.mjs";
+import User from "../schemas/User.mjs";
+import express from "express";
 
-// Middleware function to add notifications to the user's notifications field
-const addNotification = async (userId, notificationData) => {
+const NotificationController = express.Router();
+
+NotificationController.get("/pending/:user_uuid", async (req, res) => {
   try {
-    // Find the user by userId (make sure this matches your schema field)
-
-    await User.updateOne(
-      { user_uuid: userId },
-      { $push: { notifications: notificationData } }
-    );
-    console.log(`Notification added for offline user: ${userId}`);
+    const user = await User.findOne({ user_uuid: req.params.user_uuid });
+    res.status(200).json({ notifications: user.notifications });
   } catch (error) {
-    console.error("Error adding notification:", error);
+    res.status(500).json({ error: "An error occurred" });
   }
-};
+});
 
-export default addNotification;
+NotificationController.delete("/clear/:user_uuid", async (req, res) => {
+  try {
+    const result = await User.updateOne(
+      { user_uuid: req.params.user_uuid },
+      { $set: { notifications: [] } }
+    );
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ error: "An error occurred" });
+  }
+});
+
+export default NotificationController;

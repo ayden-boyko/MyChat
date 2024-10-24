@@ -5,6 +5,7 @@ import db from "./db/conn.mjs";
 import userController from "./controllers/account.mjs";
 import loginController from "./controllers/login.mjs";
 import friendController from "./controllers/friend.mjs";
+import notificationController from "./controllers/notification.mjs";
 import cors from "cors";
 import session from "express-session";
 import mongoStore from "connect-mongo";
@@ -54,6 +55,9 @@ app.use("/api/login", loginController);
 
 // Use the friend controller
 app.use("/api/friend", friendController);
+
+// Use the notification controller
+app.use("/api/notification", notificationController);
 
 app.get("/", async (req, res) => {
   try {

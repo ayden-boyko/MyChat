@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { Button } from "../components/ui/button";
 import {
   Card,
@@ -12,6 +12,7 @@ import { ScrollArea } from "../components/ui/scroll-area";
 import { Badge } from "../components/ui/badge";
 import { UserPlus, Users, MessageSquare, Bell } from "lucide-react";
 import { useToast } from "../hooks/use-toast";
+import { UserContext } from "../lib/UserContext";
 
 interface Notification {
   id: string;
@@ -29,77 +30,44 @@ interface Notification {
   groupName?: string;
 }
 
-type NotificationsPageProps = object;
-
 // TODO ENABLE SORTING OF NOTIFICATIONS BY TYPE: 1, 2, 3, 4
 
-// eslint-disable-next-line no-empty-pattern
-const NotificationPage = ({}: NotificationsPageProps) => {
+export default function NotificationPage() {
   const { toast } = useToast();
+  const [notifications, setNotifications] = React.useState<Notification[]>([]);
 
-  // This would typically come from your app's state or an API call
-  const notifications: Notification[] = [
-    {
-      id: "1",
-      type: "friend_request",
-      from: {
-        name: "Alice",
-        avatar: "https://api.dicebear.com/6.x/avataaars/svg?seed=Alice",
-      },
-      content: "Alice sent you a friend request",
-      timestamp: "5 minutes ago",
-    },
-    {
-      id: "2",
-      type: "group_invite",
-      from: {
-        name: "Bob",
-        avatar: "https://api.dicebear.com/6.x/avataaars/svg?seed=Bob",
-      },
-      content: 'Bob invited you to join "Tech Enthusiasts"',
-      timestamp: "1 hour ago",
-      groupName: "Tech Enthusiasts",
-    },
-    {
-      id: "3",
-      type: "group_join_request",
-      from: {
-        name: "Charlie",
-        avatar: "https://api.dicebear.com/6.x/avataaars/svg?seed=Charlie",
-      },
-      content: 'Charlie requested to join "Book Club"',
-      timestamp: "2 hours ago",
-      groupName: "Book Club",
-    },
-    {
-      id: "4",
-      type: "unseen_message",
-      from: {
-        name: "David",
-        avatar: "https://api.dicebear.com/6.x/avataaars/svg?seed=David",
-      },
-      content: "You have 3 unread messages from David",
-      timestamp: "3 hours ago",
-    },
-    {
-      id: "5",
-      type: "unseen_message",
-      from: {
-        name: "Fitness Fanatics",
-        avatar:
-          "https://api.dicebear.com/6.x/identicon/svg?seed=FitnessFanatics",
-      },
-      content: 'You have 5 unread messages in "Fitness Fanatics"',
-      timestamp: "4 hours ago",
-      groupName: "Fitness Fanatics",
-    },
-  ];
+  const context = useContext(UserContext);
+
+  if (!context) {
+    throw new Error("UserContext is not available");
+  }
+
+  const { user } = context;
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      const result = await fetch(
+        `${import.meta.env.VITE_BACKEND_API_URL}api/notification/pending/${
+          user?.user_uuid
+        }`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await result.json();
+      setNotifications(data);
+    };
+    fetchNotifications();
+  }, [user?.user_uuid]);
 
   const handleAction = (
     notification: Notification,
     action: "accept" | "decline"
   ) => {
-    // This is where you would handle the action, typically by making an API call
+    // This is where you would handle the action, redirect to the chat, or other logic
     toast({
       title: action === "accept" ? "Accepted" : "Declined",
       description: `You have ${
@@ -133,72 +101,74 @@ const NotificationPage = ({}: NotificationsPageProps) => {
         </CardHeader>
         <CardContent>
           <ScrollArea className="h-[600px] w-full rounded-md border p-4">
-            {notifications.map((notification) => (
-              <div key={notification.id} className="mb-4 last:mb-0">
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="flex items-start space-x-4">
-                      <Avatar>
-                        <AvatarImage
-                          src={notification.from.avatar}
-                          alt={notification.from.name}
-                        />
-                        <AvatarFallback>
-                          {notification.from.name[0]}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 space-y-1">
-                        <p className="text-sm font-medium leading-none">
-                          {notification.content}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {notification.timestamp}
-                        </p>
-                        {notification.groupName && (
-                          <Badge variant="secondary" className="mt-1">
-                            {notification.groupName}
-                          </Badge>
-                        )}
+            {notifications.length === 0 ? (
+              <p>No notifications</p>
+            ) : (
+              notifications.map((notification) => (
+                <div key={notification.id} className="mb-4 last:mb-0">
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex items-start space-x-4">
+                        <Avatar>
+                          <AvatarImage
+                            src={notification.from.avatar}
+                            alt={notification.from.name}
+                          />
+                          <AvatarFallback>
+                            {notification.from.name[0]}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 space-y-1">
+                          <p className="text-sm font-medium leading-none">
+                            {notification.content}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {notification.timestamp}
+                          </p>
+                          {notification.groupName && (
+                            <Badge variant="secondary" className="mt-1">
+                              {notification.groupName}
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          {getIcon(notification.type)}
+                          {(notification.type === "friend_request" ||
+                            notification.type === "group_invite" ||
+                            notification.type === "group_join_request") && (
+                            <>
+                              <Button
+                                size="sm"
+                                onClick={() =>
+                                  handleAction(notification, "accept")
+                                }
+                              >
+                                Accept
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() =>
+                                  handleAction(notification, "decline")
+                                }
+                              >
+                                Decline
+                              </Button>
+                            </>
+                          )}
+                          {notification.type === "unseen_message" && (
+                            <Button size="sm">View</Button>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        {getIcon(notification.type)}
-                        {(notification.type === "friend_request" ||
-                          notification.type === "group_invite" ||
-                          notification.type === "group_join_request") && (
-                          <>
-                            <Button
-                              size="sm"
-                              onClick={() =>
-                                handleAction(notification, "accept")
-                              }
-                            >
-                              Accept
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() =>
-                                handleAction(notification, "decline")
-                              }
-                            >
-                              Decline
-                            </Button>
-                          </>
-                        )}
-                        {notification.type === "unseen_message" && (
-                          <Button size="sm">View</Button>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            ))}
+                    </CardContent>
+                  </Card>
+                </div>
+              ))
+            )}
           </ScrollArea>
         </CardContent>
       </Card>
     </div>
   );
-};
-
-export default NotificationPage;
+}

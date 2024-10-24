@@ -1,7 +1,7 @@
-import addNotification from "./controllers/notification.mjs";
 import Notifications from "../schemas/Notifications.mjs";
+import User from "../schemas/User.mjs";
 
-/* EXAMPLE OF NOTIFICATION DATA
+/* EXAMPLE OF NOTIFICATION HANDLER IN USE
          Message route
 router.post('/message', notificationMiddleware(1), async (req, res) => {
   const { message, recipientId, senderId } = req.body;
@@ -16,6 +16,20 @@ router.post('/message', notificationMiddleware(1), async (req, res) => {
   }
 });
 */
+
+// Middleware function to add notifications to the user's notifications field
+const addNotification = async (userId, notificationData) => {
+  try {
+    // Find the user by userId (make sure this matches your schema field)
+    await User.updateOne(
+      { user_uuid: userId },
+      { $push: { notifications: notificationData } }
+    );
+    console.log(`Notification added for offline user: ${userId}`);
+  } catch (error) {
+    console.error("Error adding notification:", error);
+  }
+};
 
 // Global middleware to handle notifications for offline users
 const notificationHandler = (eventType) => {
