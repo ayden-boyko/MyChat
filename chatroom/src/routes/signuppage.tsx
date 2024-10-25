@@ -56,7 +56,7 @@ export default function SignUpPage() {
 
     // Send the data to the server
     const result = await fetch(
-      `${import.meta.env.VITE_BACKEND_API_URL}api/users/create`,
+      `${import.meta.env.VITE_BACKEND_API_URL}/api/users/create`,
       {
         method: "POST",
         headers: {
@@ -66,11 +66,11 @@ export default function SignUpPage() {
       }
     );
 
-    console.log("sent!");
+    console.log("signuppage.tsx - 69 - sent!");
 
     const data = await result.json();
     if (result.ok && data.email && data.username) {
-      console.log(data); // Log user data for debugging
+      console.log("signuppage.tsx - 73 -", data); // Log user data for debugging
       setUser({ ...user, ...data });
       navigate("/home"); // Redirect to HomePage on success
     }

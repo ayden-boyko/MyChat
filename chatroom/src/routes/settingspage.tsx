@@ -38,6 +38,10 @@ export default function SettingsPage() {
   }
   const { user, setUser } = context;
 
+  if (user?.username === "") {
+    navigate("/");
+  }
+
   let changedProfile = "";
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,10 +58,11 @@ export default function SettingsPage() {
 
   const handleSaveChanges = async () => {
     console.log(
+      "settingspage.tsx - 61 - ",
       (document.getElementById("username") as HTMLInputElement)?.value
     );
     const result = await fetch(
-      `${import.meta.env.VITE_BACKEND_API_URL}api/users/update/${
+      `${import.meta.env.VITE_BACKEND_API_URL}/api/users/update/${
         user?.user_uuid
       }`,
       {
@@ -119,7 +124,10 @@ export default function SettingsPage() {
             <Label htmlFor="avatar">Profile Picture</Label>
             <div className="flex items-center space-x-4">
               <Avatar className="w-20 h-20">
-                <AvatarImage src={user?.user_profile} alt={user?.username} />
+                <AvatarImage
+                  src={user!.user_profile ?? ""}
+                  alt={user!.username ?? ""}
+                />
                 <AvatarFallback>{"NONE"}</AvatarFallback>
               </Avatar>
               <Input
@@ -132,7 +140,7 @@ export default function SettingsPage() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="username">Username</Label>
-            <Input id="username" defaultValue={user?.username} />
+            <Input id="username" defaultValue={user!.username ?? ""} />
           </div>
         </CardContent>
         <CardFooter className="flex justify-between">

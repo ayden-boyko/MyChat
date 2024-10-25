@@ -33,7 +33,7 @@ async function checkRights(req, res, next) {
     }
   } catch (error) {
     console.error("Error checking rights:", error);
-    return res.status(500).json({ message: "Internal Server Error" });
+    return res.status(500).json({ message: "Error checking rights" });
   }
 }
 
@@ -43,7 +43,7 @@ userController.get("/get/all", async (req, res) => {
     const users = await db.collection("users").find({}).toArray();
     res.json(users);
   } catch (error) {
-    res.status(500).json({ error: "An error occurred" });
+    res.status(500).json({ error: "An error while getting all users" });
   }
 });
 
@@ -73,7 +73,7 @@ userController.get("/get/:username", async (req, res) => {
     //console.log("users", user);
     res.json(user);
   } catch (error) {
-    res.status(500).json({ error: "An error occurred" });
+    res.status(500).json({ error: "An error while getting user by USERNAME" });
   }
 });
 
@@ -85,13 +85,13 @@ userController.get("/get/:user_uuid", async (req, res) => {
       .findOne({ user_uuid: parseInt(req.params.user_uuid) });
     res.json(user);
   } catch (error) {
-    res.status(500).json({ error: "An error occurred" });
+    res.status(500).json({ error: "An error while getting user by ID" });
   }
 });
 
 // POST create new users
 userController.post("/create", async (req, res) => {
-  console.log("starting");
+  console.log("account.mjs - 94 -starting");
   try {
     //console.log("body", req.body); // Log the user data
 
@@ -127,10 +127,6 @@ userController.post("/create", async (req, res) => {
           username: username,
           hashed_password: hashedPassword.toString("hex"), // Store the hashed password as a string
           salt: salt,
-          user_profile: "",
-          friends: [],
-          blocked: [],
-          groups: [],
         });
 
         // Save the user to the database
@@ -141,7 +137,7 @@ userController.post("/create", async (req, res) => {
     );
   } catch (error) {
     console.error("Error creating user:", error);
-    res.status(500).json({ error: "An internal server error occurred" });
+    res.status(500).json({ error: "Error creating user" });
   }
 });
 
@@ -162,7 +158,10 @@ userController.delete("/delete/:user_uuid", checkRights, async (req, res) => {
 // PUT update username/profile (may have parameters change after JWT is implemented)
 userController.put("/update/:user_uuid", checkRights, async (req, res) => {
   // * empty values assume no change to that field
-  console.log("Received PUT request with params:", req.params); // Log parameters
+  console.log(
+    "account.mjs - 161 - Received PUT request with params:",
+    req.params
+  ); // Log parameters
   try {
     const result = await db.collection("users").updateOne(
       { user_uuid: parseInt(req.params.user_uuid) },
@@ -177,7 +176,7 @@ userController.put("/update/:user_uuid", checkRights, async (req, res) => {
     );
     res.json(result);
   } catch (error) {
-    res.status(500).json({ error: "An error occurred" });
+    res.status(500).json({ error: "An error while updating the user profile" });
   }
 });
 
@@ -215,7 +214,7 @@ userController.put(
         }
       );
     } catch (error) {
-      res.status(500).json({ error: "An error occurred" });
+      res.status(500).json({ error: "An error while updating password" });
     }
   }
 );

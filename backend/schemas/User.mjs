@@ -19,13 +19,13 @@ const userSchema = new Schema({
   },
   hashed_password: String,
   salt: String,
-  user_profile: String,
+  user_profile: { type: String, default: "" },
   friends: { type: [MiniUser], default: [] },
   blocked: { type: [Number], default: [] },
   groups: { type: [Number], default: [] },
   requests: { type: [MiniUser], default: [] },
   notifications: { type: [Notifications], default: [] },
-  online: { type: Boolean, default: false },
+  online: { type: Boolean, default: true },
 });
 
 // Static method to get the next user number

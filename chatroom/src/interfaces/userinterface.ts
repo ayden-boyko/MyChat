@@ -1,13 +1,19 @@
+import { MiniUser } from "./miniuser";
+import { Notifications } from "./notifications";
+
 export interface User {
-  user_uuid: number | null;
+  user_uuid?: string;
   email: string;
   username: string;
   hashed_password: string;
   salt: string;
   user_profile: string;
-  friends: number[];
-  blocked: number[];
+  friends: MiniUser[];
+  blocked: MiniUser[];
   groups: number[];
+  requests: MiniUser[];
+  notifications: Notifications[];
+  online: boolean;
 }
 
 export interface UserContextValue {

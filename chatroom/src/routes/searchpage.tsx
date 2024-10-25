@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import {
@@ -21,6 +21,7 @@ import { MiniUser } from "../interfaces/miniuser";
 import { Group } from "../interfaces/group";
 import UserProfilePopup from "../components/pop-ups/UserProfilePopup";
 import { UserContext } from "../lib/UserContext";
+import { useNavigate } from "react-router-dom";
 
 export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -33,18 +34,26 @@ export default function SearchPage() {
     groups: [],
   });
   const [selectedUser, setSelectedUser] = useState<MiniUser | null>(null);
+
   const context = useContext(UserContext);
+  const navigate = useNavigate();
 
   const user = context?.user;
+
+  useEffect(() => {
+    if (user?.username === "") {
+      navigate("/");
+    }
+  });
 
   // TODO SET UP GROUP SEARCH LOGIC, ONLY USER EXISTS RN
   const handleSearch = async () => {
     if (!searchQuery) alert("Please enter a search query");
 
-    console.log("preparing search", searchQuery);
+    console.log("searchpage.tsx - 53 - preparing search", searchQuery);
 
     const result = await fetch(
-      `${import.meta.env.VITE_BACKEND_API_URL}api/users/get/${searchQuery}`,
+      `${import.meta.env.VITE_BACKEND_API_URL}/api/users/get/${searchQuery}`,
       {
         method: "GET",
         headers: {
@@ -53,7 +62,7 @@ export default function SearchPage() {
       }
     );
 
-    console.log("got data!");
+    console.log("searchpage.tsx - 65 -got data!");
 
     const data = await result.json();
 
@@ -74,9 +83,9 @@ export default function SearchPage() {
 
   const handleSendFriendRequest = async () => {
     try {
-      console.log(user?.user_uuid);
+      console.log("searchpage.tsx - 86 -sender", user);
       const result = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}api/friend/request/${
+        `${import.meta.env.VITE_BACKEND_API_URL}/api/friend/request/${
           selectedUser?.user_uuid
         }`,
         {
@@ -87,16 +96,25 @@ export default function SearchPage() {
           body: JSON.stringify({
             user_uuid: user?.user_uuid,
             username: user?.username,
-            avatarUrl: user?.user_profile,
+            user_profile: user?.user_profile,
           }),
         }
       );
-      console.log(result.json());
-      if (result.ok) {
+      const message = await result.json();
+
+      console.log("searchpage.tsx - 105 -friend result", message);
+      if (
+        message.message === "You're already friends with this person" ||
+        message.message ===
+          "You've already sent a friend request to this user" ||
+        message.message === "You can't send a friend request to yourself"
+      ) {
+        alert(message.message);
+      } else if (result.ok) {
         alert("Friend request sent");
       }
     } catch (error) {
-      console.log(error);
+      console.log("searchpage.tsx - 116 -error", error);
     }
   };
 

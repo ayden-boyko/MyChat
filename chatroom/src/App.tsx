@@ -12,6 +12,7 @@ import SignUpPage from "./routes/signuppage.tsx";
 import SearchPage from "./routes/searchpage.tsx";
 import NotificationPage from "./routes/notificationpage.tsx";
 import { User } from "./interfaces/userinterface.ts";
+import { MiniUser } from "./interfaces/miniuser.ts";
 //const API = "http://localhost:8000/";
 
 // TODO IMPLEMENT DARK MODE
@@ -21,15 +22,18 @@ import { User } from "./interfaces/userinterface.ts";
 */
 function App() {
   const [user, setUser] = useState<User | null>({
-    user_uuid: null,
+    user_uuid: "",
     email: "",
     username: "",
     hashed_password: "",
     salt: "",
     user_profile: "",
-    friends: [],
-    blocked: [],
+    friends: [] as MiniUser[],
+    blocked: [] as MiniUser[],
     groups: [],
+    requests: [],
+    notifications: [],
+    online: true,
   });
 
   return (

@@ -34,7 +34,7 @@ export default function LoginPage() {
     };
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}api/login/password`,
+        `${import.meta.env.VITE_BACKEND_API_URL}/api/login/password`,
         {
           method: "POST",
           headers: {
@@ -48,7 +48,7 @@ export default function LoginPage() {
         const result = await response.json();
         // Redirect to the home page upon successful login
         setUser(result);
-        console.log(result);
+        console.log("loginpage.tsx - 51- LOGIN success", result);
 
         navigate("/home");
       } else {

@@ -61,7 +61,7 @@ app.use("/api/notification", notificationController);
 
 app.get("/", async (req, res) => {
   try {
-    console.log("GET", req.body);
+    console.log("server.mjs - 64 - GET", req.body);
     // Set CORS headers
     res.setHeader("Access-Control-Allow-Origin", "*");
 
@@ -78,7 +78,7 @@ app.get("/", async (req, res) => {
 
 app.post("/", async (req, res) => {
   try {
-    console.log("POST", req.body);
+    console.log("server.mjs - 81 - POST", req.body);
 
     res.setHeader("Access-Control-Allow-Origin", "*");
 
@@ -98,7 +98,7 @@ app.post("/", async (req, res) => {
 
     // If no duplicates are found, proceed with the insertion
     const insertResult = await db.collection("users").insertMany(test_data);
-    console.log("Data inserted", insertResult);
+    console.log("server.mjs - 101 - Data inserted", insertResult);
 
     // Fetch and return the updated list of users
     const updatedResult = await db.collection("users").find({}).toArray();

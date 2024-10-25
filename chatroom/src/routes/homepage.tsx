@@ -8,6 +8,7 @@ import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../lib/UserContext";
 import { User } from "../interfaces/userinterface";
+import { cn } from "../lib/utils";
 
 // TODO USE PAGINATION WHEN SERVING CHAT MESSAGES TO 10 PER
 // TODO MAKE ALL TEXT BLACK SO IT CAN BE SEEN ON FIREFOX
@@ -23,12 +24,16 @@ export default function HomePage() {
 
   const { user, setUser } = context;
 
-  console.log("USER-HOME", user);
+  if (user?.username === "") {
+    navigate("/");
+  }
+
+  console.log("hompage.tsx - 31 - USER-HOME", user);
 
   const logout = async (user: User | null) => {
     try {
       const result = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}api/login/sign_out`,
+        `${import.meta.env.VITE_BACKEND_API_URL}/api/login/sign_out`,
         {
           method: "POST",
           headers: {
@@ -37,7 +42,7 @@ export default function HomePage() {
           body: JSON.stringify({ user_uuid: user?.user_uuid }),
         }
       );
-      console.log("LOGOUT", result);
+      console.log("homepage.tsx - 45 -LOGOUT", result);
       navigate("/");
     } catch (error) {
       console.error("Error during logout:", error);
@@ -64,7 +69,9 @@ export default function HomePage() {
             <Search />
           </button>
           <button
-            className="p-2 rounded-md bg-gray-500 hover:bg-gray-700"
+            className={cn("p-2 rounded-md bg-gray-500 hover:bg-gray-700", {
+              "ring-2 ring-red-500": user?.notifications.length !== 0,
+            })}
             aria-label="Notifications"
             onClick={() => navigate("/notifications")}
           >
@@ -91,7 +98,7 @@ export default function HomePage() {
             <h2 className="text-lg font-semibold mb-2">Groups</h2>
             <ul className="space-y-2">
               {/* Render the list of groups here, if none render "No groups found" */}
-              {user?.groups === undefined ? (
+              {user?.groups === undefined || user?.groups === null ? (
                 <li>No groups found</li>
               ) : (
                 user?.groups.map((group, index) => (
@@ -107,7 +114,7 @@ export default function HomePage() {
             <h2 className="text-lg font-semibold mb-2">Direct Messages</h2>
             <ul className="space-y-2">
               {/* Render the list of direct messages here, if none render "No direct messages found" */}
-              {user?.friends === undefined ? (
+              {user?.friends === undefined || user?.friends === null ? (
                 <li>No direct messages found</li>
               ) : (
                 user?.friends.map((friend, index) => (
@@ -115,11 +122,11 @@ export default function HomePage() {
                     <Button variant="ghost" className="w-full justify-start">
                       <Avatar className="w-6 h-6 mr-2">
                         <AvatarImage
-                          src={`https://api.dicebear.com/6.x/initials/svg?seed=${friend}`}
+                          src={`https://api.dicebear.com/6.x/initials/svg?seed=${friend.username[0]}`}
                         />
                         <AvatarFallback>{"USER"}</AvatarFallback>
                       </Avatar>
-                      {friend}
+                      {friend.username}
                     </Button>
                   </li>
                 ))

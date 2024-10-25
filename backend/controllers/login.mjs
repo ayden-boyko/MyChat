@@ -43,7 +43,7 @@ passport.use(
         }
       );
     } catch (error) {
-      console.log("Password Hashing Error:", error);
+      console.log("login.mjs - 46 -Password Hashing Error:", error);
     }
   })
 );
@@ -78,14 +78,17 @@ loginController.post("/password", (req, res, next) => {
         .collection("users")
         .findOne({ email: user.email });
 
-      console.log(pulledUser);
+      console.log(
+        "login.mjs - 81 -pulled user from login credentials",
+        pulledUser
+      );
 
       await User.updateOne(
         { user_uuid: pulledUser.user_uuid },
         { $set: { online: true } }
       );
 
-      console.log("logged in"); // Log after successful login
+      console.log("login.mjs - 88 - logged in"); // Log after successful login
       res.status(200).json(pulledUser);
     });
   })(req, res, next);

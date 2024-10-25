@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
@@ -11,6 +11,8 @@ import {
 } from "../components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { X, Upload } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "../lib/UserContext";
 
 interface MiniUser {
   MU_Num: string;
@@ -23,6 +25,20 @@ export default function SearchPage() {
   const [groupDescription, setGroupDescription] = useState("");
   const [groupIcon, setGroupIcon] = useState<string | null>(null);
   const [invitedFriends, setInvitedFriends] = useState<MiniUser[]>([]);
+
+  const context = useContext(UserContext);
+  const navigate = useNavigate();
+
+  if (!context) {
+    // Handle the case where the component is rendered outside the provider
+    throw new Error("SomeChildComponent must be used within a UserProvider");
+  }
+
+  const { user } = context;
+
+  if (user?.username === "") {
+    navigate("/");
+  }
 
   const handleIconUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

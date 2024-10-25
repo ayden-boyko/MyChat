@@ -2,9 +2,8 @@ import mongoose from "mongoose";
 
 const { Schema } = mongoose;
 const MiniUser = new Schema({
-  MU_Num: {
+  user_uuid: {
     type: String,
-    unique: true, // Ensure user_uuid is unique
     required: true,
     default: "",
   },

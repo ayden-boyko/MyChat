@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Button } from "../components/ui/button";
 import {
   Card,
@@ -9,45 +9,43 @@ import {
 } from "../components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { ScrollArea } from "../components/ui/scroll-area";
-import { Badge } from "../components/ui/badge";
-import { UserPlus, Users, MessageSquare, Bell } from "lucide-react";
-import { useToast } from "../hooks/use-toast";
+import { UserPlus, Users, MessageSquare, Bell, UserCircle } from "lucide-react";
 import { UserContext } from "../lib/UserContext";
-
-interface Notification {
-  id: string;
-  type:
-    | "friend_request"
-    | "group_invite"
-    | "group_join_request"
-    | "unseen_message";
-  from: {
-    name: string;
-    avatar: string;
-  };
-  content: string;
-  timestamp: string;
-  groupName?: string;
-}
-
-// TODO ENABLE SORTING OF NOTIFICATIONS BY TYPE: 1, 2, 3, 4
+import { User } from "../interfaces/userinterface";
+import { Notifications } from "../interfaces/notifications";
+import { useNavigate } from "react-router-dom";
+import { formatDate } from "../lib/dateformater";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarProvider,
+} from "../components/ui/sidebar";
 
 export default function NotificationPage() {
-  const { toast } = useToast();
-  const [notifications, setNotifications] = React.useState<Notification[]>([]);
-
   const context = useContext(UserContext);
+  const navigate = useNavigate();
+  const [activeFilter, setActiveFilter] = useState<number | "all">("all");
 
   if (!context) {
     throw new Error("UserContext is not available");
   }
 
-  const { user } = context;
+  const { user, setUser } = context;
+
+  if (user?.username === "") {
+    navigate("/");
+  }
 
   useEffect(() => {
     const fetchNotifications = async () => {
       const result = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}api/notification/pending/${
+        `${import.meta.env.VITE_BACKEND_API_URL}/api/notification/pending/${
           user?.user_uuid
         }`,
         {
@@ -58,117 +56,223 @@ export default function NotificationPage() {
         }
       );
       const data = await result.json();
-      setNotifications(data);
+
+      setUser({
+        ...user,
+        notifications: data.notifications,
+      } as User);
     };
     fetchNotifications();
-  }, [user?.user_uuid]);
+  }, []);
 
-  const handleAction = (
-    notification: Notification,
+  const handleAction = async (
+    notification: Notifications,
     action: "accept" | "decline"
   ) => {
-    // This is where you would handle the action, redirect to the chat, or other logic
-    toast({
-      title: action === "accept" ? "Accepted" : "Declined",
-      description: `You have ${
-        action === "accept" ? "accepted" : "declined"
-      } the ${notification.type.replace("_", " ")}.`,
-    });
+    let result;
+    if (action === "accept") {
+      //console.log("accepting", notification);
+      result = await fetch(
+        `${import.meta.env.VITE_BACKEND_API_URL}/api/notification/accept/${
+          user?.user_uuid
+        }`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ notification }),
+        }
+      );
+    } else if (action === "decline") {
+      result = await fetch(
+        `${import.meta.env.VITE_BACKEND_API_URL}/api/notification/decline/${
+          user?.user_uuid
+        }`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ notification }),
+        }
+      );
+    }
+    if (result?.ok) {
+      setUser({
+        ...user,
+        notifications: user?.notifications?.filter((n) => n !== notification),
+      } as User);
+    } else {
+      alert("Unable to process notification");
+      throw new Error("Unable to process notification");
+    }
   };
 
-  const getIcon = (type: Notification["type"]) => {
+  const getIcon = (type: Notifications["catagory"]) => {
     switch (type) {
-      case "friend_request":
+      case 4:
         return <UserPlus className="h-4 w-4" />;
-      case "group_invite":
-      case "group_join_request":
+      case 3:
+      case 5:
         return <Users className="h-4 w-4" />;
-      case "unseen_message":
+      case 1:
+      case 2:
         return <MessageSquare className="h-4 w-4" />;
       default:
         return <Bell className="h-4 w-4" />;
     }
   };
 
+  const filteredNotifications =
+    activeFilter === "all"
+      ? user?.notifications
+      : user?.notifications?.filter(
+          (notification) => notification.catagory === activeFilter
+        );
+
   return (
-    <div className="container mx-auto py-10">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">Notifications</CardTitle>
-          <CardDescription>
-            Stay updated with your latest activities
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-[600px] w-full rounded-md border p-4">
-            {notifications.length === 0 ? (
-              <p>No notifications</p>
-            ) : (
-              notifications.map((notification) => (
-                <div key={notification.id} className="mb-4 last:mb-0">
-                  <Card>
-                    <CardContent className="p-4">
-                      <div className="flex items-start space-x-4">
-                        <Avatar>
-                          <AvatarImage
-                            src={notification.from.avatar}
-                            alt={notification.from.name}
-                          />
-                          <AvatarFallback>
-                            {notification.from.name[0]}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 space-y-1">
-                          <p className="text-sm font-medium leading-none">
-                            {notification.content}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {notification.timestamp}
-                          </p>
-                          {notification.groupName && (
-                            <Badge variant="secondary" className="mt-1">
-                              {notification.groupName}
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          {getIcon(notification.type)}
-                          {(notification.type === "friend_request" ||
-                            notification.type === "group_invite" ||
-                            notification.type === "group_join_request") && (
-                            <>
-                              <Button
-                                size="sm"
-                                onClick={() =>
-                                  handleAction(notification, "accept")
-                                }
-                              >
-                                Accept
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() =>
-                                  handleAction(notification, "decline")
-                                }
-                              >
-                                Decline
-                              </Button>
-                            </>
-                          )}
-                          {notification.type === "unseen_message" && (
-                            <Button size="sm">View</Button>
-                          )}
-                        </div>
+    <SidebarProvider>
+      <div className="flex h-screen">
+        <Sidebar>
+          <SidebarContent>
+            <SidebarGroup>
+              <SidebarGroupLabel>Filter</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      onClick={() => setActiveFilter("all")}
+                      isActive={activeFilter === "all"}
+                    >
+                      <Bell className="mr-2 h-4 w-4" />
+                      <span>All</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      onClick={() => setActiveFilter(4)}
+                      isActive={activeFilter === 4}
+                    >
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      <span>Friend Requests</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      onClick={() => setActiveFilter(2)}
+                      isActive={activeFilter === 2}
+                    >
+                      <Users className="mr-2 h-4 w-4" />
+                      <span>Group Invites</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      onClick={() => setActiveFilter(1)}
+                      isActive={activeFilter === 1}
+                    >
+                      <MessageSquare className="mr-2 h-4 w-4" />
+                      <span>Direct Messages</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      onClick={() => setActiveFilter(3)}
+                      isActive={activeFilter === 3}
+                    >
+                      <Users className="mr-2 h-4 w-4" />
+                      <span>Group Messages</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      onClick={() => setActiveFilter(5)}
+                      isActive={activeFilter === 5}
+                    >
+                      <UserCircle className="mr-2 h-4 w-4" />
+                      <span>Group Join Requests</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </SidebarContent>
+        </Sidebar>
+        <div className="flex-1">
+          <div className="container mx-auto py-10 w-max">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-2xl font-bold">
+                  Notifications
+                </CardTitle>
+                <CardDescription>
+                  Stay updated with your latest activities
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-[calc(100vh-200px)] w-full rounded-md border p-4">
+                  {filteredNotifications === null ||
+                  filteredNotifications?.length === 0 ? (
+                    <p>No notifications</p>
+                  ) : (
+                    filteredNotifications?.map((notification, index) => (
+                      <div key={index} className="mb-4 last:mb-0">
+                        <Card>
+                          <CardContent className="p-4">
+                            <div className="flex items-start space-x-4">
+                              <Avatar>
+                                <AvatarImage
+                                  src={notification.sender.avatarUrl}
+                                  alt={notification.sender.username}
+                                />
+                                <AvatarFallback>
+                                  {notification.sender.username[0]}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1 space-y-1">
+                                <p className="text-sm font-medium leading-none">
+                                  {notification.payload}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                  {formatDate(notification.date)}
+                                </p>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                {getIcon(notification.catagory)}
+                                {(notification.catagory === 4 ||
+                                  notification.catagory === 2 ||
+                                  notification.catagory === 5) && (
+                                  <>
+                                    <Button
+                                      size="sm"
+                                      onClick={() =>
+                                        handleAction(notification, "accept")
+                                      }
+                                    >
+                                      Accept
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      onClick={() =>
+                                        handleAction(notification, "decline")
+                                      }
+                                    >
+                                      Decline
+                                    </Button>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
                       </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              ))
-            )}
-          </ScrollArea>
-        </CardContent>
-      </Card>
-    </div>
+                    ))
+                  )}
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </SidebarProvider>
   );
 }
