@@ -12,9 +12,15 @@ const groupSchema = new Schema({
     type: [{ sender: MiniUser, message: String }],
     validate: {
       validator: function (v) {
-        return v.length <= 100; // Limit to 100 elements
+        if (v.between.length >= 100) {
+          v.between.splice(0, 1);
+          v.between.push(v);
+        } else {
+          v.between.push(v);
+        }
+        return v.between.length <= 100;
       },
-      message: "Chat History is limited to 100 messages",
+      message: "Group Chat History is limited to 100 messages",
     },
   },
 });

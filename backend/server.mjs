@@ -1,22 +1,36 @@
 "use strict";
-import express from "express";
+//local imports
 import "./loadEnviroment.mjs"; // Load environment variables
 import db from "./db/conn.mjs";
 import userController from "./controllers/account.mjs";
 import loginController from "./controllers/login.mjs";
 import friendController from "./controllers/friend.mjs";
 import notificationController from "./controllers/notification.mjs";
+
+//external imports
+import express from "express";
 import cors from "cors";
 import session from "express-session";
 import mongoStore from "connect-mongo";
 import passport from "passport";
-
+import { Server } from "socket.io";
+import http from "http";
+import join from "path";
 // TODO SET UP SOCKET.IO SERVERS
 // TODO USE JWT FOR AUTHORIZATION
+// TODO HAVE BACKEND SEND FRONTEND FILES
+/*
+app.get('/', (req, res) => {
+  res.sendFile(join(__dirname, 'index.html'));
+});
+*/
 
 const PORT = process.env.PORT || 8000;
 
 const app = express();
+// create socket io server for messages
+const server = http.createServer(app);
+const io = new Server(server);
 
 app.use(express.json());
 app.use(cors());
@@ -79,37 +93,13 @@ app.get("/", async (req, res) => {
   }
 });
 
-app.post("/", async (req, res) => {
-  try {
-    console.log("server.mjs - 81 - POST", req.body);
+// socket io server logics
 
-    res.setHeader("Access-Control-Allow-Origin", "*");
-
-    // Check if there are any existing users with matching IDs in test_data
-    const existingUsers = await db
-      .collection("users")
-      .find({ id: { $in: test_data.map((user) => user.id) } })
-      .toArray();
-
-    if (existingUsers.length > 0) {
-      // If duplicates are found, return an error message with the duplicates
-      return res.status(409).json({
-        error: "Duplicate users found",
-        duplicates: existingUsers.map((user) => user.id),
-      });
-    }
-
-    // If no duplicates are found, proceed with the insertion
-    const insertResult = await db.collection("users").insertMany(test_data);
-    console.log("server.mjs - 101 - Data inserted", insertResult);
-
-    // Fetch and return the updated list of users
-    const updatedResult = await db.collection("users").find({}).toArray();
-    res.json(updatedResult);
-  } catch (error) {
-    console.error("Error occurred:", error);
-    res.status(500).json({ error: "An error occurred" });
-  }
+io.on("connection", (socket) => {
+  console.log("a user connected");
+  socket.on("disconnect", () => {
+    console.log("user disconnected");
+  });
 });
 
 app.listen(PORT, () => {
