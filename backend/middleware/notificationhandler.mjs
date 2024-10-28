@@ -1,46 +1,116 @@
 import User from "../schemas/User.mjs";
+import db from "../db/conn.mjs";
+
+const prenotifCheck = async (userId, notificationData) => {
+  let hasbeenNotified = false;
+
+  //check that the user isnt already friended with them
+  const resultFriend = await db.collection("users").findOne({
+    user_uuid: userId,
+    friends: { $elemMatch: { user_uuid: notificationData.sender.user_uuid } },
+  });
+  if (resultFriend) {
+    //removes the notification if its already been sent
+    console.log(
+      "notificationHandler.mjs - 16 - removing notification that was added"
+    );
+    await User.updateOne(
+      { user_uuid: userId },
+      {
+        $pull: {
+          $elemMatch: {
+            type: notificationData.type,
+            "sender.user_uuid": notificationData.sender.user_uuid,
+            "sender.username": notificationData.sender.username,
+            "sender.user_profile": notificationData.sender.user_profile,
+            payload: notificationData.payload,
+          },
+        },
+      }
+    );
+    hasbeenNotified = true;
+  }
+
+  // check that the sender data isn't the same, minus the objectID (_id)
+  const resultAlreadyFriended = await db.collection("users").findOne({
+    user_uuid: userId,
+    notifications: {
+      $elemMatch: {
+        "sender.user_uuid": notificationData.sender.user_uuid,
+        "sender.username": notificationData.sender.username,
+        "sender.user_profile": notificationData.sender.user_profile,
+      },
+    },
+  });
+
+  if (resultAlreadyFriended) {
+    //removes the notification if its already been sent
+    console.log(
+      "notificationHandler.mjs - 46 - removing notification that was added"
+    );
+    await User.updateOne(
+      { user_uuid: userId },
+      {
+        $pull: {
+          $elemMatch: {
+            type: notificationData.type,
+            "sender.user_uuid": notificationData.sender.user_uuid,
+            "sender.username": notificationData.sender.username,
+            "sender.user_profile": notificationData.sender.user_profile,
+            payload: notificationData.payload,
+          },
+        },
+      }
+    );
+    hasbeenNotified = true;
+  }
+
+  // dont let the user send a friend request to themself
+  if (userId === notificationData.sender.user_uuid) {
+    //removes the notification if its already been sent
+    console.log(
+      "notificationHandler.mjs - 67 - removing notification that was added"
+    );
+    await User.updateOne(
+      { user_uuid: userId },
+      {
+        $pull: {
+          $elemMatch: {
+            type: notificationData.type,
+            "sender.user_uuid": notificationData.sender.user_uuid,
+            "sender.username": notificationData.sender.username,
+            "sender.user_profile": notificationData.sender.user_profile,
+            payload: notificationData.payload,
+          },
+        },
+      }
+    );
+    hasbeenNotified = true;
+  }
+  return hasbeenNotified;
+};
 
 // Middleware function to add notifications to the user's notifications field
 const addNotification = async (userId, notificationData) => {
   try {
-    //console.log("notificationData post add", notificationData);
-
-    //check that the user hasnt recieved a friend or join or invite request from the same user already
-    const result = await User.findOne({
-      user_uuid: userId,
-      notifications: {
-        $elemMatch: {
-          type: notificationData.type,
-          sender: notificationData.sender,
-        },
-      },
-    });
-    if (result) {
+    console.log(
+      "notificationData post add",
+      await prenotifCheck(userId, notificationData)
+    );
+    if (await prenotifCheck(userId, notificationData)) {
+      console.log(
+        `notificationHandler.mjs - 93 - Notification already sent to for offline user: ${userId}`
+      );
       return;
     } else {
-      // Find the user by userId (make sure this matches your schema field) and add the notification
-      // to the user's notifications array
-      const existingNotification = await User.findOne({
-        user_uuid: userId,
-        notifications: {
-          $elemMatch: {
-            type: notificationData.type,
-            sender: notificationData.sender,
-            payload: notificationData.payload,
-          },
-        },
-      });
-      if (!existingNotification) {
-        await User.updateOne(
-          { user_uuid: userId },
-          { $addToSet: { notifications: notificationData } }
-        );
-      }
+      console.log(
+        `notificationHandler.mjs - 97 - Notification added for offline user: ${userId}`
+      );
+      await User.updateOne(
+        { user_uuid: userId },
+        { $addToSet: { notifications: notificationData } }
+      );
     }
-
-    console.log(
-      `notificationHandler.mjs - 41 - Notification added for offline user: ${userId}`
-    );
   } catch (error) {
     console.error("Error adding notification:", error);
   }
@@ -53,7 +123,7 @@ const addnotificationHandler = (eventType) => {
   return async (req, res, next) => {
     try {
       console.log(
-        "notificaionHandler.mjs - 55 - Received request",
+        "notificaionHandler.mjs - 121 - Received request",
         req.body.user_profile
       );
       // console.log("recipient", req.params.user_uuid);
@@ -94,7 +164,7 @@ const addnotificationHandler = (eventType) => {
       };
 
       console.log(
-        "notificationHandler.mjs - 96 - notificationData pre add",
+        "notificationHandler.mjs - 162 - notificationData pre add",
         notificationData
       );
 

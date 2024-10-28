@@ -16,86 +16,12 @@ friendController.put(
   async (req, res) => {
     try {
       console.log("friend.mjs - 18 -recieved", req.body);
-      console.log(
-        "friend.mjs - 19 - sent from the same user",
-        req.body.user_uuid === req.params.user_uuid
-      );
       //create new friend object based on MiniUser schema
       const newFriend = {
         MU_Num: req.body.user_uuid,
         username: req.body.username,
         user_profile: req.body.user_profile,
       };
-
-      //check that the user isnt already friended with them
-      const resultFriend = await db.collection("users").findOne({
-        user_uuid: req.params.user_uuid,
-        friends: { $elemMatch: { user_uuid: req.body.user_uuid } },
-      });
-      if (resultFriend) {
-        //removes the notification if its already been sent
-        console.log("friend.mjs - 53 - removing notification that was added");
-        await User.updateOne(
-          { user_uuid: userId },
-          {
-            $pull: {
-              $elemMatch: {
-                type: notificationData.type,
-                sender: notificationData.sender,
-                payload: notificationData.payload,
-              },
-            },
-          }
-        );
-        return res
-          .status(200)
-          .json({ message: "You're already friends with this person" });
-      }
-      // check that the user hasnt already sent a friend request to them
-      const resultAlreadyFriended = await db.collection("users").findOne({
-        user_uuid: req.params.user_uuid,
-        requests: { $elemMatch: newFriend },
-      });
-      if (resultAlreadyFriended) {
-        //removes the notification if its already been sent
-        console.log("friend.mjs - 53 - removing notification that was added");
-        await User.updateOne(
-          { user_uuid: userId },
-          {
-            $pull: {
-              $elemMatch: {
-                type: notificationData.type,
-                sender: notificationData.sender,
-                payload: notificationData.payload,
-              },
-            },
-          }
-        );
-        return res.status(200).json({
-          message: "You've already sent a friend request to this user",
-        });
-      }
-      // dont let the user send a friend request to themself
-      if (req.body.user_uuid === req.params.user_uuid) {
-        //TODO turn notification remover into function
-        //removes the notification if its already been sent
-        console.log("friend.mjs - 53 - removing notification that was added");
-        await User.updateOne(
-          { user_uuid: userId },
-          {
-            $pull: {
-              $elemMatch: {
-                type: notificationData.type,
-                sender: notificationData.sender,
-                payload: notificationData.payload,
-              },
-            },
-          }
-        );
-        return res
-          .status(200)
-          .json({ message: "You can't send a friend request to yourself" });
-      }
 
       const result = await db.collection("users").updateOne(
         { user_uuid: req.params.user_uuid },
