@@ -9,30 +9,39 @@ import { addnotificationHandler } from "../middleware/notificationhandler.mjs";
 const friendController = express.Router();
 
 // PUT friend request to user
-// TODO MAKE SURE IF THE REQUEST HAS BEEN SENT, THEN IT CANNOT BE SENT AGAIN
 friendController.put(
   "/request/:user_uuid",
   addnotificationHandler(4),
   async (req, res) => {
     try {
       console.log("friend.mjs - 18 -recieved", req.body);
-      //create new friend object based on MiniUser schema
-      const newFriend = {
-        MU_Num: req.body.user_uuid,
-        username: req.body.username,
-        user_profile: req.body.user_profile,
-      };
 
-      const result = await db.collection("users").updateOne(
-        { user_uuid: req.params.user_uuid },
-        {
-          $addToSet: {
-            requests: {
-              newFriend,
+      const blockedUser = await User.findOne({
+        user_uuid: req.params.user_uuid,
+        $elemMatch: {
+          blocked: req.body.user_uuid,
+        },
+      });
+
+      if (blockedUser === null) {
+        //create new friend object based on MiniUser schema
+        const newFriend = {
+          MU_Num: req.body.user_uuid,
+          username: req.body.username,
+          user_profile: req.body.user_profile,
+        };
+
+        const result = await db.collection("users").updateOne(
+          { user_uuid: req.params.user_uuid },
+          {
+            $addToSet: {
+              requests: {
+                newFriend,
+              },
             },
-          },
-        }
-      );
+          }
+        );
+      }
       res.status(200).json(result);
     } catch (error) {
       console.error("Error sending friend request: ", error);

@@ -26,7 +26,7 @@ NotificationController.delete("/clear/:user_uuid", async (req, res) => {
   }
 });
 
-/* TODO IMPLEMENT ACCEPTING THE NOTIFICATION
+/*  IMPLEMENTED ACCEPTING THE NOTIFICATION
  MAY NEED ADDITION HANDLER FOR TYPES OF REQUESTS OF WHICH THERE ARE 5
  messages from user (1) or group (2), group invite (3), friend request(4), group join request(5)
  for 1 & 2, just redirect them to that chat

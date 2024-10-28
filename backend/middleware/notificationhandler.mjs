@@ -118,7 +118,6 @@ const addNotification = async (userId, notificationData) => {
 
 // Global middleware to handle notifications for users
 // adds all requests to the user's notifications field
-// TODO ONLY ADD NOTIFICATIONS THAT ARENT FROM BLOCKED USERSs
 const addnotificationHandler = (eventType) => {
   return async (req, res, next) => {
     try {
@@ -168,8 +167,18 @@ const addnotificationHandler = (eventType) => {
         notificationData
       );
 
-      // Call the notification handler for offline users
-      await addNotification(req.params.user_uuid, notificationData);
+      //check that request isnt from a user within the blocked users list of the user
+      const blockedUser = await User.findOne({
+        user_uuid: req.params.user_uuid,
+        $elemMatch: {
+          blocked: req.body.user_uuid,
+        },
+      });
+
+      // Call the notification handler for offline users, if the user isnt blocked
+      if (blockedUser === null) {
+        await addNotification(req.params.user_uuid, notificationData);
+      }
 
       // Proceed to the next middleware or route handler
       next();
