@@ -4,17 +4,20 @@ import { ScrollArea } from "../components/ui/scroll-area";
 import { Separator } from "../components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { Settings, LogOut, Search, Send, Bell } from "lucide-react";
-import { useContext } from "react";
+import { useContext, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../lib/UserContext";
 import { User } from "../interfaces/userinterface";
 import { cn } from "../lib/utils";
+import { MiniUser } from "../interfaces/miniuser";
 
 // TODO USE PAGINATION WHEN SERVING CHAT MESSAGES TO 10 PER
 // TODO MAKE ALL TEXT BLACK SO IT CAN BE SEEN ON FIREFOX
 
 export default function HomePage() {
   const context = useContext(UserContext);
+  const [friendChat, setFriendChat] = useState<string[] | null>(null);
+  const selectedFriend = useRef<MiniUser | null>(null);
   const navigate = useNavigate();
 
   if (!context) {
@@ -47,6 +50,23 @@ export default function HomePage() {
     } catch (error) {
       console.error("Error during logout:", error);
     }
+  };
+
+  const startChatting = async (friend: MiniUser) => {
+    const chat = await fetch(
+      `${import.meta.env.VITE_BACKEND_API_URL}/api/chat/${friend.user_uuid}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ user_uuid: user?.user_uuid }),
+      }
+    );
+    const chatData = await chat.json();
+    console.log("homepage.tsx - 67 - CHAT", chatData);
+    setFriendChat(chatData);
+    selectedFriend.current = friend;
   };
 
   return (
@@ -119,12 +139,16 @@ export default function HomePage() {
               ) : (
                 user?.friends.map((friend, index) => (
                   <li key={index}>
-                    <Button variant="ghost" className="w-full justify-start">
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start"
+                      onClick={() => startChatting(friend)}
+                    >
                       <Avatar className="w-6 h-6 mr-2">
                         <AvatarImage
                           src={`https://api.dicebear.com/6.x/initials/svg?seed=${friend.username[0]}`}
                         />
-                        <AvatarFallback>{"USER"}</AvatarFallback>
+                        <AvatarFallback>{friend.username[0]}</AvatarFallback>
                       </Avatar>
                       {friend.username}
                     </Button>
@@ -139,31 +163,40 @@ export default function HomePage() {
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col">
         <header className="bg-white border-b p-4">
-          <h1 className="text-xl font-semibold">GROUP THATS BEEN SELECTED</h1>
+          <h1 className="text-xl font-semibold">
+            Messages to {selectedFriend.current?.username}
+          </h1>
         </header>
         <ScrollArea className="flex-1 p-4">
           <div className="space-y-4">
-            {[
-              { sender: "Alice", message: "Hey everyone! How's it going?" },
-              { sender: "Bob", message: "Pretty good, thanks! How about you?" },
-              {
-                sender: "Charlie",
-                message: "Just finished a big project. Feeling accomplished!",
-              },
-            ].map((msg, index) => (
-              <div key={index} className="flex items-start space-x-2">
-                <Avatar>
-                  <AvatarImage
-                    src={`https://api.dicebear.com/6.x/initials/svg?seed=${msg.sender}`}
-                  />
-                  <AvatarFallback>{msg.sender[0]}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="font-semibold">{msg.sender}</p>
-                  <p>{msg.message}</p>
+            {friendChat?.length === 0 ? (
+              <p>No messages found</p>
+            ) : (
+              friendChat?.map((msg, index) => (
+                <div key={index} className="flex items-start space-x-2">
+                  <Avatar>
+                    <AvatarImage src={selectedFriend.current?.avatarUrl} />
+                    <AvatarFallback>
+                      {selectedFriend.current?.username[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div
+                    className={`flex ${
+                      msg.startsWith("U-") ? "justify-end" : "justify-start"
+                    }`}
+                  >
+                    <div>
+                      <p className="font-semibold">
+                        {msg.startsWith("U-")
+                          ? "You"
+                          : selectedFriend.current?.username}
+                      </p>
+                      <p>{msg.replace(/^U-|^T-/, "")}</p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </ScrollArea>
         <footer className="bg-white border-t p-4">

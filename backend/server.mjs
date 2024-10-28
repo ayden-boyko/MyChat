@@ -59,6 +59,9 @@ app.use("/api/friend", friendController);
 // Use the notification controller
 app.use("/api/notification", notificationController);
 
+// Use the chat controller
+app.use("/api/chat", chatController);
+
 app.get("/", async (req, res) => {
   try {
     console.log("server.mjs - 64 - GET", req.body);

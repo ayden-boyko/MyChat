@@ -76,7 +76,7 @@ loginController.post("/password", (req, res, next) => {
       }
       let pulledUser = await db
         .collection("users")
-        .findOne({ email: user.email });
+        .findOne({ email: user.email }, { projection: { chat: 0 } });
 
       console.log(
         "login.mjs - 81 -pulled user from login credentials",
