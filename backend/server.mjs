@@ -94,7 +94,7 @@ app.get("/", async (req, res) => {
 });
 
 // socket io server logics
-
+// TODO when user disconnects, set the online status to false
 io.on("connection", (socket) => {
   console.log("a user connected");
   socket.on("disconnect", () => {
