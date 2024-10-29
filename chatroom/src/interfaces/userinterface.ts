@@ -1,3 +1,4 @@
+import { Socket } from "socket.io-client";
 import { MiniUser } from "./miniuser";
 import { Notifications } from "./notifications";
 
@@ -14,6 +15,7 @@ export interface User {
   requests: MiniUser[];
   notifications: Notifications[];
   online: boolean;
+  socket: Socket;
 }
 
 export interface UserContextValue {

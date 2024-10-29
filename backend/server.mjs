@@ -6,6 +6,8 @@ import userController from "./controllers/account.mjs";
 import loginController from "./controllers/login.mjs";
 import friendController from "./controllers/friend.mjs";
 import notificationController from "./controllers/notification.mjs";
+import chatController from "./controllers/chat.mjs";
+import UserNamespace from "./namespaces/usernamespace.mjs";
 
 //external imports
 import express from "express";
@@ -14,9 +16,7 @@ import session from "express-session";
 import mongoStore from "connect-mongo";
 import passport from "passport";
 import { Server } from "socket.io";
-import http from "http";
-import join from "path";
-// TODO SET UP SOCKET.IO SERVERS
+import { createServer } from "http";
 // TODO USE JWT FOR AUTHORIZATION
 // TODO HAVE BACKEND SEND FRONTEND FILES
 /*
@@ -28,9 +28,15 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 8000;
 
 const app = express();
+
 // create socket io server for messages
-const server = http.createServer(app);
-const io = new Server(server);
+const server = createServer(app);
+const io = new Server(server, {
+  cleanupEmptyChildNamespaces: true,
+  cors: {
+    origin: "http://localhost:5173",
+  },
+});
 
 app.use(express.json());
 app.use(cors());
@@ -93,15 +99,10 @@ app.get("/", async (req, res) => {
   }
 });
 
-// socket io server logics
-// TODO when user disconnects, set the online status to false
-io.on("connection", (socket) => {
-  console.log("a user connected");
-  socket.on("disconnect", () => {
-    console.log("user disconnected");
-  });
-});
+//namespaces for user and group messages
+const userNamespace = io.of("/user");
+new UserNamespace(userNamespace);
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });

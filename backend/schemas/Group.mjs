@@ -7,7 +7,7 @@ const groupSchema = new Schema({
   group_num: String,
   group_name: String,
   group_profile: String,
-  members: { type: [MiniUser], default: [] }, // [MiniUser],
+  members: { type: [MiniUser], default: [] },
   chat: {
     type: [{ sender: MiniUser, message: String }],
     validate: {

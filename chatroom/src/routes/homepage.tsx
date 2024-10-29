@@ -4,20 +4,23 @@ import { ScrollArea } from "../components/ui/scroll-area";
 import { Separator } from "../components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { Settings, LogOut, Search, Send, Bell } from "lucide-react";
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../lib/UserContext";
 import { User } from "../interfaces/userinterface";
 import { cn } from "../lib/utils";
 import { MiniUser } from "../interfaces/miniuser";
+import { io } from "socket.io-client";
 
-// TODO USE PAGINATION WHEN SERVING CHAT MESSAGES TO 10 PER
 // TODO MAKE ALL TEXT BLACK SO IT CAN BE SEEN ON FIREFOX
 
 export default function HomePage() {
   const context = useContext(UserContext);
-  const [friendChat, setFriendChat] = useState<string[] | null>(null);
-  const selectedFriend = useRef<MiniUser | null>(null);
+  const [friendChat, setFriendChat] = useState<
+    { sender: string; message: string }[] | null
+  >(null);
+  const [hasJoined, setHasJoined] = useState<boolean>(false);
+  const [selectedFriend, setSelectedFriend] = useState<MiniUser | null>(null);
   const navigate = useNavigate();
 
   if (!context) {
@@ -31,7 +34,30 @@ export default function HomePage() {
     navigate("/");
   }
 
-  console.log("hompage.tsx - 31 - USER-HOME", user);
+  useEffect(() => {
+    if (!hasJoined) {
+      const createSocket = async () => {
+        // instantiate user socket
+        const socket = io("http://localhost:8000/user");
+        setUser({ ...user, socket: socket } as User);
+        // join the user namespace
+        socket.emit("join", user?.user_uuid);
+        setHasJoined(true);
+      };
+
+      createSocket();
+    }
+
+    user?.socket?.on("message", (data) =>
+      setFriendChat((prevChat) => {
+        if (prevChat === null)
+          return [{ sender: data.sender, message: data.message }];
+        return [...prevChat, { sender: data.sender, message: data.message }];
+      })
+    );
+  }, [user]);
+
+  console.log("hompage.tsx - 60 - USER-HOME", user);
 
   const logout = async (user: User | null) => {
     try {
@@ -53,20 +79,64 @@ export default function HomePage() {
   };
 
   const startChatting = async (friend: MiniUser) => {
+    console.log("homepage.tsx - 80 - FRIEND", friend);
+    if (friend === null) {
+      alert("Please select a friend to start chatting");
+      return;
+    }
     const chat = await fetch(
-      `${import.meta.env.VITE_BACKEND_API_URL}/api/chat/${friend.user_uuid}`,
+      `${import.meta.env.VITE_BACKEND_API_URL}/api/chat/${user?.user_uuid}/${
+        friend.user_uuid
+      }`,
       {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ user_uuid: user?.user_uuid }),
       }
     );
     const chatData = await chat.json();
-    console.log("homepage.tsx - 67 - CHAT", chatData);
+    console.log("homepage.tsx - 84 - CHAT", chatData);
     setFriendChat(chatData);
-    selectedFriend.current = friend;
+    setSelectedFriend(friend);
+  };
+
+  // TODO ONCE FRIEND HAS BEEN SELECTED PULL THE CHAT HISTORY TO DISPLAY IT
+  const sendMessage = async (event: React.FormEvent<HTMLFormElement>) => {
+    event?.preventDefault();
+    const message = document.getElementById("msg") as HTMLInputElement;
+    console.log("homepage.tsx - 104 - MESSAGE", message.value);
+
+    startChatting(selectedFriend as MiniUser); // to refresh the caht incase they sent something
+
+    if (message.value === "") {
+      return;
+    }
+    //update friendcaht to have the message we are about to send
+    if (friendChat !== null) {
+      setFriendChat((prevChat) => {
+        if (prevChat === null)
+          return [{ sender: user?.username ?? "", message: message.value }];
+        return [
+          ...prevChat,
+          { sender: user?.username ?? "", message: message.value },
+        ];
+      });
+    }
+
+    //send message with socket.io, the message will be added to the chat on the backend
+    user?.socket.emit("message", {
+      sendee: selectedFriend?.user_uuid,
+      message: message.value,
+      //sender is in the format of a MiniUser
+      sender: {
+        username: user?.username,
+        user_uuid: user?.user_uuid,
+        user_profile: user?.user_profile,
+      },
+    });
+    //clear form
+    message.value = "";
   };
 
   return (
@@ -118,7 +188,9 @@ export default function HomePage() {
             <h2 className="text-lg font-semibold mb-2">Groups</h2>
             <ul className="space-y-2">
               {/* Render the list of groups here, if none render "No groups found" */}
-              {user?.groups === undefined || user?.groups === null ? (
+              {user?.groups === undefined ||
+              user?.groups === null ||
+              user?.groups.length === 0 ? (
                 <li>No groups found</li>
               ) : (
                 user?.groups.map((group, index) => (
@@ -134,7 +206,9 @@ export default function HomePage() {
             <h2 className="text-lg font-semibold mb-2">Direct Messages</h2>
             <ul className="space-y-2">
               {/* Render the list of direct messages here, if none render "No direct messages found" */}
-              {user?.friends === undefined || user?.friends === null ? (
+              {user?.friends === undefined ||
+              user?.friends === null ||
+              user?.friends.length === 0 ? (
                 <li>No direct messages found</li>
               ) : (
                 user?.friends.map((friend, index) => (
@@ -164,34 +238,42 @@ export default function HomePage() {
       <main className="flex-1 flex flex-col">
         <header className="bg-white border-b p-4">
           <h1 className="text-xl font-semibold">
-            Messages to {selectedFriend.current?.username}
+            Messages to {selectedFriend?.username}
           </h1>
         </header>
         <ScrollArea className="flex-1 p-4">
           <div className="space-y-4">
-            {friendChat?.length === 0 ? (
-              <p>No messages found</p>
+            {friendChat?.length === 0 || selectedFriend === null ? (
+              <p>No messages</p>
             ) : (
               friendChat?.map((msg, index) => (
                 <div key={index} className="flex items-start space-x-2">
                   <Avatar>
-                    <AvatarImage src={selectedFriend.current?.avatarUrl} />
+                    <AvatarImage src={selectedFriend?.avatarUrl} />
                     <AvatarFallback>
-                      {selectedFriend.current?.username[0]}
+                      {selectedFriend?.username[0]}
                     </AvatarFallback>
                   </Avatar>
                   <div
                     className={`flex ${
-                      msg.startsWith("U-") ? "justify-end" : "justify-start"
+                      msg.sender === user?.user_uuid
+                        ? "justify-end"
+                        : "justify-start"
                     }`}
                   >
-                    <div>
+                    <div
+                      className={`max-w-xs p-2 rounded-md ${
+                        msg.sender === user?.user_uuid
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-200 text-black"
+                      }`}
+                    >
                       <p className="font-semibold">
-                        {msg.startsWith("U-")
+                        {msg.sender === user?.user_uuid
                           ? "You"
-                          : selectedFriend.current?.username}
+                          : selectedFriend?.username}
                       </p>
-                      <p>{msg.replace(/^U-|^T-/, "")}</p>
+                      <p className="text-sm">{msg.message}</p>
                     </div>
                   </div>
                 </div>
@@ -199,14 +281,22 @@ export default function HomePage() {
             )}
           </div>
         </ScrollArea>
-        <footer className="bg-white border-t p-4">
-          <form className="flex space-x-2">
-            <Input className="flex-1" placeholder="Type a message..." />
-            <Button type="submit" size="icon">
-              <Send className="h-4 w-4" />
-            </Button>
-          </form>
-        </footer>
+        {selectedFriend === null ? (
+          <p>Select a friend to start chatting</p>
+        ) : (
+          <footer className="bg-white border-t p-4">
+            <form className="flex space-x-2" onSubmit={sendMessage}>
+              <Input
+                className="flex-1"
+                placeholder="Type a message..."
+                id="msg"
+              />
+              <Button type="submit" size="icon">
+                <Send className="h-4 w-4" />
+              </Button>
+            </form>
+          </footer>
+        )}
       </main>
     </div>
   );

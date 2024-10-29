@@ -1,6 +1,7 @@
 // routes/account.js
 import express from "express";
 import db from "../db/conn.mjs";
+import User from "../schemas/User.mjs";
 
 import MiniUser from "../schemas/MiniUser.mjs";
 
@@ -18,9 +19,7 @@ friendController.put(
 
       const blockedUser = await User.findOne({
         user_uuid: req.params.user_uuid,
-        $elemMatch: {
-          blocked: req.body.user_uuid,
-        },
+        blocked: { $in: [req.body.user_uuid] },
       });
 
       if (blockedUser === null) {
@@ -41,8 +40,9 @@ friendController.put(
             },
           }
         );
+
+        res.status(200).json(result);
       }
-      res.status(200).json(result);
     } catch (error) {
       console.error("Error sending friend request: ", error);
       res.status(500).json({ error: "Error sending friend request" });
@@ -59,6 +59,14 @@ friendController.put("/accept/:user_uuid", async (req, res) => {
       .updateOne(
         { user_uuid: req.params.user_uuid },
         { $addToSet: { friends: req.body.mini_user } }
+      );
+
+    // remove from requests
+    const requests = await db
+      .collection("users")
+      .updateOne(
+        { user_uuid: req.body.mini_user.user_uuid },
+        { $pull: { requests: { MU_Num: req.params.user_uuid } } }
       );
 
     //create mini user based on the request sender, this will be added to our friends,

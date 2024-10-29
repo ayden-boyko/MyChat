@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from "uuid";
 
 import MiniUser from "./MiniUser.mjs";
 import Notifications from "./Notifications.mjs";
-
 // TODO IMPLEMENT USER PROFILES IMAGES, USE MULTER?
 
 const { Schema, model } = mongoose;
@@ -21,8 +20,8 @@ const userSchema = new Schema({
   salt: String,
   user_profile: { type: String, default: "" },
   friends: { type: [MiniUser], default: [] },
-  blocked: { type: [Number], default: [] },
-  groups: { type: [Number], default: [] },
+  blocked: { type: [String], default: [] },
+  groups: { type: [String], default: [] },
   requests: { type: [MiniUser], default: [] },
   notifications: { type: [Notifications], default: [] },
   online: { type: Boolean, default: true },

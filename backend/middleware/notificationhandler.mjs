@@ -12,7 +12,7 @@ const prenotifCheck = async (userId, notificationData) => {
   if (resultFriend) {
     //removes the notification if its already been sent
     console.log(
-      "notificationHandler.mjs - 16 - removing notification that was added"
+      "notificationHandler.mjs - 15 - removing notification that was added"
     );
     await User.updateOne(
       { user_uuid: userId },
@@ -46,7 +46,7 @@ const prenotifCheck = async (userId, notificationData) => {
   if (resultAlreadyFriended) {
     //removes the notification if its already been sent
     console.log(
-      "notificationHandler.mjs - 46 - removing notification that was added"
+      "notificationHandler.mjs - 49 - removing notification that was added"
     );
     await User.updateOne(
       { user_uuid: userId },
@@ -69,7 +69,7 @@ const prenotifCheck = async (userId, notificationData) => {
   if (userId === notificationData.sender.user_uuid) {
     //removes the notification if its already been sent
     console.log(
-      "notificationHandler.mjs - 67 - removing notification that was added"
+      "notificationHandler.mjs - 72 - removing notification that was added"
     );
     await User.updateOne(
       { user_uuid: userId },
@@ -99,12 +99,12 @@ const addNotification = async (userId, notificationData) => {
     );
     if (await prenotifCheck(userId, notificationData)) {
       console.log(
-        `notificationHandler.mjs - 93 - Notification already sent to for offline user: ${userId}`
+        `notificationHandler.mjs - 102 - Notification already sent to for offline user: ${userId}`
       );
       return;
     } else {
       console.log(
-        `notificationHandler.mjs - 97 - Notification added for offline user: ${userId}`
+        `notificationHandler.mjs - 107 - Notification added for offline user: ${userId}`
       );
       await User.updateOne(
         { user_uuid: userId },
@@ -112,7 +112,7 @@ const addNotification = async (userId, notificationData) => {
       );
     }
   } catch (error) {
-    console.error("Error adding notification:", error);
+    console.error("Error adding notification - 115 -:", error);
   }
 };
 
@@ -122,7 +122,7 @@ const addnotificationHandler = (eventType) => {
   return async (req, res, next) => {
     try {
       console.log(
-        "notificaionHandler.mjs - 121 - Received request",
+        "notificaionHandler.mjs - 125 - Received request",
         req.body.user_profile
       );
       // console.log("recipient", req.params.user_uuid);
@@ -163,16 +163,14 @@ const addnotificationHandler = (eventType) => {
       };
 
       console.log(
-        "notificationHandler.mjs - 162 - notificationData pre add",
+        "notificationHandler.mjs - 166 - notificationData pre add",
         notificationData
       );
 
       //check that request isnt from a user within the blocked users list of the user
       const blockedUser = await User.findOne({
         user_uuid: req.params.user_uuid,
-        $elemMatch: {
-          blocked: req.body.user_uuid,
-        },
+        blocked: { $in: [req.body.user_uuid] },
       });
 
       // Call the notification handler for offline users, if the user isnt blocked
@@ -183,7 +181,7 @@ const addnotificationHandler = (eventType) => {
       // Proceed to the next middleware or route handler
       next();
     } catch (error) {
-      console.error("Error in notification middleware:", error);
+      console.error("Error in notification middleware - 186 -:", error);
       res
         .status(500)
         .json({ message: "Server error in notification handling" });
@@ -259,7 +257,7 @@ const notificationExecuterHandler = async (userId, notificationData, next) => {
       default:
         throw new Error("Invalid notification type");
     }
-    console.log("notificationhandler - 183 - notification executed", result);
+    console.log("notificationhandler - 265 - notification executed", result);
     // Proceed to the next middleware or route handler
     next();
   } catch (error) {

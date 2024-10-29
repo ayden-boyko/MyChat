@@ -14,7 +14,6 @@ const MiniUser = new Schema({
   },
   user_profile: {
     type: String,
-    required: true,
     default: "",
   },
 });

@@ -4,40 +4,32 @@ import MiniUser from "./MiniUser.mjs";
 
 const { Schema, model } = mongoose;
 
-const chatSchema = new Schema(
-  {
-    between: {
-      type: [MiniUser],
-      required: true,
-      default: [],
-    },
-    sender: {
-      type: MiniUser, // doesnt need to be unique since a user can send multiple things
-      required: true,
-      default: null,
-    },
-    message: String,
-    date: {
-      type: Date,
-      default: Date.now,
-    },
+const chatSchema = new Schema({
+  between: {
+    type: [String],
+    required: true,
+    default: [],
   },
-  {
+  messages: {
+    type: [
+      {
+        sender: MiniUser,
+        message: String,
+      },
+    ],
+    default: [],
     validate: {
       validator: function (v) {
-        if (v.between.length >= 50) {
-          v.between.splice(0, 1);
-          v.between.push(v);
-        } else {
-          v.between.push(v);
-        }
-        return v.between.length <= 50;
+        return v.length <= 50;
       },
       message: "Chat History is limited to 50 messages",
     },
-  }
-);
+  },
+  date: {
+    type: Date,
+    default: Date.now,
+  },
+});
 
 const Chats = model("chats", chatSchema);
-
 export default Chats;

@@ -13,6 +13,7 @@ import SearchPage from "./routes/searchpage.tsx";
 import NotificationPage from "./routes/notificationpage.tsx";
 import { User } from "./interfaces/userinterface.ts";
 import { MiniUser } from "./interfaces/miniuser.ts";
+import { Socket } from "socket.io-client";
 //const API = "http://localhost:8000/";
 
 // TODO IMPLEMENT DARK MODE
@@ -34,6 +35,7 @@ function App() {
     requests: [],
     notifications: [],
     online: true,
+    socket: {} as Socket,
   });
 
   return (
