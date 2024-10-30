@@ -6,7 +6,8 @@ import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local"; //middleware for authentication
 import crypto from "crypto";
 import User from "../schemas/User.mjs";
-import { register } from "module";
+// import jsonwebtoken
+import jwt from "jsonwebtoken";
 
 const loginController = express.Router();
 
@@ -74,22 +75,30 @@ loginController.post("/password", (req, res, next) => {
       if (err) {
         return res.status(500).json({ message: "Error during login" });
       }
-      let pulledUser = await db
+      const returnedUser = await db
         .collection("users")
         .findOne({ email: user.email }, { projection: { chat: 0 } });
 
       console.log(
         "login.mjs - 81 -pulled user from login credentials",
-        pulledUser
+        returnedUser
       );
 
       await User.updateOne(
-        { user_uuid: pulledUser.user_uuid },
+        { user_uuid: returnedUser.user_uuid },
         { $set: { online: true } }
       );
 
+      const jwttoken = jwt.sign(
+        { user_uuid: returnedUser.user_uuid },
+        process.env.JWT_SECRET_KEY,
+        {
+          expiresIn: "24h",
+        }
+      );
+
       console.log("login.mjs - 88 - logged in"); // Log after successful login
-      res.status(200).json(pulledUser);
+      res.status(200).json({ pulledUser: returnedUser, token: jwttoken });
     });
   })(req, res, next);
 });

@@ -17,6 +17,7 @@ import mongoStore from "connect-mongo";
 import passport from "passport";
 import { Server } from "socket.io";
 import { createServer } from "http";
+import { configDotenv } from "dotenv";
 // TODO USE JWT FOR AUTHORIZATION
 // TODO HAVE BACKEND SEND FRONTEND FILES
 /*
@@ -24,6 +25,8 @@ app.get('/', (req, res) => {
   res.sendFile(join(__dirname, 'index.html'));
 });
 */
+
+configDotenv();
 
 const PORT = process.env.PORT || 8000;
 
@@ -35,17 +38,12 @@ const io = new Server(server, {
   cleanupEmptyChildNamespaces: true,
   cors: {
     origin: "http://localhost:5173",
+    credentials: true,
   },
 });
 
 app.use(express.json());
 app.use(cors());
-
-// Set CORS headers for all responses
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  next();
-});
 
 // Express session setup
 app.use(
@@ -99,10 +97,10 @@ app.get("/", async (req, res) => {
   }
 });
 
-//namespaces for user and group messages
-const userNamespace = io.of("/user");
-new UserNamespace(userNamespace);
-
 server.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });
+
+//namespaces for user and group messages
+const userNamespace = io.of("/user");
+new UserNamespace(userNamespace);

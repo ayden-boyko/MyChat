@@ -30,15 +30,19 @@ export default function HomePage() {
 
   const { user, setUser } = context;
 
-  if (user?.username === "") {
-    navigate("/");
-  }
-
   useEffect(() => {
+    if (user?.username === "") {
+      navigate("/");
+    }
+
     if (!hasJoined) {
       const createSocket = async () => {
         // instantiate user socket
-        const socket = io("http://localhost:8000/user");
+        const socket = io("http://localhost:8000/user", {
+          query: {
+            user_uuid: user?.user_uuid, // include user_uuid here
+          },
+        });
         setUser({ ...user, socket: socket } as User);
         // join the user namespace
         socket.emit("join", user?.user_uuid);
@@ -102,6 +106,8 @@ export default function HomePage() {
   };
 
   // TODO ONCE FRIEND HAS BEEN SELECTED PULL THE CHAT HISTORY TO DISPLAY IT
+  // TODO PROPERLLY DISPLAY THE MESSAGES THAT THE USER SENDS NOT JUST THE ONES THE RECEIVE (WHICH ARENT WORKING EITHER)
+  // TODO MAKE A CALL TO THE BACKEND ROUTE TO ADD A NOTIFICATION IF THE USER ISNT ONLINE
   const sendMessage = async (event: React.FormEvent<HTMLFormElement>) => {
     event?.preventDefault();
     const message = document.getElementById("msg") as HTMLInputElement;

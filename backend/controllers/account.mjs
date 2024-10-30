@@ -3,39 +3,9 @@ import express from "express";
 import User from "../schemas/User.mjs"; // Import the User schema
 import db from "../db/conn.mjs";
 import crypto from "crypto";
+import checkRights from "../middleware/authenticationhandler.mjs";
 
 const userController = express.Router();
-
-// TODO USE JWT FOR AUTHORIZATION
-async function checkRights(req, res, next) {
-  try {
-    // Ensure req.user is defined
-    if (!req.params || !req.body) {
-      return res.status(403).json({ message: "Access denied" });
-      w;
-    }
-
-    // Fetch the user from the database
-    const userFromDb = await db
-      .collection("users")
-      .findOne({ user_uuid: parseInt(req.params.user_uuid) });
-
-    // Ensure user exists in the database
-    if (!userFromDb) {
-      return res.status(403).json({ message: "Access denied" });
-    }
-
-    // Compare the IDs
-    if (req.body.id === userFromDb._id.toString()) {
-      return next(); // User has access, proceed to the next middleware
-    } else {
-      return res.status(403).json({ message: "Access denied" });
-    }
-  } catch (error) {
-    console.error("Error checking rights:", error);
-    return res.status(500).json({ message: "Error checking rights" });
-  }
-}
 
 // GET all users
 userController.get("/get/all", async (req, res) => {
@@ -141,20 +111,19 @@ userController.post("/create", async (req, res) => {
   }
 });
 
-// ! MUST HAVE PROPER AUTHORIZATION TO DELETE USER
+// TODO MUST HAVE PROPER AUTHORIZATION TO DELETE USER
 // DELETE user (may have parameters change after JWT is implemented)
 userController.delete("/delete/:user_uuid", checkRights, async (req, res) => {
   try {
     const result = await db
       .collection("users")
-      .deleteOne({ user_uuid: parseInt(req.params.user_uuid) });
+      .deleteOne({ user_uuid: req.params.user_uuid });
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: "An error occurred" });
   }
 });
 
-// ! MUST HAVE PROPER AUTHORIZATION TO UPDATE USER
 // PUT update username/profile (may have parameters change after JWT is implemented)
 userController.put("/update/:user_uuid", checkRights, async (req, res) => {
   // * empty values assume no change to that field
@@ -164,7 +133,7 @@ userController.put("/update/:user_uuid", checkRights, async (req, res) => {
   ); // Log parameters
   try {
     const result = await db.collection("users").updateOne(
-      { user_uuid: parseInt(req.params.user_uuid) },
+      { user_uuid: req.params.user_uuid },
       //updates name if it is not empty
       req.params.username != ""
         ? { $set: { username: req.body.username } }

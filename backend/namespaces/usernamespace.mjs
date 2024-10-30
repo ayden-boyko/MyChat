@@ -2,7 +2,7 @@ import User from "../schemas/User.mjs";
 import Chats from "../schemas/Chats.mjs";
 
 // for storing online users and their sockets/uuids
-const users = {};
+const usersOnline = {};
 
 export default class UserNamespace {
   constructor(namespace) {
@@ -11,9 +11,11 @@ export default class UserNamespace {
   }
 
   initialize() {
+    console.log("initializing user namespace");
+
     this.namespace.on("connection", (socket) => {
       socket.on("join", (user_uuid) => {
-        users[user_uuid] = socket.id;
+        usersOnline[user_uuid] = socket.id;
         console.log(
           `usernamespace - 18 - ${socket} joined with uuid: ${user_uuid}`
         );
@@ -31,6 +33,7 @@ export default class UserNamespace {
         } else {
           console.log(
             `usernamespace - 30 - ${data.sender.username} could not send: ${data.message} to ${sendee} as they are offline`
+            // TODO SEND A NOTIFICATION
           );
           return;
         }

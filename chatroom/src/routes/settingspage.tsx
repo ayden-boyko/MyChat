@@ -69,9 +69,10 @@ export default function SettingsPage() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
-          id: (user as unknown as { _id: string })?._id,
+          user_uuid: user?.user_uuid,
           username: (document.getElementById("username") as HTMLInputElement)
             ?.value,
           user_profile: changedProfile,

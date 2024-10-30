@@ -1,18 +1,31 @@
 import User from "../schemas/User.mjs";
 import db from "../db/conn.mjs";
 
+// TODO DIFFERENT LOGIC DEPENDING ON NOTIFICATION TYPE
 const prenotifCheck = async (userId, notificationData) => {
   let hasbeenNotified = false;
+  let resultType = true;
 
-  //check that the user isnt already friended with them
-  const resultFriend = await db.collection("users").findOne({
-    user_uuid: userId,
-    friends: { $elemMatch: { user_uuid: notificationData.sender.user_uuid } },
-  });
-  if (resultFriend) {
-    //removes the notification if its already been sent
+  // TODO CASE 2, 3, 5
+  switch (notificationData.type) {
+    case 1: // for messaging, not needed here in case of future requirements
+      break;
+
+    case 4: // friend request
+      //check that the user isnt already friended with them
+      resultType = await db.collection("users").findOne({
+        user_uuid: userId,
+        friends: {
+          $elemMatch: { user_uuid: notificationData.sender.user_uuid },
+        },
+      });
+      break;
+  }
+
+  if (resultType) {
+    //removes the notification if its already been sent, regadless of type
     console.log(
-      "notificationHandler.mjs - 15 - removing notification that was added"
+      "notificationHandler.mjs - 28 - removing notification that was added"
     );
     await User.updateOne(
       { user_uuid: userId },
@@ -30,9 +43,8 @@ const prenotifCheck = async (userId, notificationData) => {
     );
     hasbeenNotified = true;
   }
-
   // check that the sender data isn't the same, minus the objectID (_id)
-  const resultAlreadyFriended = await db.collection("users").findOne({
+  const resultAlreadySent = await db.collection("users").findOne({
     user_uuid: userId,
     notifications: {
       $elemMatch: {
@@ -43,10 +55,10 @@ const prenotifCheck = async (userId, notificationData) => {
     },
   });
 
-  if (resultAlreadyFriended) {
+  if (resultAlreadySent) {
     //removes the notification if its already been sent
     console.log(
-      "notificationHandler.mjs - 49 - removing notification that was added"
+      "notificationHandler.mjs - 61 - removing notification that was added"
     );
     await User.updateOne(
       { user_uuid: userId },
@@ -69,7 +81,7 @@ const prenotifCheck = async (userId, notificationData) => {
   if (userId === notificationData.sender.user_uuid) {
     //removes the notification if its already been sent
     console.log(
-      "notificationHandler.mjs - 72 - removing notification that was added"
+      "notificationHandler.mjs - 84 - removing notification that was added"
     );
     await User.updateOne(
       { user_uuid: userId },
@@ -99,12 +111,12 @@ const addNotification = async (userId, notificationData) => {
     );
     if (await prenotifCheck(userId, notificationData)) {
       console.log(
-        `notificationHandler.mjs - 102 - Notification already sent to for offline user: ${userId}`
+        `notificationHandler.mjs - 114 - Notification already sent to for offline user: ${userId}`
       );
       return;
     } else {
       console.log(
-        `notificationHandler.mjs - 107 - Notification added for offline user: ${userId}`
+        `notificationHandler.mjs - 119 - Notification added for offline user: ${userId}`
       );
       await User.updateOne(
         { user_uuid: userId },
@@ -112,17 +124,17 @@ const addNotification = async (userId, notificationData) => {
       );
     }
   } catch (error) {
-    console.error("Error adding notification - 115 -:", error);
+    console.error("Error adding notification - 127 -:", error);
   }
 };
 
 // Global middleware to handle notifications for users
-// adds all requests to the user's notifications field
+// adds all requests to the user's notifications field, creates a notification
 const addnotificationHandler = (eventType) => {
   return async (req, res, next) => {
     try {
       console.log(
-        "notificaionHandler.mjs - 125 - Received request",
+        "notificaionHandler.mjs - 137 - Received request",
         req.body.user_profile
       );
       // console.log("recipient", req.params.user_uuid);
@@ -145,6 +157,8 @@ const addnotificationHandler = (eventType) => {
           eventData = `You have been invited to join group ${req.body.username}.`;
         case 4:
           eventData = `${req.body.username} has sent you a friend request.`;
+        case 5:
+          eventData = `${req.body.username} wants to join your group.`;
         default:
           break;
       }
@@ -163,7 +177,7 @@ const addnotificationHandler = (eventType) => {
       };
 
       console.log(
-        "notificationHandler.mjs - 166 - notificationData pre add",
+        "notificationHandler.mjs - 180 - notificationData pre add",
         notificationData
       );
 
@@ -181,7 +195,7 @@ const addnotificationHandler = (eventType) => {
       // Proceed to the next middleware or route handler
       next();
     } catch (error) {
-      console.error("Error in notification middleware - 186 -:", error);
+      console.error("Error in notification middleware - 198 -:", error);
       res
         .status(500)
         .json({ message: "Server error in notification handling" });
@@ -190,14 +204,8 @@ const addnotificationHandler = (eventType) => {
 };
 
 //executes what the notifaction requires, i.e. accepts the friend/group request or join group request
-/*
-sender: {
-          user_uuid: req.body.user_uuid,
-          username: req.body.username,
-          user_profile: req.body.user_profile,
-        },
-*/
 const notificationExecuterHandler = async (userId, notificationData, next) => {
+  // TODO MAKE EACH CASE A FUNCTION
   try {
     const notificationInstructions = notificationData;
     let result;
@@ -257,7 +265,7 @@ const notificationExecuterHandler = async (userId, notificationData, next) => {
       default:
         throw new Error("Invalid notification type");
     }
-    console.log("notificationhandler - 265 - notification executed", result);
+    console.log("notificationhandler - 275 - notification executed", result);
     // Proceed to the next middleware or route handler
     next();
   } catch (error) {
