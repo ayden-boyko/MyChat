@@ -24,7 +24,6 @@ chatController.get("/:user_uuid/:friend_uuid", async (req, res) => {
   }
 });
 
-// TODO
 chatController.post(
   "/:user_uuid/:friend_uuid",
   addnotificationHandler(1),

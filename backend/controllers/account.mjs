@@ -111,8 +111,7 @@ userController.post("/create", async (req, res) => {
   }
 });
 
-// TODO MUST HAVE PROPER AUTHORIZATION TO DELETE USER
-// DELETE user (may have parameters change after JWT is implemented)
+// DELETE user, uses JWT
 userController.delete("/delete/:user_uuid", checkRights, async (req, res) => {
   try {
     const result = await db

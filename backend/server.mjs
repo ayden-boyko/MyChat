@@ -18,7 +18,7 @@ import passport from "passport";
 import { Server } from "socket.io";
 import { createServer } from "http";
 import { configDotenv } from "dotenv";
-// TODO USE JWT FOR AUTHORIZATION
+
 // TODO HAVE BACKEND SEND FRONTEND FILES
 /*
 app.get('/', (req, res) => {

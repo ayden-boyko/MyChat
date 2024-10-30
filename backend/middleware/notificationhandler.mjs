@@ -1,7 +1,7 @@
 import User from "../schemas/User.mjs";
 import db from "../db/conn.mjs";
 
-// TODO DIFFERENT LOGIC DEPENDING ON NOTIFICATION TYPE
+// TODO check that message notifications are working
 const prenotifCheck = async (userId, notificationData) => {
   let hasbeenNotified = false;
   let resultType = true;
@@ -205,7 +205,7 @@ const addnotificationHandler = (eventType) => {
 
 //executes what the notifaction requires, i.e. accepts the friend/group request or join group request
 const notificationExecuterHandler = async (userId, notificationData, next) => {
-  // TODO MAKE EACH CASE A FUNCTION
+  // TODO MAKE EACH CASE A FUNCTION Might not be needed
   try {
     const notificationInstructions = notificationData;
     let result;

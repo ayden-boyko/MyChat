@@ -107,7 +107,7 @@ export default function HomePage() {
 
   // TODO ONCE FRIEND HAS BEEN SELECTED PULL THE CHAT HISTORY TO DISPLAY IT
   // TODO PROPERLLY DISPLAY THE MESSAGES THAT THE USER SENDS NOT JUST THE ONES THE RECEIVE (WHICH ARENT WORKING EITHER)
-  // TODO MAKE A CALL TO THE BACKEND ROUTE TO ADD A NOTIFICATION IF THE USER ISNT ONLINE
+  // TODO MAKE A CALL TO THE BACKEND ROUTE TO ADD A NOTIFICATION IF THE USER ISNT ONLINE (might be handled by the backend)
   const sendMessage = async (event: React.FormEvent<HTMLFormElement>) => {
     event?.preventDefault();
     const message = document.getElementById("msg") as HTMLInputElement;
