@@ -45,6 +45,7 @@ const io = new Server(server, {
 app.use(express.json());
 app.use(cors());
 
+//TODO check out express sessions, can they be used on the front end?
 // Express session setup
 app.use(
   session({
