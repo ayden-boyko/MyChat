@@ -159,7 +159,10 @@ export default function SearchPage() {
                       className="flex items-center space-x-4 mb-4"
                     >
                       <Avatar>
-                        <AvatarImage src={user.avatarUrl} alt={user.username} />
+                        <AvatarImage
+                          src={user.user_profile}
+                          alt={user.username}
+                        />
                         <AvatarFallback>{user.username[0]}</AvatarFallback>
                       </Avatar>
                       <div onClick={() => handleUserClick(user)}>

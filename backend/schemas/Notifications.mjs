@@ -9,7 +9,7 @@ const Notifications = new Schema({
     default: null,
   },
   catagory: {
-    // types 4: messages from user (1) or group (2), group invite (3), friend request(4), NULL (0) = autofail
+    // types 5: messages from user (1) or group (2), group invite (3), friend request(4), group join request(5), NULL (0) = autofail
     type: Number,
     default: 0,
   },

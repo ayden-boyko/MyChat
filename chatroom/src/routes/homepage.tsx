@@ -17,8 +17,8 @@ import { io } from "socket.io-client";
 export default function HomePage() {
   const context = useContext(UserContext);
   const [friendChat, setFriendChat] = useState<
-    { sender: string; message: string }[] | null
-  >(null);
+    { sender: MiniUser; message: string }[] | null
+  >([]);
   const [hasJoined, setHasJoined] = useState<boolean>(false);
   const [selectedFriend, setSelectedFriend] = useState<MiniUser | null>(null);
   const navigate = useNavigate();
@@ -100,34 +100,28 @@ export default function HomePage() {
       }
     );
     const chatData = await chat.json();
-    console.log("homepage.tsx - 84 - CHAT", chatData);
-    setFriendChat(chatData);
-    setSelectedFriend(friend);
-  };
+    console.log("homepage.tsx - 103 - CHATDATA", chatData);
 
-  // TODO ONCE FRIEND HAS BEEN SELECTED PULL THE CHAT HISTORY TO DISPLAY IT
-  // TODO PROPERLLY DISPLAY THE MESSAGES THAT THE USER SENDS NOT JUST THE ONES THE RECEIVE (WHICH ARENT WORKING EITHER)
-  // TODO MAKE A CALL TO THE BACKEND ROUTE TO ADD A NOTIFICATION IF THE USER ISNT ONLINE (might be handled by the backend)
+    setSelectedFriend(friend); //sets friend regarldess of whether caht is null or not
+
+    //if messages are null, make them empty
+    if (chatData === null) {
+      setFriendChat([]);
+      return;
+    }
+    setFriendChat(chatData.messages);
+  };
+  // TODO FIX STYLING OF MESSAGES, all messages are on the left for some reason
+  // TODO make messages that you send display when sent, not when another message is sent
   const sendMessage = async (event: React.FormEvent<HTMLFormElement>) => {
     event?.preventDefault();
     const message = document.getElementById("msg") as HTMLInputElement;
     console.log("homepage.tsx - 104 - MESSAGE", message.value);
 
-    startChatting(selectedFriend as MiniUser); // to refresh the caht incase they sent something
+    await startChatting(selectedFriend as MiniUser); // to refresh the chat incase they sent something
 
     if (message.value === "") {
       return;
-    }
-    //update friendcaht to have the message we are about to send
-    if (friendChat !== null) {
-      setFriendChat((prevChat) => {
-        if (prevChat === null)
-          return [{ sender: user?.username ?? "", message: message.value }];
-        return [
-          ...prevChat,
-          { sender: user?.username ?? "", message: message.value },
-        ];
-      });
     }
 
     //send message with socket.io, the message will be added to the chat on the backend
@@ -141,6 +135,36 @@ export default function HomePage() {
         user_profile: user?.user_profile,
       },
     });
+
+    //update friendcaht to have the message we are about to send
+    setFriendChat((prevChat) => {
+      if (prevChat === null)
+        return [
+          {
+            sender: {
+              username: user?.username,
+              user_uuid: user?.user_uuid,
+              user_profile: user?.user_profile,
+            } as MiniUser,
+            message: message.value,
+          },
+        ];
+      return [
+        ...prevChat,
+        {
+          sender: {
+            username: user?.username,
+            user_uuid: user?.user_uuid,
+            user_profile: user?.user_profile,
+          } as MiniUser,
+          message: message.value,
+        },
+      ];
+    });
+
+    //log chat to console
+    console.log("homepage.tsx - 136 - CHAT", friendChat);
+
     //clear form
     message.value = "";
   };
@@ -252,38 +276,43 @@ export default function HomePage() {
             {friendChat?.length === 0 || selectedFriend === null ? (
               <p>No messages</p>
             ) : (
-              friendChat?.map((msg, index) => (
-                <div key={index} className="flex items-start space-x-2">
-                  <Avatar>
-                    <AvatarImage src={selectedFriend?.avatarUrl} />
-                    <AvatarFallback>
-                      {selectedFriend?.username[0]}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div
-                    className={`flex ${
-                      msg.sender === user?.user_uuid
-                        ? "justify-end"
-                        : "justify-start"
-                    }`}
-                  >
-                    <div
-                      className={`max-w-xs p-2 rounded-md ${
-                        msg.sender === user?.user_uuid
-                          ? "bg-blue-500 text-white"
-                          : "bg-gray-200 text-black"
-                      }`}
-                    >
-                      <p className="font-semibold">
-                        {msg.sender === user?.user_uuid
-                          ? "You"
-                          : selectedFriend?.username}
-                      </p>
-                      <p className="text-sm">{msg.message}</p>
+              friendChat?.map(
+                (msg: { sender: MiniUser; message: string }, index) => (
+                  console.log("homepage.tsx - 262 - MSG", msg),
+                  (
+                    <div key={index} className="flex items-start space-x-2">
+                      <Avatar>
+                        <AvatarImage src={msg.sender.user_profile} />
+                        <AvatarFallback>
+                          {msg.sender.username[0]}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div
+                        className={`flex ${
+                          msg.sender.user_uuid === user?.user_uuid
+                            ? "justify-start"
+                            : "justify-end"
+                        }`}
+                      >
+                        <div
+                          className={`max-w-xs p-2 rounded-md ${
+                            msg.sender.user_uuid === user?.user_uuid
+                              ? "bg-blue-500 text-white"
+                              : "bg-gray-200 text-black"
+                          }`}
+                        >
+                          <p className="text-xs font-semibold">
+                            {msg.sender.user_uuid === user?.user_uuid
+                              ? "You"
+                              : selectedFriend?.username}
+                          </p>
+                          <p className="text-base">{msg.message}</p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              ))
+                  )
+                )
+              )
             )}
           </div>
         </ScrollArea>

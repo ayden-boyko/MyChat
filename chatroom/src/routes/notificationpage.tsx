@@ -221,7 +221,7 @@ export default function NotificationPage() {
                             <div className="flex items-start space-x-4">
                               <Avatar>
                                 <AvatarImage
-                                  src={notification.sender.avatarUrl}
+                                  src={notification.sender.user_profile}
                                   alt={notification.sender.username}
                                 />
                                 <AvatarFallback>

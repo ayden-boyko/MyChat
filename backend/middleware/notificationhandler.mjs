@@ -1,7 +1,6 @@
 import User from "../schemas/User.mjs";
 import db from "../db/conn.mjs";
 
-// TODO check that message notifications are working
 const prenotifCheck = async (userId, notificationData) => {
   let hasbeenNotified = false;
   let resultType = true;
@@ -9,6 +8,16 @@ const prenotifCheck = async (userId, notificationData) => {
   // TODO CASE 2, 3, 5
   switch (notificationData.type) {
     case 1: // for messaging, not needed here in case of future requirements
+      //check that the user doesnt already have a message notification from the user
+      resultType = await db.collection("users").findOne({
+        user_uuid: userId,
+        notifications: {
+          $elemMatch: {
+            user_uuid: notificationData.sender.user_uuid,
+            type: notificationData.type,
+          },
+        },
+      });
       break;
 
     case 4: // friend request
@@ -23,7 +32,7 @@ const prenotifCheck = async (userId, notificationData) => {
   }
 
   if (resultType) {
-    //removes the notification if its already been sent, regadless of type
+    //removes the notification if its already been sent, regardless of type
     console.log(
       "notificationHandler.mjs - 28 - removing notification that was added"
     );
@@ -43,7 +52,7 @@ const prenotifCheck = async (userId, notificationData) => {
     );
     hasbeenNotified = true;
   }
-  // check that the sender data isn't the same, minus the objectID (_id)
+  // check that the sender data isn't the same
   const resultAlreadySent = await db.collection("users").findOne({
     user_uuid: userId,
     notifications: {
@@ -105,11 +114,9 @@ const prenotifCheck = async (userId, notificationData) => {
 // Middleware function to add notifications to the user's notifications field
 const addNotification = async (userId, notificationData) => {
   try {
-    console.log(
-      "notificationData post add",
-      await prenotifCheck(userId, notificationData)
-    );
-    if (await prenotifCheck(userId, notificationData)) {
+    const postAdd = await prenotifCheck(userId, notificationData);
+    console.log("notificationData post add", postAdd);
+    if (postAdd) {
       console.log(
         `notificationHandler.mjs - 114 - Notification already sent to for offline user: ${userId}`
       );
@@ -205,7 +212,7 @@ const addnotificationHandler = (eventType) => {
 
 //executes what the notifaction requires, i.e. accepts the friend/group request or join group request
 const notificationExecuterHandler = async (userId, notificationData, next) => {
-  // TODO MAKE EACH CASE A FUNCTION Might not be needed
+  // TODO MAKE EACH CASE A FUNCTION (Might not be needed)
   try {
     const notificationInstructions = notificationData;
     let result;
@@ -273,4 +280,4 @@ const notificationExecuterHandler = async (userId, notificationData, next) => {
   }
 };
 
-export { addnotificationHandler, notificationExecuterHandler };
+export { addnotificationHandler, notificationExecuterHandler, addNotification };

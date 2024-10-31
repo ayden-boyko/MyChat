@@ -35,7 +35,7 @@ export default function UserProfilePopup({
           </Button>
           <div className="flex items-center space-x-4">
             <Avatar className="h-20 w-20">
-              <AvatarImage src={user?.avatarUrl} />
+              <AvatarImage src={user?.user_profile} />
               <AvatarFallback>{user?.username[0]}</AvatarFallback>
             </Avatar>
             <div className="space-y-1">

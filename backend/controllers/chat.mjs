@@ -5,16 +5,14 @@ import { addnotificationHandler } from "../middleware/notificationhandler.mjs";
 
 const chatController = express.Router();
 
-// TODO CREATE CHAT, DELETE CHAT? might not be needed
+// TODO  so far this is only for direct messaging, not group messaging
 
 chatController.get("/:user_uuid/:friend_uuid", async (req, res) => {
   try {
     const chat = await db.collection("chats").findOne({
       between: {
-        $all: [
-          { user_uuid: req.params.user_uuid },
-          { user_uuid: req.params.friend_uuid },
-        ],
+        $size: 2,
+        $all: [req.params.user_uuid, req.params.friend_uuid],
       },
     });
     res.json(chat);
