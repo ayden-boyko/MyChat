@@ -86,13 +86,12 @@ export default function NotificationPage() {
       result = await fetch(
         `${import.meta.env.VITE_BACKEND_API_URL}/api/notification/decline/${
           user?.user_uuid
-        }`,
+        }/${notification.date}`,
         {
-          method: "DELETE",
+          method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ notification }),
         }
       );
     }
@@ -102,6 +101,7 @@ export default function NotificationPage() {
         notifications: user?.notifications?.filter((n) => n !== notification),
       } as User);
     } else {
+      console.log(result);
       alert("Unable to process notification");
       throw new Error("Unable to process notification");
     }
@@ -238,9 +238,7 @@ export default function NotificationPage() {
                               </div>
                               <div className="flex items-center space-x-2">
                                 {getIcon(notification.catagory)}
-                                {(notification.catagory === 4 ||
-                                  notification.catagory === 2 ||
-                                  notification.catagory === 5) && (
+                                {
                                   <>
                                     <Button
                                       size="sm"
@@ -248,7 +246,11 @@ export default function NotificationPage() {
                                         handleAction(notification, "accept")
                                       }
                                     >
-                                      Accept
+                                      {notification.catagory === 4 ||
+                                      notification.catagory === 5 ||
+                                      notification.catagory === 3
+                                        ? "Accept"
+                                        : "View"}
                                     </Button>
                                     <Button
                                       size="sm"
@@ -256,10 +258,14 @@ export default function NotificationPage() {
                                         handleAction(notification, "decline")
                                       }
                                     >
-                                      Decline
+                                      {notification.catagory === 4 ||
+                                      notification.catagory === 5 ||
+                                      notification.catagory === 3
+                                        ? "Decline"
+                                        : "Close"}
                                     </Button>
                                   </>
-                                )}
+                                }
                               </div>
                             </div>
                           </CardContent>

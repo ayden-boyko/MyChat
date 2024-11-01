@@ -32,16 +32,6 @@ const PORT = process.env.PORT || 8000;
 
 const app = express();
 
-// create socket io server for messages
-const server = createServer(app);
-const io = new Server(server, {
-  cleanupEmptyChildNamespaces: true,
-  cors: {
-    origin: "http://localhost:5173",
-    credentials: true,
-  },
-});
-
 app.use(express.json());
 app.use(cors());
 
@@ -96,6 +86,16 @@ app.get("/", async (req, res) => {
     // Handle any errors and send appropriate response
     res.status(500).json({ error: "An error occurred" });
   }
+});
+
+// create socket io server for messages
+const server = createServer(app);
+const io = new Server(server, {
+  cleanupEmptyChildNamespaces: true,
+  cors: {
+    origin: "http://localhost:5173",
+    credentials: true,
+  },
 });
 
 server.listen(PORT, () => {

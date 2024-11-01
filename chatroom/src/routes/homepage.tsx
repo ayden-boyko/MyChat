@@ -4,7 +4,7 @@ import { ScrollArea } from "../components/ui/scroll-area";
 import { Separator } from "../components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { Settings, LogOut, Search, Send, Bell } from "lucide-react";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../lib/UserContext";
 import { User } from "../interfaces/userinterface";
@@ -17,7 +17,7 @@ import { io } from "socket.io-client";
 export default function HomePage() {
   const context = useContext(UserContext);
   const [friendChat, setFriendChat] = useState<
-    { sender: MiniUser; message: string }[] | null
+    { sender: MiniUser; message: string }[]
   >([]);
   const [hasJoined, setHasJoined] = useState<boolean>(false);
   const [selectedFriend, setSelectedFriend] = useState<MiniUser | null>(null);
@@ -29,6 +29,15 @@ export default function HomePage() {
   }
 
   const { user, setUser } = context;
+
+  const updateFriendChat = useCallback(
+    (newMessage: { sender: MiniUser; message: string }) => {
+      setFriendChat((prevChat) => {
+        return [...prevChat, newMessage];
+      });
+    },
+    [setFriendChat]
+  );
 
   useEffect(() => {
     if (user?.username === "") {
@@ -53,11 +62,7 @@ export default function HomePage() {
     }
 
     user?.socket?.on("message", (data) =>
-      setFriendChat((prevChat) => {
-        if (prevChat === null)
-          return [{ sender: data.sender, message: data.message }];
-        return [...prevChat, { sender: data.sender, message: data.message }];
-      })
+      updateFriendChat({ sender: data.sender, message: data.message })
     );
   }, [user]);
 
@@ -112,8 +117,9 @@ export default function HomePage() {
     setFriendChat(chatData.messages);
   };
   // TODO FIX STYLING OF MESSAGES, all messages are on the left for some reason
-  // TODO make messages that you send display when sent, not when another message is sent
+  // TODO make messages that you send display when sent, not when a secon d message is sent
   const sendMessage = async (event: React.FormEvent<HTMLFormElement>) => {
+    console.log("sending message");
     event?.preventDefault();
     const message = document.getElementById("msg") as HTMLInputElement;
     console.log("homepage.tsx - 104 - MESSAGE", message.value);
@@ -123,6 +129,16 @@ export default function HomePage() {
     if (message.value === "") {
       return;
     }
+
+    //update friendchat to have the message we are about to send
+    updateFriendChat({
+      sender: {
+        username: user?.username,
+        user_uuid: user?.user_uuid,
+        user_profile: user?.user_profile,
+      } as MiniUser,
+      message: message.value,
+    });
 
     //send message with socket.io, the message will be added to the chat on the backend
     user?.socket.emit("message", {
@@ -136,36 +152,7 @@ export default function HomePage() {
       },
     });
 
-    //update friendcaht to have the message we are about to send
-    setFriendChat((prevChat) => {
-      if (prevChat === null)
-        return [
-          {
-            sender: {
-              username: user?.username,
-              user_uuid: user?.user_uuid,
-              user_profile: user?.user_profile,
-            } as MiniUser,
-            message: message.value,
-          },
-        ];
-      return [
-        ...prevChat,
-        {
-          sender: {
-            username: user?.username,
-            user_uuid: user?.user_uuid,
-            user_profile: user?.user_profile,
-          } as MiniUser,
-          message: message.value,
-        },
-      ];
-    });
-
-    //log chat to console
-    console.log("homepage.tsx - 136 - CHAT", friendChat);
-
-    //clear form
+    //clear input with id 'msg'
     message.value = "";
   };
 
@@ -278,39 +265,41 @@ export default function HomePage() {
             ) : (
               friendChat?.map(
                 (msg: { sender: MiniUser; message: string }, index) => (
-                  console.log("homepage.tsx - 262 - MSG", msg),
-                  (
-                    <div key={index} className="flex items-start space-x-2">
-                      <Avatar>
-                        <AvatarImage src={msg.sender.user_profile} />
-                        <AvatarFallback>
-                          {msg.sender.username[0]}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div
-                        className={`flex ${
-                          msg.sender.user_uuid === user?.user_uuid
-                            ? "justify-start"
-                            : "justify-end"
-                        }`}
-                      >
-                        <div
-                          className={`max-w-xs p-2 rounded-md ${
-                            msg.sender.user_uuid === user?.user_uuid
-                              ? "bg-blue-500 text-white"
-                              : "bg-gray-200 text-black"
-                          }`}
-                        >
-                          <p className="text-xs font-semibold">
-                            {msg.sender.user_uuid === user?.user_uuid
-                              ? "You"
-                              : selectedFriend?.username}
+                  <div key={index} className="flex space-x-2 w-full">
+                    {msg.sender.user_uuid === user?.user_uuid ? (
+                      <div className="flex-1 flex justify-end">
+                        <div className="flex space-x-2">
+                          <div className="max-w-xs p-2 rounded-md bg-blue-400 text-white">
+                            <p className="text-xs font-semibold ">
+                              {user?.username}
+                            </p>
+                            <p className="text-base">{msg.message}</p>
+                          </div>
+                          <Avatar>
+                            <AvatarImage src={msg.sender.user_profile} />
+                            <AvatarFallback>
+                              {msg.sender.username[0]}
+                            </AvatarFallback>
+                          </Avatar>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex-1 flex justify-start">
+                        <Avatar>
+                          <AvatarImage src={msg.sender.user_profile} />
+                          <AvatarFallback>
+                            {msg.sender.username[0]}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="max-w-xs p-2 rounded-md bg-gray-200 text-black">
+                          <p className="text-xs font-semibold ">
+                            {selectedFriend?.username}
                           </p>
                           <p className="text-base">{msg.message}</p>
                         </div>
                       </div>
-                    </div>
-                  )
+                    )}
+                  </div>
                 )
               )
             )}

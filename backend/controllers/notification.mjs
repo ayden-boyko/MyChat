@@ -71,11 +71,11 @@ NotificationController.put(
   }
 );
 
-NotificationController.put("/decline/:user_uuid", async (req, res) => {
+NotificationController.put("/decline/:user_uuid/:date", async (req, res) => {
   try {
     const result = await User.updateOne(
-      { user_uuid: req.params.user_uuid },
-      { $pull: { notifications: req.body.notification } }
+      { user_uuid: user_uuid },
+      { $pull: { notifications: { date: date } } }
     );
     res.status(200).json(result);
   } catch (error) {

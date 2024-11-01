@@ -30,7 +30,7 @@ export default class UserNamespace {
           console.log(
             `usernamespace - 31 - ${data.sender.username} sent: "${data.message}" to ${sendee}`
           );
-          socket.to(users[sendee]).emit("message", data.message);
+          socket.to(usersOnline[sendee]).emit("message", data);
         } else {
           console.log(
             `usernamespace - 36 - ${data.sender.username} could not send: ${data.message} to ${sendee} as they are offline`
@@ -94,12 +94,12 @@ export default class UserNamespace {
         ).then((res) => {
           if (res.nModified === 0) {
             console.log(
-              `usernamespace - 104 - failed to set user: ${user_uuid} online to false`
+              `usernamespace - 104 - failed to set user: ${socket.id} online to false`
             );
           }
         });
         console.log(
-          `usernamespace - 109 - set user: ${user_uuid} online to false`
+          `usernamespace - 109 - set user: ${socket.id} online to false`
         );
       });
     });
