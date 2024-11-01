@@ -3,7 +3,6 @@
 import jwt from "jsonwebtoken";
 import db from "../db/conn.mjs";
 
-// TODO USE JWT FOR AUTHORIZATION
 export default async function checkRights(req, res, next) {
   try {
     // get token from header

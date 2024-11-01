@@ -116,8 +116,6 @@ export default function HomePage() {
     }
     setFriendChat(chatData.messages);
   };
-  // TODO FIX STYLING OF MESSAGES, all messages are on the left for some reason
-  // TODO make messages that you send display when sent, not when a secon d message is sent
   const sendMessage = async (event: React.FormEvent<HTMLFormElement>) => {
     console.log("sending message");
     event?.preventDefault();
