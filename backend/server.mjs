@@ -8,6 +8,7 @@ import friendController from "./controllers/friend.mjs";
 import notificationController from "./controllers/notification.mjs";
 import chatController from "./controllers/chat.mjs";
 import UserNamespace from "./namespaces/usernamespace.mjs";
+import groupController from "./controllers/group.mjs";
 
 //external imports
 import express from "express";
@@ -70,6 +71,9 @@ app.use("/api/notification", notificationController);
 
 // Use the chat controller
 app.use("/api/chat", chatController);
+
+// Use the group controller
+app.use("/api/group", groupController);
 
 app.get("/", async (req, res) => {
   try {
