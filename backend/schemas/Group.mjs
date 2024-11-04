@@ -11,7 +11,7 @@ const groupSchema = new Schema({
   owner: MiniUser,
   members: { type: [MiniUser], default: [] },
   chat: {
-    type: [{ sender: MiniUser, message: String, timestamp: Date }],
+    type: [{ sender: MiniUser, message: String, date: Date }],
     validate: {
       validator: function (chatArray) {
         if (chatArray.length > 100) {

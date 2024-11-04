@@ -12,16 +12,19 @@ import { cn } from "../lib/utils";
 import { MiniUser } from "../interfaces/miniuser";
 import { io } from "socket.io-client";
 import GroupCreationPopup from "../components/pop-ups/createGroupPopup";
+import { MiniGroup } from "../interfaces/MiniGroup";
 
 // TODO MAKE ALL TEXT BLACK SO IT CAN BE SEEN ON FIREFOX
 
 export default function HomePage() {
   const context = useContext(UserContext);
   const [friendChat, setFriendChat] = useState<
-    { sender: MiniUser; message: string }[]
+    { sender: MiniUser; message: string; date: Date }[]
   >([]); // for use with individual friends or groups
   const [hasJoined, setHasJoined] = useState<boolean>(false);
-  const [selectedFriend, setSelectedFriend] = useState<MiniUser | null>(null); // for use with individual friends or groups
+  const [selectedFriend, setSelectedFriend] = useState<
+    MiniUser | MiniGroup | null
+  >(null); // for use with individual friends or groups
   const [createGroup, setCreateGroup] = useState<boolean>(false);
 
   const navigate = useNavigate();
@@ -34,7 +37,7 @@ export default function HomePage() {
   const { user, setUser } = context;
 
   const updateFriendChat = useCallback(
-    (newMessage: { sender: MiniUser; message: string }) => {
+    (newMessage: { sender: MiniUser; message: string; date: Date }) => {
       setFriendChat((prevChat) => {
         return [...prevChat, newMessage];
       });
@@ -65,7 +68,11 @@ export default function HomePage() {
     }
 
     user?.socket?.on("message", (data) =>
-      updateFriendChat({ sender: data.sender, message: data.message })
+      updateFriendChat({
+        sender: data.sender,
+        message: data.message,
+        date: data.date,
+      })
     );
   }, [user]);
 
@@ -88,6 +95,37 @@ export default function HomePage() {
     } catch (error) {
       console.error("Error during logout:", error);
     }
+  };
+
+  const startGroupChatting = async (group: MiniGroup) => {
+    console.log("homepage.tsx - 100 - GROUP", group);
+    if (group === null) {
+      alert("Please select a group to start chatting");
+      return;
+    }
+    const chat = await fetch(
+      `${import.meta.env.VITE_BACKEND_API_URL}/api/chat/${user?.user_uuid}/${
+        group.group_uuid
+      }`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const chatData = await chat.json();
+
+    console.log("homepage.tsx - 122 - GROUPCHATDATA", chatData);
+
+    setSelectedFriend(group);
+
+    //if messages are null, make them empty
+    if (chatData === null) {
+      setFriendChat([]);
+      return;
+    }
+    setFriendChat(chatData.messages);
   };
 
   const startChatting = async (friend: MiniUser) => {
@@ -140,11 +178,14 @@ export default function HomePage() {
         user_profile: user?.user_profile,
       } as MiniUser,
       message: message.value,
+      date: new Date(),
     });
 
     //send message with socket.io, the message will be added to the chat on the backend
     user?.socket.emit("message", {
-      sendee: selectedFriend?.user_uuid,
+      sendee:
+        (selectedFriend as MiniUser)?.user_uuid ||
+        (selectedFriend as MiniGroup)?.group_uuid,
       message: message.value,
       //sender is in the format of a MiniUser
       sender: {
@@ -152,6 +193,7 @@ export default function HomePage() {
         user_uuid: user?.user_uuid,
         user_profile: user?.user_profile,
       },
+      date: new Date(),
     });
 
     //clear input with id 'msg'
@@ -214,7 +256,11 @@ export default function HomePage() {
               ) : (
                 user?.groups.map((group, index) => (
                   <li key={index}>
-                    <Button variant="ghost" className="w-full justify-start ">
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start "
+                      onClick={() => startGroupChatting(group)}
+                    >
                       <Avatar className="w-6 h-6 mr-2">
                         <AvatarImage
                           src={`https://api.dicebear.com/6.x/initials/svg?seed=${group.group_name[0]}`}
@@ -275,7 +321,9 @@ export default function HomePage() {
       <main className="flex-1 flex flex-col">
         <header className="bg-white border-b p-4">
           <h1 className="text-xl font-semibold">
-            Messages to {selectedFriend?.username}
+            Messages to{" "}
+            {(selectedFriend as MiniUser)?.username ||
+              (selectedFriend as MiniGroup)?.group_name}
           </h1>
         </header>
         <ScrollArea className="flex-1 p-4">
@@ -313,7 +361,8 @@ export default function HomePage() {
                         </Avatar>
                         <div className="max-w-xs p-2 rounded-md bg-gray-200 text-black">
                           <p className="text-xs font-semibold ">
-                            {selectedFriend?.username}
+                            {(selectedFriend as MiniUser)?.username ||
+                              (selectedFriend as MiniGroup)?.group_name}
                           </p>
                           <p className="text-base">{msg.message}</p>
                         </div>

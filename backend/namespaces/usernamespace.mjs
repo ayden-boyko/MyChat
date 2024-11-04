@@ -29,7 +29,7 @@ export default class UserNamespace {
         const online = usersOnline[sendee];
         if (online) {
           console.log(
-            `usernamespace - 31 - ${data.sender.username} sent: "${data.message}" to ${sendee}`
+            `usernamespace - 31 - ${data.sender.username} sent: "${data.message}" to ${sendee} at ${data.date}`
           );
           socket.to(usersOnline[sendee]).emit("message", data);
         } else {
@@ -61,6 +61,7 @@ export default class UserNamespace {
             chat.messages.push({
               sender: data.sender,
               message: data.message,
+              date: data.date,
             });
             await chat.save();
           } else {
@@ -71,6 +72,7 @@ export default class UserNamespace {
                 {
                   sender: data.sender,
                   message: data.message,
+                  date: data.date,
                 },
               ],
             });
