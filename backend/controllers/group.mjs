@@ -79,10 +79,12 @@ groupController.put("/update/:group_num", async (req, res) => {
       {
         $set: Object.assign(
           {},
-          req.body.group_name ? { group_name: req.body.group_name } : {},
+          req.body.group_name
+            ? { group_name: req.body.group_name }
+            : "Group NoName",
           req.body.group_profile
             ? { group_profile: req.body.group_profile }
-            : {}
+            : "Group NoProfile"
         ),
       }
     );
@@ -109,7 +111,7 @@ groupController.put("/leave/:group_num", async (req, res) => {
     //! members are MiniUsers
     const result = await Group.updateOne(
       { group_num: req.params.group_num },
-      { $pull: { members: req.body.user_uuid } }
+      { $pull: { members: { user_uuid: req.body.user_uuid } } }
     );
     res.status(200).json(result);
   } catch (error) {
@@ -124,7 +126,7 @@ groupController.delete("/remove/:group_num/:user_uuid", async (req, res) => {
     //! members are MiniUsers
     const result = await Group.updateOne(
       { group_num: req.params.group_num },
-      { $pull: { members: req.params.user_uuid } }
+      { $pull: { members: { user_uuid: req.body.user_uuid } } }
     );
     res.status(200).json(result);
   } catch (error) {
@@ -147,10 +149,10 @@ groupController.put("/invite/:group_num/:user_uuid", async (req, res) => {
 // add user to group
 groupController.put("/add/:group_num/:user_uuid", async (req, res) => {
   try {
-    //TODO get MiniUser from user_uuid
+    const miniMember = await User.findOne({ user_uuid: req.params.user_uuid });
     const result = await Group.updateOne(
       { group_num: req.params.group_num },
-      { $push: { members: req.params.user_uuid } }
+      { $push: { members: miniMember } }
     );
     res.status(200).json(result);
   } catch (error) {
