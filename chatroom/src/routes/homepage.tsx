@@ -3,7 +3,7 @@ import { Input } from "../components/ui/input";
 import { ScrollArea } from "../components/ui/scroll-area";
 import { Separator } from "../components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
-import { Settings, LogOut, Search, Send, Bell } from "lucide-react";
+import { Settings, LogOut, Search, Send, Bell, PlusCircle } from "lucide-react";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../lib/UserContext";
@@ -11,6 +11,7 @@ import { User } from "../interfaces/userinterface";
 import { cn } from "../lib/utils";
 import { MiniUser } from "../interfaces/miniuser";
 import { io } from "socket.io-client";
+import GroupCreationPopup from "../components/pop-ups/createGroupPopup";
 
 // TODO MAKE ALL TEXT BLACK SO IT CAN BE SEEN ON FIREFOX
 
@@ -18,9 +19,11 @@ export default function HomePage() {
   const context = useContext(UserContext);
   const [friendChat, setFriendChat] = useState<
     { sender: MiniUser; message: string }[]
-  >([]);
+  >([]); // for use with individual friends or groups
   const [hasJoined, setHasJoined] = useState<boolean>(false);
-  const [selectedFriend, setSelectedFriend] = useState<MiniUser | null>(null);
+  const [selectedFriend, setSelectedFriend] = useState<MiniUser | null>(null); // for use with individual friends or groups
+  const [createGroup, setCreateGroup] = useState<boolean>(false);
+
   const navigate = useNavigate();
 
   if (!context) {
@@ -116,6 +119,7 @@ export default function HomePage() {
     }
     setFriendChat(chatData.messages);
   };
+  // TODO add timestamps in messages
   const sendMessage = async (event: React.FormEvent<HTMLFormElement>) => {
     console.log("sending message");
     event?.preventDefault();
@@ -211,11 +215,29 @@ export default function HomePage() {
                 user?.groups.map((group, index) => (
                   <li key={index}>
                     <Button variant="ghost" className="w-full justify-start ">
-                      # {group}
+                      <Avatar className="w-6 h-6 mr-2">
+                        <AvatarImage
+                          src={`https://api.dicebear.com/6.x/initials/svg?seed=${group.group_name[0]}`}
+                        />
+                        <AvatarFallback>{group.group_name[0]}</AvatarFallback>
+                      </Avatar>
+                      {group.group_name}
                     </Button>
                   </li>
                 ))
               )}
+              <li>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    setCreateGroup(true);
+                  }}
+                >
+                  <PlusCircle />
+                  Create Group
+                </Button>
+              </li>
             </ul>
             <Separator className="my-4" />
             <h2 className="text-lg font-semibold mb-2">Direct Messages</h2>
@@ -303,6 +325,12 @@ export default function HomePage() {
             )}
           </div>
         </ScrollArea>
+        <GroupCreationPopup
+          isOpen={createGroup}
+          onClose={() => {
+            setCreateGroup(false);
+          }}
+        />
         {selectedFriend === null ? (
           <p>Select a friend to start chatting</p>
         ) : (

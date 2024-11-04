@@ -7,6 +7,7 @@ import User from "../schemas/User.mjs"; // Import the User schema
 import Group from "../schemas/Group.mjs";
 import db from "../db/conn.mjs";
 import checkRights from "../middleware/authenticationhandler.mjs"; //may be needed
+import MiniUser from "../schemas/MiniUser.mjs";
 
 // group_num: String,
 // group_name: String,
@@ -17,14 +18,44 @@ const groupController = express.Router();
 // create group
 groupController.post("/create/:group_name", async (req, res) => {
   try {
+    console.log(
+      `create group: name: ${req.params.group_name} body: ${req.body}`
+    );
+    const groupMaker = {
+      user_uuid: req.body.creator.user_uuid,
+      username: req.body.creator.username,
+      user_profile: req.body.creator.user_profile,
+    };
     const newGroup = new Group({
       group_name: req.params.group_name,
-      members: [req.body.creator],
+      members: [groupMaker],
+      owner: groupMaker,
+      group_profile:
+        req.body.group_profile !== null ? req.body.group_profile : "None",
+      chat: [],
     });
     const result = await newGroup.save();
+    console.log("group created!", result);
+    //save group id to creator's group field
+    await User.updateOne(
+      { user_uuid: req.body.creator.user_uuid },
+      {
+        $push: {
+          groups: {
+            group_uuid: result.group_uuid,
+            group_name: result.group_name,
+            group_profile: result.group_profile,
+          },
+        },
+      }
+    );
+
+    console.log("group created! user updated!", result);
     res.status(201).json(result);
   } catch (error) {
-    res.status(500).json({ error: "An error occurred, group not created" });
+    res.status(500).json({
+      message: `An error occurred, group not created error is as follows: ${error}`,
+    });
   }
 });
 

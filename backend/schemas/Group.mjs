@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
-import MiniUser from "../interfaces/userinterface";
+import MiniUser from "./MiniUser.mjs";
 import { v4 as uuidv4 } from "uuid";
-s;
 
 const { Schema, model } = mongoose;
 
@@ -9,33 +8,23 @@ const groupSchema = new Schema({
   group_uuid: String,
   group_name: String,
   group_profile: String,
+  owner: MiniUser,
   members: { type: [MiniUser], default: [] },
   chat: {
-    type: [{ sender: MiniUser, message: String }],
+    type: [{ sender: MiniUser, message: String, timestamp: Date }],
     validate: {
-      validator: function (v) {
-        if (v.between.length >= 100) {
-          v.between.splice(0, 1);
-          v.between.push(v);
-        } else {
-          v.between.push(v);
+      validator: function (chatArray) {
+        if (chatArray.length > 100) {
+          chatArray.sort((a, b) => a.timestamp - b.timestamp);
+          chatArray.splice(0, chatArray.length - 100);
         }
-        return v.between.length <= 100;
+        return true;
       },
       message: "Group Chat History is limited to 100 messages",
     },
     default: [],
   },
 });
-// Method to add a message to the chat
-groupSchema.methods.addMessage = function (messageId, messageContent, sender) {
-  if (this.chat.length >= 100) {
-    // Remove the oldest message (first element in the array)
-    this.chat.shift();
-  }
-  // Add the new message
-  this.chat.push({ sender, message: messageContent });
-};
 
 // Static method to get the next user number
 groupSchema.statics.getNextUserUuid = async function () {

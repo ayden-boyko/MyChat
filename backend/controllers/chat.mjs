@@ -6,6 +6,7 @@ import { addnotificationHandler } from "../middleware/notificationhandler.mjs";
 const chatController = express.Router();
 
 // TODO  so far this is only for direct messaging, not group messaging
+// TODO implement timestamps for messages
 
 chatController.get("/:user_uuid/:friend_uuid", async (req, res) => {
   try {

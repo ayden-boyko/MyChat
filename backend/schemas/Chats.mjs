@@ -15,6 +15,7 @@ const chatSchema = new Schema({
       {
         sender: MiniUser,
         message: String,
+        date: Date,
       },
     ],
     default: [],

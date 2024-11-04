@@ -14,6 +14,7 @@ import NotificationPage from "./routes/notificationpage.tsx";
 import { User } from "./interfaces/userinterface.ts";
 import { MiniUser } from "./interfaces/miniuser.ts";
 import { Socket } from "socket.io-client";
+import { MiniGroup } from "./interfaces/MiniGroup.ts";
 //const API = "http://localhost:8000/";
 
 // TODO IMPLEMENT DARK MODE
@@ -31,7 +32,7 @@ function App() {
     user_profile: "",
     friends: [] as MiniUser[],
     blocked: [] as MiniUser[],
-    groups: [],
+    groups: [] as MiniGroup[],
     requests: [],
     notifications: [],
     online: true,
