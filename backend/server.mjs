@@ -75,6 +75,7 @@ app.use("/api/chat", chatController);
 // Use the group controller
 app.use("/api/group", groupController);
 
+// TODO SERVE LOGIN PAGE
 app.get("/", async (req, res) => {
   try {
     console.log("server.mjs - 64 - GET", req.body);

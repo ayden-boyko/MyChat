@@ -15,6 +15,7 @@ import GroupCreationPopup from "../components/pop-ups/createGroupPopup";
 import { MiniGroup } from "../interfaces/MiniGroup";
 import FriendProfilePopup from "../components/pop-ups/FriendProfilePopup";
 import { formatDate } from "../lib/dateformater";
+import GroupProfilePopup from "../components/pop-ups/GroupProfilePopup";
 
 // TODO MAKE ALL TEXT BLACK SO IT CAN BE SEEN ON FIREFOX
 
@@ -89,9 +90,8 @@ export default function HomePage() {
     // pull data from database and update the user
     const updateUser = async () => {
       if (!user?.user_uuid) return;
-
       const result = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}/api/users/get/${
+        `${import.meta.env.VITE_BACKEND_API_URL}/api/users/get/id/${
           user?.user_uuid
         }`,
         {
@@ -103,7 +103,6 @@ export default function HomePage() {
       );
 
       const data = await result.json();
-
       setUser({ ...user, ...data } as User);
     };
     updateUser();
@@ -132,6 +131,12 @@ export default function HomePage() {
 
   const startGroupChatting = async (group: MiniGroup) => {
     console.log("homepage.tsx - 100 - GROUP", group);
+
+    if (selectedFriend == group) {
+      setViewProfile(true);
+      return;
+    }
+
     if (group === null) {
       alert("Please select a group to start chatting");
       return;
@@ -437,7 +442,17 @@ export default function HomePage() {
           />
         )}
 
-        {/* */}
+        {/* checks that viewProfile is not null and is a MiniGroup before rendering the group popup */}
+        {viewProfile && selectedFriend && "group_name" in selectedFriend && (
+          <GroupProfilePopup
+            isOpen={viewProfile}
+            onClose={() => {
+              setViewProfile(false);
+            }}
+            group={selectedFriend as MiniGroup}
+            isMember={true}
+          />
+        )}
 
         {selectedFriend === null ? (
           <p>Select a friend or group to start chatting</p>

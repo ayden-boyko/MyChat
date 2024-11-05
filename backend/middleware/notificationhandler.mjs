@@ -245,20 +245,22 @@ const notificationExecuterHandler = async (userId, notificationData, next) => {
         );
 
         console.log(
-          "notificaiotn handler: user to be added to group - 247 - ",
+          "notificatn handler: user to be added to group - 247 - ",
           miniUserInfo
         );
 
-        //add the user to the group
+        const newMember = {
+          user_uuid: miniUserInfo.user_uuid,
+          username: miniUserInfo.username,
+          user_profile: miniUserInfo.user_profile,
+        };
+
+        // add the user to the group
         result = await Group.updateOne(
-          { group_num: notificationInstructions.sender.user_uuid },
+          { group_uuid: notificationInstructions.sender.user_uuid },
           {
             $addToSet: {
-              members: {
-                user_uuid: miniUserInfo.user_uuid,
-                username: miniUserInfo.username,
-                user_profile: miniUserInfo.user_profile,
-              },
+              members: newMember,
             },
           }
         );

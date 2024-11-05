@@ -18,7 +18,7 @@ userController.get("/get/all", async (req, res) => {
 });
 
 // GET a user by USERNAME
-userController.get("/get/:username", async (req, res) => {
+userController.get("/get/name/:username", async (req, res) => {
   try {
     // Search for users that utilizes fuzzy search for usernames
     const user = await db
@@ -48,7 +48,7 @@ userController.get("/get/:username", async (req, res) => {
 });
 
 // GET a user by ID
-userController.get("/get/:user_uuid", async (req, res) => {
+userController.get("/get/id/:user_uuid", async (req, res) => {
   try {
     const user = await db
       .collection("users")

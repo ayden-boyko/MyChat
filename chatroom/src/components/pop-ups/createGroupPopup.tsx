@@ -57,9 +57,7 @@ export default function GroupCreationPopup({
 
     try {
       const result = await fetch(
-        `${
-          import.meta.env.VITE_BACKEND_API_URL
-        }/api/friend/create/${groupName}`,
+        `${import.meta.env.VITE_BACKEND_API_URL}/api/group/create/${groupName}`,
         {
           method: "POST",
           headers: {

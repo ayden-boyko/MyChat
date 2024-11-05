@@ -1,20 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { X, UserPlus, UserMinus } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { useToast } from "../../hooks/use-toast";
-
-interface Group {
-  id: number;
-  name: string;
-  description: string;
-  iconUrl: string;
-  memberCount: number;
-}
+import { MiniGroup } from "../../interfaces/MiniGroup";
 
 interface GroupProfilePopupProps {
-  group: Group;
+  isOpen: boolean;
+  group: MiniGroup;
   onClose: () => void;
   isMember: boolean;
 }
@@ -22,11 +16,13 @@ interface GroupProfilePopupProps {
 // TODO GET THIS WORKING
 
 export default function GroupProfilePopup({
+  isOpen,
   group,
   onClose,
   isMember,
 }: GroupProfilePopupProps) {
   const [memberStatus, setMemberStatus] = useState(isMember);
+  const [members, setMembers] = useState<number>(0);
   const { toast } = useToast();
 
   const handleMembershipAction = () => {
@@ -34,14 +30,57 @@ export default function GroupProfilePopup({
     toast({
       title: memberStatus ? "Left Group" : "Joined Group",
       description: memberStatus
-        ? `You have left ${group.name}.`
-        : `You have joined ${group.name}.`,
+        ? `You have left ${group.group_name}.`
+        : `You have joined ${group.group_name}.`,
     });
   };
 
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const result = await fetch(
+          `${import.meta.env.VITE_BACKEND_API_URL}/api/group/membercount/${
+            group.group_uuid
+          }`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const data = await result.json();
+        setMembers(data.membercount);
+      } catch (error) {
+        console.error("member error", error);
+      }
+    };
+
+    fetchMembers();
+  }, []);
+
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("keydown", handleEscape);
+      document.body.style.overflow = "hidden";
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md bg-white">
         <CardHeader className="relative">
           <Button
             variant="ghost"
@@ -54,23 +93,17 @@ export default function GroupProfilePopup({
           </Button>
           <div className="flex items-center space-x-4">
             <Avatar className="h-20 w-20">
-              <AvatarImage src={group.iconUrl} />
-              <AvatarFallback>{group.name[0]}</AvatarFallback>
+              <AvatarImage src={group.group_profile} />
+              <AvatarFallback>{group.group_name[0]}</AvatarFallback>
             </Avatar>
             <div>
-              <CardTitle>{group.name}</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                {group.memberCount} members
-              </p>
+              <CardTitle>{group.group_name}</CardTitle>
+              <p className="text-sm text-muted-foreground">{members} members</p>
             </div>
           </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div>
-              <h3 className="font-semibold">Description</h3>
-              <p className="text-sm">{group.description}</p>
-            </div>
             <Button
               onClick={handleMembershipAction}
               className="w-full"
