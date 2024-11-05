@@ -1,11 +1,12 @@
 import User from "../schemas/User.mjs";
+import Group from "../schemas/Group.mjs";
 import db from "../db/conn.mjs";
 
 const prenotifCheck = async (userId, notificationData) => {
   let hasbeenNotified = false;
   let resultType = true;
 
-  // TODO CASE 2, 3, 5
+  // TODO CASE 2, 5
   switch (notificationData.type) {
     case 1: // for messaging, not needed here in case of future requirements
       //check that the user doesnt already have a message notification from the user
@@ -16,6 +17,16 @@ const prenotifCheck = async (userId, notificationData) => {
             user_uuid: notificationData.sender.user_uuid,
             type: notificationData.type,
           },
+        },
+      });
+      break;
+
+    case 3: // group invite
+      //check that the user isnt already in the group
+      resultType = await db.collection("users").findOne({
+        user_uuid: userId,
+        groups: {
+          $elemMatch: { group_uuid: notificationData.group.group_uuid },
         },
       });
       break;
@@ -173,9 +184,10 @@ const addnotificationHandler = (eventType) => {
       // Prepare the notification data
       const notificationData = {
         sender: {
+          // or group if its a group invite or join request
           user_uuid: req.body.user_uuid,
           username: req.body.username,
-          user_profile: req.body.user_profile,
+          user_profile: eq.body.user_profile,
         },
         catagory: eventType,
         payload: eventData,
@@ -211,6 +223,7 @@ const addnotificationHandler = (eventType) => {
 };
 
 //executes what the notifaction requires, i.e. accepts the friend/group request or join group request
+// userID is the user who accepted the notification the notification.sender is the user who sent the notification
 const notificationExecuterHandler = async (userId, notificationData, next) => {
   // TODO MAKE EACH CASE A FUNCTION (Might not be needed)
   try {
@@ -219,6 +232,19 @@ const notificationExecuterHandler = async (userId, notificationData, next) => {
     switch (notificationInstructions.catagory) {
       //group invite
       case 3:
+        //add the user to the groups members list
+        result = await Group.updateOne(
+          { group_num: notificationInstructions.group_num },
+          {
+            $push: {
+              members: {
+                user_uuid: notificationInstructions.sender.user_uuid,
+                username: notificationInstructions.sender.username,
+                user_profile: notificationInstructions.sender.user_profile,
+              },
+            },
+          }
+        );
         break;
       //friend request
       case 4:

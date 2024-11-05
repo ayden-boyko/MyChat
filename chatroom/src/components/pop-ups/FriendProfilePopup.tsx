@@ -23,6 +23,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { MiniGroup } from "../../interfaces/minigroup";
 
 interface FriendProfilePopupProps {
   isOpen: boolean;
@@ -131,7 +132,7 @@ export default function FriendProfilePopup({
     }
   };
 
-  const handleInviteToGroup = async () => {
+  const handleInviteToGroup = async (group: MiniGroup) => {
     try {
       const result = await fetch(
         `${import.meta.env.VITE_BACKEND_API_URL}/api/group/invite/${
@@ -143,9 +144,9 @@ export default function FriendProfilePopup({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            user_uuid: user?.user_uuid,
-            username: user?.username,
-            user_profile: user?.user_profile,
+            user_uuid: group?.group_uuid,
+            username: group?.group_name,
+            user_profile: group?.group_profile,
           }),
         }
       );
@@ -201,7 +202,7 @@ export default function FriendProfilePopup({
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 {user?.groups?.map((group) => (
-                  <DropdownMenuItem onClick={handleInviteToGroup}>
+                  <DropdownMenuItem onClick={() => handleInviteToGroup(group)}>
                     <PlusCircleIcon className="mr-2 h-4 w-4" /> Invite to
                     {group.group_name}
                     <Avatar className="ml-2 h-4 w-4">

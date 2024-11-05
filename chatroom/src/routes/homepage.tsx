@@ -14,6 +14,7 @@ import { io } from "socket.io-client";
 import GroupCreationPopup from "../components/pop-ups/createGroupPopup";
 import { MiniGroup } from "../interfaces/minigroup";
 import FriendProfilePopup from "../components/pop-ups/FriendProfilePopup";
+import { formatDate } from "../lib/dateformater";
 
 // TODO MAKE ALL TEXT BLACK SO IT CAN BE SEEN ON FIREFOX
 
@@ -110,9 +111,9 @@ export default function HomePage() {
       return;
     }
     const chat = await fetch(
-      `${import.meta.env.VITE_BACKEND_API_URL}/api/chat/${user?.user_uuid}/${
-        group.group_uuid
-      }`,
+      `${import.meta.env.VITE_BACKEND_API_URL}/api/chat/between/${
+        user?.user_uuid
+      }/${group.group_uuid}`,
       {
         method: "GET",
         headers: {
@@ -144,9 +145,9 @@ export default function HomePage() {
       return;
     }
     const chat = await fetch(
-      `${import.meta.env.VITE_BACKEND_API_URL}/api/chat/${user?.user_uuid}/${
-        friend.user_uuid
-      }`,
+      `${import.meta.env.VITE_BACKEND_API_URL}/api/chat/between/${
+        user?.user_uuid
+      }/${friend.user_uuid}`,
       {
         method: "GET",
         headers: {
@@ -166,7 +167,7 @@ export default function HomePage() {
     }
     setFriendChat(chatData.messages);
   };
-  // TODO add timestamps in messages
+
   const sendMessage = async (event: React.FormEvent<HTMLFormElement>) => {
     console.log("sending message");
     event?.preventDefault();
@@ -340,46 +341,54 @@ export default function HomePage() {
             {friendChat?.length === 0 || selectedFriend === null ? (
               <p>No messages</p>
             ) : (
-              friendChat?.map(
-                (msg: { sender: MiniUser; message: string }, index) => (
-                  <div key={index} className="flex space-x-2 w-full">
-                    {msg.sender.user_uuid === user?.user_uuid ? (
-                      <div className="flex-1 flex justify-end">
-                        <div className="flex space-x-2">
-                          <div className="max-w-xs p-2 rounded-md bg-blue-400 text-white">
-                            <p className="text-xs font-semibold ">
-                              {user?.username}
-                            </p>
-                            <p className="text-base">{msg.message}</p>
+              friendChat //sorts the chat by date from newest to oldest then maps it
+                ?.slice()
+                .sort((a, b) => b.date.getTime() - a.date.getTime())
+                .map(
+                  (
+                    msg: { sender: MiniUser; message: string; date: Date },
+                    index
+                  ) => (
+                    <div key={index} className="flex space-x-2 w-full">
+                      {msg.sender.user_uuid === user?.user_uuid ? (
+                        <div className="flex-1 flex justify-end">
+                          <div className="flex space-x-2">
+                            <div className="max-w-xs p-2 rounded-md bg-blue-400 text-white">
+                              <p className="text-xs font-semibold ">
+                                {user?.username}
+                              </p>
+                              <p className="text-base">{msg.message}</p>
+                              <p>{formatDate(msg.date)}</p>
+                            </div>
+                            <Avatar>
+                              <AvatarImage src={msg.sender.user_profile} />
+                              <AvatarFallback>
+                                {msg.sender.username[0]}
+                              </AvatarFallback>
+                            </Avatar>
                           </div>
+                        </div>
+                      ) : (
+                        <div className="flex-1 flex justify-start">
                           <Avatar>
                             <AvatarImage src={msg.sender.user_profile} />
                             <AvatarFallback>
                               {msg.sender.username[0]}
                             </AvatarFallback>
                           </Avatar>
+                          <div className="max-w-xs p-2 rounded-md bg-gray-200 text-black">
+                            <p className="text-xs font-semibold ">
+                              {(selectedFriend as MiniUser)?.username ||
+                                (selectedFriend as MiniGroup)?.group_name}
+                            </p>
+                            <p className="text-base">{msg.message}</p>
+                            <p>{formatDate(msg.date)}</p>
+                          </div>
                         </div>
-                      </div>
-                    ) : (
-                      <div className="flex-1 flex justify-start">
-                        <Avatar>
-                          <AvatarImage src={msg.sender.user_profile} />
-                          <AvatarFallback>
-                            {msg.sender.username[0]}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="max-w-xs p-2 rounded-md bg-gray-200 text-black">
-                          <p className="text-xs font-semibold ">
-                            {(selectedFriend as MiniUser)?.username ||
-                              (selectedFriend as MiniGroup)?.group_name}
-                          </p>
-                          <p className="text-base">{msg.message}</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                      )}
+                    </div>
+                  )
                 )
-              )
             )}
           </div>
         </ScrollArea>

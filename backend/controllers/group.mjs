@@ -1,6 +1,5 @@
 // TODO WHEN SERVING GROUP'S MEMEBERS AND CHAT HISTORY USE DATA COMPRESSSION MAY BE ABLE TO SEND MORE MESSAGES IN HISTORY
 // ! WHEN SENDING  AGROUP INVITE THE SENDER UUID SHOULD BE THE GROUP ID NOT THE PERSON WHO SENT THE INVITE
-// TODO, when creating groupm inlcude creator info as miniuser
 
 import express from "express";
 import User from "../schemas/User.mjs"; // Import the User schema
@@ -151,7 +150,7 @@ groupController.put(
   }
 );
 
-// TODO, requires auth
+// TODO, requires auth? probably should, maybe requires the uuid of a user already in it? something with a jwt token?
 // add user to group
 groupController.put("/add/:group_num/:user_uuid", async (req, res) => {
   try {

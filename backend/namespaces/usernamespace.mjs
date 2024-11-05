@@ -22,7 +22,6 @@ export default class UserNamespace {
         );
       });
 
-      // TODO implememnt timestamps
       socket.on("message", async (data) => {
         const sendee = data.sendee;
         //check the user to see if they are online
