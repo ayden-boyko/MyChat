@@ -18,8 +18,6 @@ import { formatDate } from "../lib/dateformater";
 
 // TODO MAKE ALL TEXT BLACK SO IT CAN BE SEEN ON FIREFOX
 
-// TODO test invite to group in friend profile popup
-
 export default function HomePage() {
   const context = useContext(UserContext);
   const [friendChat, setFriendChat] = useState<
@@ -428,7 +426,8 @@ export default function HomePage() {
           }}
         />
 
-        {viewProfile && (
+        {/* checks that viewProfile is not null and is not a MiniGroup before rendering the friend popup */}
+        {viewProfile && selectedFriend && "user_uuid" in selectedFriend && (
           <FriendProfilePopup
             isOpen={viewProfile}
             onClose={() => {
@@ -437,6 +436,8 @@ export default function HomePage() {
             friend={selectedFriend as MiniUser}
           />
         )}
+
+        {/* */}
 
         {selectedFriend === null ? (
           <p>Select a friend or group to start chatting</p>
