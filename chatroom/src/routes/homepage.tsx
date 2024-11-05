@@ -18,7 +18,7 @@ import { formatDate } from "../lib/dateformater";
 
 // TODO MAKE ALL TEXT BLACK SO IT CAN BE SEEN ON FIREFOX
 
-// TODO TEST THAT FRIEND PROFILES ARE WORKING
+// TODO test invite to group in friend profile popup
 
 export default function HomePage() {
   const context = useContext(UserContext);

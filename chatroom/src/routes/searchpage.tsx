@@ -16,7 +16,7 @@ import {
 } from "../components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { ScrollArea } from "../components/ui/scroll-area";
-import { Search } from "lucide-react";
+import { Home, Search } from "lucide-react";
 import { MiniUser } from "../interfaces/miniuser";
 import { Group } from "../interfaces/group";
 import UserProfilePopup from "../components/pop-ups/UserProfilePopup";
@@ -120,6 +120,16 @@ export default function SearchPage() {
 
   return (
     <div className="container mx-auto py-10">
+      <div className="absolute top-4 right-4">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => navigate("/home")}
+          aria-label="Go to homepage"
+        >
+          <Home className="h-4 w-4" />
+        </Button>
+      </div>
       <Card>
         <CardHeader>
           <CardTitle>Search</CardTitle>

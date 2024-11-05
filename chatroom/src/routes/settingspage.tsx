@@ -25,6 +25,7 @@ import { UserContext } from "../lib/UserContext";
 import { useContext } from "react";
 import { User } from "../interfaces/userinterface";
 import { useNavigate } from "react-router-dom";
+import { Home } from "lucide-react";
 
 // TODO MAKE ALL TEXT BLACK SO IT CAN BE SEEN ON FIREFOX
 
@@ -113,6 +114,16 @@ export default function SettingsPage() {
 
   return (
     <div className="container mx-auto py-10">
+      <div className="absolute top-4 right-4">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => navigate("/home")}
+          aria-label="Go to homepage"
+        >
+          <Home className="h-4 w-4" />
+        </Button>
+      </div>
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle>Account Settings</CardTitle>

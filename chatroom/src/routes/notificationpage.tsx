@@ -9,7 +9,14 @@ import {
 } from "../components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { ScrollArea } from "../components/ui/scroll-area";
-import { UserPlus, Users, MessageSquare, Bell, UserCircle } from "lucide-react";
+import {
+  UserPlus,
+  Users,
+  MessageSquare,
+  Bell,
+  UserCircle,
+  Home,
+} from "lucide-react";
 import { UserContext } from "../lib/UserContext";
 import { User } from "../interfaces/userinterface";
 import { Notifications } from "../interfaces/notifications";
@@ -198,6 +205,16 @@ export default function NotificationPage() {
           </SidebarContent>
         </Sidebar>
         <div className="flex-1">
+          <div className="absolute top-4 right-4">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => navigate("/home")}
+              aria-label="Go to homepage"
+            >
+              <Home className="h-4 w-4" />
+            </Button>
+          </div>
           <div className="container mx-auto py-10 w-max">
             <Card>
               <CardHeader>
