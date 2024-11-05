@@ -4,7 +4,7 @@ import db from "../db/conn.mjs";
 
 const prenotifCheck = async (userId, notificationData) => {
   let hasbeenNotified = false;
-  let resultType = true;
+  let resultType = false;
 
   // TODO CASE 2, 5
   switch (notificationData.type) {
@@ -169,14 +169,19 @@ const addnotificationHandler = (eventType) => {
       switch (eventType) {
         case 1:
           eventData = `${req.body.username} has sent you a message.`;
+          break;
         case 2:
           eventData = `A new message has been sent to ${req.body.username}.`;
+          break;
         case 3:
           eventData = `You have been invited to join group ${req.body.username}.`;
+          break;
         case 4:
           eventData = `${req.body.username} has sent you a friend request.`;
+          break;
         case 5:
           eventData = `${req.body.username} wants to join your group.`;
+          break;
         default:
           break;
       }
@@ -187,7 +192,7 @@ const addnotificationHandler = (eventType) => {
           // or group if its a group invite or join request
           user_uuid: req.body.user_uuid,
           username: req.body.username,
-          user_profile: eq.body.user_profile,
+          user_profile: req.body.user_profile,
         },
         catagory: eventType,
         payload: eventData,
@@ -229,6 +234,7 @@ const notificationExecuterHandler = async (userId, notificationData, next) => {
   try {
     const notificationInstructions = notificationData;
     let result;
+    console.log("notificationhandler - 232 - ", notificationData);
     switch (notificationInstructions.catagory) {
       //group invite
       case 3:
@@ -302,7 +308,10 @@ const notificationExecuterHandler = async (userId, notificationData, next) => {
     // Proceed to the next middleware or route handler
     next();
   } catch (error) {
-    console.error("Error executing notification:", error);
+    console.error(
+      "Error executing notification - notificationhandler - 305 -:",
+      error
+    );
   }
 };
 

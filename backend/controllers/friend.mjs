@@ -65,8 +65,8 @@ friendController.put("/accept/:user_uuid", async (req, res) => {
     const requests = await db
       .collection("users")
       .updateOne(
-        { user_uuid: req.body.mini_user.user_uuid },
-        { $pull: { requests: { MU_Num: req.params.user_uuid } } }
+        { user_uuid: req.body.params.user_uuid },
+        { $pull: { requests: { MU_Num: req.body.mini_user.user_uuid } } }
       );
 
     //create mini user based on the request sender, this will be added to our friends,
@@ -104,14 +104,22 @@ friendController.put("/accept/:user_uuid", async (req, res) => {
 });
 
 // PUT unfriend user
-friendController.delete("/remove/:user_uuid", async (req, res) => {
+friendController.delete("/remove/:friend_uuid/:user_uuid", async (req, res) => {
   try {
-    const result = await db
-      .collection("users")
-      .deleteOne(
-        { user_uuid: register.body.mini_user.user_uuid },
-        { $pull: { friends: req.params.user_uuid } }
-      );
+    // both users are removed from each others friends list
+    const result = await db.collection("users").updateOne(
+      { user_uuid: req.params.friend_uuid },
+      {
+        $pull: { friends: { user_uuid: req.params.user_uuid } },
+      }
+    );
+    const result2 = await db.collection("users").updateOne(
+      { user_uuid: req.params.user_uuid },
+      {
+        $pull: { friends: { user_uuid: req.params.friend_uuid } },
+      }
+    );
+
     res.status(200).json(result);
   } catch (error) {
     console.error("Error unfriending user:", error);

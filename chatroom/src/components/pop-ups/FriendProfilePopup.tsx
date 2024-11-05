@@ -70,19 +70,12 @@ export default function FriendProfilePopup({
       const result = await fetch(
         `${import.meta.env.VITE_BACKEND_API_URL}/api/friend/remove/${
           friend.user_uuid
-        }`,
+        }/${user?.user_uuid}`,
         {
-          method: "PUT",
+          method: "DELETE",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            mini_user: {
-              user_uuid: user?.user_uuid,
-              username: user?.username,
-              user_profile: user?.user_profile,
-            },
-          }),
         }
       );
 
@@ -160,7 +153,7 @@ export default function FriendProfilePopup({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md bg-white">
         <CardHeader className="relative">
           <Button
             variant="ghost"
@@ -173,7 +166,7 @@ export default function FriendProfilePopup({
           </Button>
           <div className="flex items-center space-x-4">
             <Avatar className="h-20 w-20">
-              <AvatarImage src={friend.user_profile} />
+              <AvatarImage src={friend.user_profile || ""} />
               <AvatarFallback>{friend.username[0]}</AvatarFallback>
             </Avatar>
             <div>
@@ -200,14 +193,26 @@ export default function FriendProfilePopup({
               <DropdownMenuTrigger asChild>
                 <Button variant={"outline"}>Invite to Group</Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                {user?.groups?.map((group) => (
-                  <DropdownMenuItem onClick={() => handleInviteToGroup(group)}>
-                    <PlusCircleIcon className="mr-2 h-4 w-4" /> Invite to
-                    {group.group_name}
-                    <Avatar className="ml-2 h-4 w-4">
+              <DropdownMenuContent className="bg-white">
+                {user?.groups?.map((group, index) => (
+                  <DropdownMenuItem
+                    onClick={() => handleInviteToGroup(group)}
+                    key={index}
+                  >
+                    <PlusCircleIcon className="mr-2 h-4 w-4" />
+                    {`Invite to
+                    ${group.group_name}`}
+                    <Avatar className="ml-2 h-4 w-4 border border-black p-3">
                       <AvatarImage src={group.group_profile} />
-                      <AvatarFallback>{group.group_name[0]}</AvatarFallback>
+                      <AvatarFallback
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        {group.group_name[0]}
+                      </AvatarFallback>
                     </Avatar>
                   </DropdownMenuItem>
                 ))}

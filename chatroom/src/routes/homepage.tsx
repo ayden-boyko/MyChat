@@ -137,6 +137,7 @@ export default function HomePage() {
 
   const startChatting = async (friend: MiniUser) => {
     if (selectedFriend == friend) {
+      setViewProfile(true);
       return;
     }
     console.log("homepage.tsx - 80 - FRIEND", friend);
@@ -398,13 +399,17 @@ export default function HomePage() {
             setCreateGroup(false);
           }}
         />
-        <FriendProfilePopup
-          isOpen={viewProfile}
-          onClose={() => {
-            setViewProfile(false);
-          }}
-          friend={selectedFriend as MiniUser}
-        />
+
+        {viewProfile && (
+          <FriendProfilePopup
+            isOpen={viewProfile}
+            onClose={() => {
+              setViewProfile(false);
+            }}
+            friend={selectedFriend as MiniUser}
+          />
+        )}
+
         {selectedFriend === null ? (
           <p>Select a friend or group to start chatting</p>
         ) : (
