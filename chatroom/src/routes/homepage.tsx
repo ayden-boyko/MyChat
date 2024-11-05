@@ -12,7 +12,7 @@ import { cn } from "../lib/utils";
 import { MiniUser } from "../interfaces/miniuser";
 import { io } from "socket.io-client";
 import GroupCreationPopup from "../components/pop-ups/createGroupPopup";
-import { MiniGroup } from "../interfaces/minigroup";
+import { MiniGroup } from "../interfaces/MiniGroup";
 import FriendProfilePopup from "../components/pop-ups/FriendProfilePopup";
 import { formatDate } from "../lib/dateformater";
 

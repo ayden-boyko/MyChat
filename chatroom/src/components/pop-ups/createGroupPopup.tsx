@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { PlusCircle } from "lucide-react";
 import { GroupCreationPopupProps } from "../../interfaces/createGroup";
 import { UserContext } from "../../lib/UserContext";
-import { MiniGroup } from "../../interfaces/minigroup";
+import { MiniGroup } from "../../interfaces/MiniGroup";
 import { User } from "../../interfaces/userinterface";
 
 export default function GroupCreationPopup({
