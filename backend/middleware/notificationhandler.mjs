@@ -238,15 +238,40 @@ const notificationExecuterHandler = async (userId, notificationData, next) => {
     switch (notificationInstructions.catagory) {
       //group invite
       case 3:
-        //add the user to the groups members list
+        // get Miniuser information
+        const miniUserInfo = await User.findOne(
+          { user_uuid: userId },
+          { user_uuid: 1, username: 1, user_profile: 1 }
+        );
+
+        console.log(
+          "notificaiotn handler: user to be added to group - 247 - ",
+          miniUserInfo
+        );
+
+        //add the user to the group
         result = await Group.updateOne(
-          { group_num: notificationInstructions.group_num },
+          { group_num: notificationInstructions.sender.user_uuid },
           {
-            $push: {
+            $addToSet: {
               members: {
-                user_uuid: notificationInstructions.sender.user_uuid,
-                username: notificationInstructions.sender.username,
-                user_profile: notificationInstructions.sender.user_profile,
+                user_uuid: miniUserInfo.user_uuid,
+                username: miniUserInfo.username,
+                user_profile: miniUserInfo.user_profile,
+              },
+            },
+          }
+        );
+
+        // add group to user's groups
+        result = await User.updateOne(
+          { user_uuid: userId },
+          {
+            $addToSet: {
+              groups: {
+                group_uuid: notificationInstructions.sender.user_uuid,
+                group_name: notificationInstructions.sender.username,
+                group_profile: notificationInstructions.sender.user_profile,
               },
             },
           }

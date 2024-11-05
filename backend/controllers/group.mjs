@@ -139,10 +139,19 @@ groupController.delete("/remove/:group_num/:user_uuid", async (req, res) => {
 
 // invite user to group
 groupController.put(
-  "/invite/:group_num/:user_uuid",
+  "/invite/:user_uuid",
   addnotificationHandler(3),
   async (req, res) => {
     try {
+      //check that the user has recieved a notification whos sender contents are the same as the groups included in the req.body
+      const result = await User.findOne(
+        { user_uuid: req.body.user_uuid },
+        {
+          notifications: {
+            $elemMatch: { "sender.user_uuid": req.body.group_uuid },
+          },
+        }
+      );
       res.status(200).json(result);
     } catch (error) {
       res.status(500).json({ error: "An error occurred, user not invited" });

@@ -66,7 +66,7 @@ friendController.put("/accept/:user_uuid", async (req, res) => {
       .collection("users")
       .updateOne(
         { user_uuid: req.body.params.user_uuid },
-        { $pull: { requests: { MU_Num: req.body.mini_user.user_uuid } } }
+        { $pull: { requests: { MU_Num: req.body.mini_user } } }
       );
 
     //create mini user based on the request sender, this will be added to our friends,

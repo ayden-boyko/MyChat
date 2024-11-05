@@ -165,8 +165,8 @@ export default function NotificationPage() {
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton
-                      onClick={() => setActiveFilter(2)}
-                      isActive={activeFilter === 2}
+                      onClick={() => setActiveFilter(3)}
+                      isActive={activeFilter === 3}
                     >
                       <Users className="mr-2 h-4 w-4" />
                       <span>Group Invites</span>
@@ -183,8 +183,8 @@ export default function NotificationPage() {
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton
-                      onClick={() => setActiveFilter(3)}
-                      isActive={activeFilter === 3}
+                      onClick={() => setActiveFilter(2)}
+                      isActive={activeFilter === 2}
                     >
                       <Users className="mr-2 h-4 w-4" />
                       <span>Group Messages</span>

@@ -71,17 +71,45 @@ export default function HomePage() {
 
       createSocket();
     }
+  }, []); // changed from [user] to [] to prevent re-running when user changes
 
-    user?.socket?.on(
-      "message",
-      (data: { sender: MiniUser; message: string; date: Date }) =>
-        updateFriendChat({
-          sender: data.sender,
-          message: data.message,
-          date: data.date,
-        })
-    );
-  }, [user]);
+  useEffect(() => {
+    if (user?.socket) {
+      user.socket.on(
+        "message",
+        (data: { sender: MiniUser; message: string; date: Date }) =>
+          updateFriendChat({
+            sender: data.sender,
+            message: data.message,
+            date: data.date,
+          })
+      );
+    }
+  }, [user?.socket, updateFriendChat]);
+
+  useEffect(() => {
+    // pull data from database and update the user
+    const updateUser = async () => {
+      if (!user?.user_uuid) return;
+
+      const result = await fetch(
+        `${import.meta.env.VITE_BACKEND_API_URL}/api/users/get/${
+          user?.user_uuid
+        }`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await result.json();
+
+      setUser({ ...user, ...data } as User);
+    };
+    updateUser();
+  }, [user?.user_uuid]); // changed from [user] to [user?.user_uuid] to prevent re-running when user changes
 
   console.log("hompage.tsx - 60 - USER-HOME", user);
 

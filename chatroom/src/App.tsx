@@ -15,8 +15,6 @@ import { User } from "./interfaces/userinterface.ts";
 import { MiniUser } from "./interfaces/miniuser.ts";
 import { Socket } from "socket.io-client";
 import { MiniGroup } from "./interfaces/MiniGroup.ts";
-import AppHeader from "./components/headers/appheader.tsx";
-//const API = "http://localhost:8000/";
 
 // TODO IMPLEMENT DARK MODE
 /* TODO WHEN A USER ENTERS A NEW PAGE ONLY PULL DATA FROM NOTIFICATIONS SO THAT WAY IT ONLY UPDATES
