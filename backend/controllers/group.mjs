@@ -8,6 +8,10 @@ import Group from "../schemas/Group.mjs";
 import db from "../db/conn.mjs";
 import checkRights from "../middleware/authenticationhandler.mjs"; //may be needed
 import MiniUser from "../schemas/MiniUser.mjs";
+import {
+  addNotification,
+  addnotificationHandler,
+} from "../middleware/notificationhandler.mjs";
 
 // group_num: String,
 // group_name: String,
@@ -134,16 +138,18 @@ groupController.delete("/remove/:group_num/:user_uuid", async (req, res) => {
   }
 });
 
-// TODO, maybe requires auth
 // invite user to group
-groupController.put("/invite/:group_num/:user_uuid", async (req, res) => {
-  try {
-    // send a notification to the user
-    res.status(200).json(result);
-  } catch (error) {
-    res.status(500).json({ error: "An error occurred, user not invited" });
+groupController.put(
+  "/invite/:group_num/:user_uuid",
+  addnotificationHandler(3),
+  async (req, res) => {
+    try {
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ error: "An error occurred, user not invited" });
+    }
   }
-});
+);
 
 // TODO, requires auth
 // add user to group

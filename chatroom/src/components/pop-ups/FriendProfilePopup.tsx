@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { X, UserPlus, UserMinus, Ban, UserCheck } from "lucide-react";
+import { useContext, useEffect } from "react";
+import { X, UserMinus, Ban, PlusCircleIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
@@ -14,60 +14,145 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 //   AlertDialogTitle,
 //   AlertDialogTrigger,
 // } from "../ui/alert-dialog";
-import { useToast } from "../../hooks/use-toast";
-
-interface Friend {
-  id: number;
-  username: string;
-  name: string;
-  status: string;
-  bio: string;
-  avatarUrl: string;
-}
+import { UserContext } from "../../lib/UserContext";
+import { MiniUser } from "../../interfaces/miniuser";
+import { User } from "../../interfaces/userinterface";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 interface FriendProfilePopupProps {
-  friend: Friend;
+  isOpen: boolean;
+  friend: MiniUser;
   onClose: () => void;
-  isFriend: boolean;
-  isBlocked: boolean;
 }
 
 export default function FriendProfilePopup({
+  isOpen,
   friend,
   onClose,
-  isFriend,
-  isBlocked,
 }: FriendProfilePopupProps) {
-  const [friendStatus, setFriendStatus] = useState(isFriend);
-  const [blockedStatus, setBlockedStatus] = useState(isBlocked);
-  const { toast } = useToast();
+  const context = useContext(UserContext);
 
-  const handleFriendAction = () => {
-    setFriendStatus(!friendStatus);
-    toast({
-      title: friendStatus ? "Friend Removed" : "Friend Added",
-      description: friendStatus
-        ? `You have removed ${friend.name} from your friends list.`
-        : `You have added ${friend.name} to your friends list.`,
-    });
+  if (!context) {
+    // Handle the case where the component is rendered outside the provider
+    throw new Error("SomeChildComponent must be used within a UserProvider");
+  }
+
+  const { user, setUser } = context;
+
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("keydown", handleEscape);
+      document.body.style.overflow = "hidden";
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen, onClose]);
+
+  const handleFriendAction = async () => {
+    try {
+      const result = await fetch(
+        `${import.meta.env.VITE_BACKEND_API_URL}/api/friend/remove/${
+          friend.user_uuid
+        }`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            mini_user: {
+              user_uuid: user?.user_uuid,
+              username: user?.username,
+              user_profile: user?.user_profile,
+            },
+          }),
+        }
+      );
+
+      console.log("friend removed: ", result);
+      alert(`You have unfriended ${friend.username}.`);
+      setUser({
+        ...user,
+        friends:
+          user?.friends.filter((f) => f !== friend) ?? ([] as MiniUser[]),
+      } as User);
+    } catch (error) {
+      alert(`Failed to unfriend ${friend.username}.`);
+      console.log("friend not removed: ", error);
+    }
   };
 
-  const handleBlockAction = () => {
-    setBlockedStatus(!blockedStatus);
-    toast({
-      title: blockedStatus ? "User Unblocked" : "User Blocked",
-      description: blockedStatus
-        ? `You have unblocked ${friend.name}.`
-        : `You have blocked ${friend.name}.`,
-    });
+  const handleBlockAction = async () => {
+    try {
+      const result = await fetch(
+        `
+        ${import.meta.env.VITE_BACKEND_API_URL}/api/friend/block/${
+          friend.user_uuid
+        }`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            mini_user: {
+              user_uuid: user?.user_uuid,
+              username: user?.username,
+              user_profile: user?.user_profile,
+            },
+          }),
+        }
+      );
+      console.log("friend blocked: ", result);
+      alert(`You have blocked ${friend.username}.`);
+      setUser({
+        ...user,
+        blocked: [...(user?.blocked ?? []), friend],
+      } as User);
+    } catch (error) {
+      alert(`Failed to block ${friend.username}.`);
+      console.log("friend not blocked: ", error);
+    }
   };
 
-  const handleInviteToGroup = () => {
-    // This would typically open a group selection dialog
-    toast({
-      title: "Invite Sent",
-      description: `You have invited ${friend.name} to join a group.`,
-    });
+  const handleInviteToGroup = async () => {
+    try {
+      const result = await fetch(
+        `${import.meta.env.VITE_BACKEND_API_URL}/api/group/invite/${
+          friend.user_uuid
+        }`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            user_uuid: user?.user_uuid,
+            username: user?.username,
+            user_profile: user?.user_profile,
+          }),
+        }
+      );
+      console.log("invite sent: ", result);
+      alert(`Inviting ${friend.username} to a group.`);
+    } catch (error) {
+      alert(`Failed to invite ${friend.username} to a group.`);
+      console.log("invite not sent: ", error);
+    }
   };
 
   return (
@@ -85,61 +170,45 @@ export default function FriendProfilePopup({
           </Button>
           <div className="flex items-center space-x-4">
             <Avatar className="h-20 w-20">
-              <AvatarImage src={friend.avatarUrl} />
-              <AvatarFallback>{friend.name[0]}</AvatarFallback>
+              <AvatarImage src={friend.user_profile} />
+              <AvatarFallback>{friend.username[0]}</AvatarFallback>
             </Avatar>
             <div>
-              <CardTitle>{friend.name}</CardTitle>
+              <CardTitle>{friend.username}</CardTitle>
               <p className="text-sm text-muted-foreground">
                 @{friend.username}
               </p>
-              <p className="text-sm text-muted-foreground">{friend.status}</p>
             </div>
           </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div>
-              <h3 className="font-semibold">Bio</h3>
-              <p className="text-sm">{friend.bio}</p>
-            </div>
             <div className="flex space-x-2">
-              <Button
-                onClick={handleFriendAction}
-                variant={friendStatus ? "destructive" : "default"}
-              >
-                {friendStatus ? (
-                  <>
-                    <UserMinus className="mr-2 h-4 w-4" /> Unfriend
-                  </>
-                ) : (
-                  <>
-                    <UserPlus className="mr-2 h-4 w-4" /> Add Friend
-                  </>
-                )}
+              <Button onClick={handleFriendAction} variant={"default"}>
+                <UserMinus className="mr-2 h-4 w-4" /> Unfriend
               </Button>
-              <Button
-                onClick={handleBlockAction}
-                variant={blockedStatus ? "outline" : "secondary"}
-              >
-                {blockedStatus ? (
-                  <>
-                    <UserCheck className="mr-2 h-4 w-4" /> Unblock
-                  </>
-                ) : (
-                  <>
-                    <Ban className="mr-2 h-4 w-4" /> Block
-                  </>
-                )}
+              <Button onClick={handleBlockAction} variant={"secondary"}>
+                <Ban className="mr-2 h-4 w-4" /> Block
               </Button>
             </div>
-            <Button
-              onClick={handleInviteToGroup}
-              variant="outline"
-              className="w-full"
-            >
-              Invite to Group
-            </Button>
+            {/* group invite menu */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant={"outline"}>Invite to Group</Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                {user?.groups?.map((group) => (
+                  <DropdownMenuItem onClick={handleInviteToGroup}>
+                    <PlusCircleIcon className="mr-2 h-4 w-4" /> Invite to
+                    {group.group_name}
+                    <Avatar className="ml-2 h-4 w-4">
+                      <AvatarImage src={group.group_profile} />
+                      <AvatarFallback>{group.group_name[0]}</AvatarFallback>
+                    </Avatar>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </CardContent>
       </Card>

@@ -52,7 +52,7 @@ userController.get("/get/:user_uuid", async (req, res) => {
   try {
     const user = await db
       .collection("users")
-      .findOne({ user_uuid: parseInt(req.params.user_uuid) });
+      .findOne({ user_uuid: req.params.user_uuid });
     res.json(user);
   } catch (error) {
     res.status(500).json({ error: "An error while getting user by ID" });
@@ -170,7 +170,7 @@ userController.put(
               .json({ error: "An error occurred while hashing the password" });
           }
           const result = await db.collection("users").updateOne(
-            { user_uuid: parseInt(req.params.user_uuid) },
+            { user_uuid: req.params.user_uuid },
             {
               $set: {
                 hashed_password: hashedPassword.toString("hex"),

@@ -22,6 +22,7 @@ const userSchema = new Schema({
   user_profile: { type: String, default: "" },
   friends: { type: [MiniUser], default: [] },
   blocked: { type: [String], default: [] },
+  //reason blocked isnt miniuser[] is because their name and profile arent needed, if they are blocked all their content wont be shown
   groups: { type: [MiniGroup], default: [] },
   requests: { type: [MiniUser], default: [] },
   notifications: { type: [Notifications], default: [] },

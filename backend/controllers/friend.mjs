@@ -110,7 +110,7 @@ friendController.delete("/remove/:user_uuid", async (req, res) => {
       .collection("users")
       .deleteOne(
         { user_uuid: register.body.mini_user.user_uuid },
-        { $pull: { friends: parseInt(req.params.user_uuid) } }
+        { $pull: { friends: req.params.user_uuid } }
       );
     res.status(200).json(result);
   } catch (error) {
@@ -126,7 +126,8 @@ friendController.put("/block/:user_uuid", async (req, res) => {
     const result = await db.collection("users").updateOne(
       { user_uuid: req.body.mini_user.user_uuid },
       {
-        $set: { blocked: parseInt(req.params.user_uuid) },
+        $set: { blocked: req.params.user_uuid },
+        $pull: { friends: { user_uuid: req.params.user_uuid } },
       }
     );
     res.status(200).json(result);
@@ -144,7 +145,7 @@ friendController.put("/unblock/:user_uuid", async (req, res) => {
       .collection("users")
       .updateOne(
         { user_uuid: req.body.mini_user.user_uuid },
-        { $pull: { blocked: parseInt(req.params.user_uuid) } }
+        { $pull: { blocked: req.params.user_uuid } }
       );
     res.status(200).json(result);
   } catch (error) {

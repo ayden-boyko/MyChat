@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { PlusCircle } from "lucide-react";
 import { GroupCreationPopupProps } from "../../interfaces/createGroup";
 import { UserContext } from "../../lib/UserContext";
-import { MiniGroup } from "../../interfaces/MiniGroup";
+import { MiniGroup } from "../../interfaces/minigroup";
 import { User } from "../../interfaces/userinterface";
 
 export default function GroupCreationPopup({
@@ -56,8 +56,10 @@ export default function GroupCreationPopup({
     event.preventDefault();
 
     try {
-      const result = fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}/api/group/create/${groupName}`,
+      const result = await fetch(
+        `${
+          import.meta.env.VITE_BACKEND_API_URL
+        }/api/friend/create/${groupName}`,
         {
           method: "POST",
           headers: {
@@ -74,7 +76,7 @@ export default function GroupCreationPopup({
         }
       );
 
-      const groupData = await (await result).json();
+      const groupData = await result.json();
 
       console.log("groupCreationPopup.tsx - 71 - result", groupData);
       setGroupName("");

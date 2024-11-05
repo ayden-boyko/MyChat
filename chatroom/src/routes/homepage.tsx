@@ -12,7 +12,8 @@ import { cn } from "../lib/utils";
 import { MiniUser } from "../interfaces/miniuser";
 import { io } from "socket.io-client";
 import GroupCreationPopup from "../components/pop-ups/createGroupPopup";
-import { MiniGroup } from "../interfaces/MiniGroup";
+import { MiniGroup } from "../interfaces/minigroup";
+import FriendProfilePopup from "../components/pop-ups/FriendProfilePopup";
 
 // TODO MAKE ALL TEXT BLACK SO IT CAN BE SEEN ON FIREFOX
 
@@ -26,6 +27,7 @@ export default function HomePage() {
     MiniUser | MiniGroup | null
   >(null); // for use with individual friends or groups
   const [createGroup, setCreateGroup] = useState<boolean>(false);
+  const [viewProfile, setViewProfile] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -67,12 +69,14 @@ export default function HomePage() {
       createSocket();
     }
 
-    user?.socket?.on("message", (data) =>
-      updateFriendChat({
-        sender: data.sender,
-        message: data.message,
-        date: data.date,
-      })
+    user?.socket?.on(
+      "message",
+      (data: { sender: MiniUser; message: string; date: Date }) =>
+        updateFriendChat({
+          sender: data.sender,
+          message: data.message,
+          date: data.date,
+        })
     );
   }, [user]);
 
@@ -129,6 +133,9 @@ export default function HomePage() {
   };
 
   const startChatting = async (friend: MiniUser) => {
+    if (selectedFriend == friend) {
+      return;
+    }
     console.log("homepage.tsx - 80 - FRIEND", friend);
     if (friend === null) {
       alert("Please select a friend to start chatting");
@@ -380,8 +387,15 @@ export default function HomePage() {
             setCreateGroup(false);
           }}
         />
+        <FriendProfilePopup
+          isOpen={viewProfile}
+          onClose={() => {
+            setViewProfile(false);
+          }}
+          friend={selectedFriend as MiniUser}
+        />
         {selectedFriend === null ? (
-          <p>Select a friend to start chatting</p>
+          <p>Select a friend or group to start chatting</p>
         ) : (
           <footer className="bg-white border-t p-4">
             <form className="flex space-x-2" onSubmit={sendMessage}>
