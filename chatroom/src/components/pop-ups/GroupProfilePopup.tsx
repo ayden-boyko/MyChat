@@ -19,6 +19,8 @@ interface GroupProfilePopupProps {
   isMember: boolean;
 }
 
+// TODO GET THIS WORKING
+
 export default function GroupProfilePopup({
   group,
   onClose,

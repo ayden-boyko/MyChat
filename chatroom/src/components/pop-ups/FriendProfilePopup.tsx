@@ -30,6 +30,8 @@ interface FriendProfilePopupProps {
   onClose: () => void;
 }
 
+// TODO test group drop down, test block and unfriend
+
 export default function FriendProfilePopup({
   isOpen,
   friend,
@@ -192,6 +194,7 @@ export default function FriendProfilePopup({
               </Button>
             </div>
             {/* group invite menu */}
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant={"outline"}>Invite to Group</Button>

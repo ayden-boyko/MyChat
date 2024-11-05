@@ -17,6 +17,8 @@ import FriendProfilePopup from "../components/pop-ups/FriendProfilePopup";
 
 // TODO MAKE ALL TEXT BLACK SO IT CAN BE SEEN ON FIREFOX
 
+// TODO TEST THAT FRIEND PROFILES ARE WORKING
+
 export default function HomePage() {
   const context = useContext(UserContext);
   const [friendChat, setFriendChat] = useState<
