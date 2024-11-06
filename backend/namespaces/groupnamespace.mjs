@@ -12,6 +12,8 @@ export default class GroupNamespace {
     this.initialize();
   }
 
+  // TODO USER SOCKETIO ROOMS FOR GROUP CHATS
+
   initialize() {
     console.log("initializing group namespace");
 
