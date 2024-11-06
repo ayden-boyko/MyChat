@@ -123,6 +123,8 @@ export default function HomePage() {
         }
       );
       console.log("homepage.tsx - 45 -LOGOUT", result);
+      //disconnet user socket
+      user?.socket?.disconnect();
       navigate("/");
     } catch (error) {
       console.error("Error during logout:", error);
@@ -130,7 +132,18 @@ export default function HomePage() {
   };
 
   const startGroupChatting = async (group: MiniGroup) => {
+    // TODO change user.socket to socket in group namespace
     console.log("homepage.tsx - 100 - GROUP", group);
+
+    if (selectedFriend && "user_uuid" in selectedFriend) {
+      user?.socket.disconnect();
+      const socket = io("http://localhost:8000/group", {
+        query: {
+          user_uuid: user?.user_uuid, // include user_uuid here
+        },
+      });
+      setUser({ ...user, socket: socket } as User);
+    }
 
     if (selectedFriend == group) {
       setViewProfile(true);
@@ -167,6 +180,17 @@ export default function HomePage() {
   };
 
   const startChatting = async (friend: MiniUser) => {
+    // change user.socket to socket in user namespace if its not already there
+    if (selectedFriend && "group_uuid" in selectedFriend) {
+      user?.socket.disconnect();
+      const socket = io("http://localhost:8000/user", {
+        query: {
+          user_uuid: user?.user_uuid, // include user_uuid here
+        },
+      });
+      setUser({ ...user, socket: socket } as User);
+    }
+
     if (selectedFriend == friend) {
       setViewProfile(true);
       return;
@@ -223,20 +247,26 @@ export default function HomePage() {
       date: new Date(),
     });
 
-    //send message with socket.io, the message will be added to the chat on the backend
-    user?.socket.emit("message", {
-      sendee:
-        (selectedFriend as MiniUser)?.user_uuid ||
-        (selectedFriend as MiniGroup)?.group_uuid,
-      message: message.value,
-      //sender is in the format of a MiniUser
-      sender: {
-        username: user?.username,
-        user_uuid: user?.user_uuid,
-        user_profile: user?.user_profile,
-      },
-      date: new Date(),
-    });
+    // check if user or group message is being sent
+    if ((selectedFriend as MiniUser)?.user_uuid) {
+      //send message with socket.io, the message will be added to the chat on the backend
+      user?.socket.emit("message", {
+        sendee:
+          (selectedFriend as MiniUser)?.user_uuid ||
+          (selectedFriend as MiniGroup)?.group_uuid,
+        message: message.value,
+        //sender is in the format of a MiniUser
+        sender: {
+          username: user?.username,
+          user_uuid: user?.user_uuid,
+          user_profile: user?.user_profile,
+        },
+        date: new Date(),
+      });
+    } else {
+      //send message with socket.io, the message will be added to the chat on the backend
+      user?.socket.emit("message", {});
+    }
 
     //clear input with id 'msg'
     message.value = "";

@@ -110,3 +110,5 @@ server.listen(PORT, () => {
 //namespaces for user and group messages
 const userNamespace = io.of("/user");
 new UserNamespace(userNamespace);
+const groupNamespace = io.of("/group");
+new UserNamespace(groupNamespace);

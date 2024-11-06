@@ -48,7 +48,6 @@ export default function SearchPage() {
     }
   });
 
-  // TODO SET UP GROUP SEARCH LOGIC, ONLY USER EXISTS RN, get group profiles to work with it
   const handleSearch = async () => {
     if (!searchQuery) alert("Please enter a search query");
 
