@@ -19,6 +19,9 @@ import GroupProfilePopup from "../components/pop-ups/GroupProfilePopup";
 
 // TODO MAKE ALL TEXT BLACK SO IT CAN BE SEEN ON FIREFOX
 
+// TODO TEST USER MESSAGING TO MAKE SURE IT STILL WORKS
+// TODO TEST GROUP MESSAGING AFTER YOU GET GROUPNAMESPACE FIGURED OUT
+
 export default function HomePage() {
   const context = useContext(UserContext);
   const [friendChat, setFriendChat] = useState<
