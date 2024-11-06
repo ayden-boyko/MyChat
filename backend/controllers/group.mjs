@@ -18,6 +18,34 @@ import {
 
 const groupController = express.Router();
 
+//get group by name
+groupController.get("/get/name/:group_name", async (req, res) => {
+  try {
+    const group = await db
+      .collection("groups")
+      .aggregate([
+        {
+          $search: {
+            index: "groupnameSearchIndex",
+            text: {
+              query: req.params.group_name,
+              path: "group_name",
+              fuzzy: {
+                maxEdits: 2, // Allow up to 2 changes (insertion, deletion, substitution)
+                prefixLength: 2, // Require at least 2 starting characters to match
+                maxExpansions: 100, // Limit the number of expansions for the fuzzy search
+              },
+            },
+          },
+        },
+      ])
+      .toArray();
+    res.status(200).json(group);
+  } catch (error) {
+    res.status(500).json({ error: "An error occurred" });
+  }
+});
+
 // get member count
 groupController.get("/membercount/:group_uuid", async (req, res) => {
   try {

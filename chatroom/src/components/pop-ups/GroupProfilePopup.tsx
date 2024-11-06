@@ -39,7 +39,7 @@ export default function GroupProfilePopup({
     const fetchMembers = async () => {
       try {
         const result = await fetch(
-          `${import.meta.env.VITE_BACKEND_API_URL}/api/group/membercount/${
+          `${import.meta.env.VITE_BACKEND_API_URL}/api/groups/membercount/${
             group.group_uuid
           }`,
           {

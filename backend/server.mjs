@@ -73,7 +73,7 @@ app.use("/api/notification", notificationController);
 app.use("/api/chat", chatController);
 
 // Use the group controller
-app.use("/api/group", groupController);
+app.use("/api/groups", groupController);
 
 // TODO SERVE LOGIN PAGE
 app.get("/", async (req, res) => {

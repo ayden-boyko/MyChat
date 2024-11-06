@@ -18,22 +18,24 @@ import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { ScrollArea } from "../components/ui/scroll-area";
 import { Home, Search } from "lucide-react";
 import { MiniUser } from "../interfaces/miniuser";
-import { Group } from "../interfaces/group";
 import UserProfilePopup from "../components/pop-ups/UserProfilePopup";
 import { UserContext } from "../lib/UserContext";
 import { useNavigate } from "react-router-dom";
+import { MiniGroup } from "../interfaces/MiniGroup";
+import GroupProfilePopup from "../components/pop-ups/GroupProfilePopup";
 
 export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [collection, setCollection] = useState("user");
   const [searchResults, setSearchResults] = useState<{
     people: MiniUser[];
-    groups: Group[];
+    groups: MiniGroup[];
   }>({
     people: [],
     groups: [],
   });
   const [selectedUser, setSelectedUser] = useState<MiniUser | null>(null);
+  const [selectedGroup, setSelectedGroup] = useState<MiniGroup | null>(null);
 
   const context = useContext(UserContext);
   const navigate = useNavigate();
@@ -46,14 +48,16 @@ export default function SearchPage() {
     }
   });
 
-  // TODO SET UP GROUP SEARCH LOGIC, ONLY USER EXISTS RN
+  // TODO SET UP GROUP SEARCH LOGIC, ONLY USER EXISTS RN, get group profiles to work with it
   const handleSearch = async () => {
     if (!searchQuery) alert("Please enter a search query");
 
     console.log("searchpage.tsx - 53 - preparing search", searchQuery);
 
     const result = await fetch(
-      `${import.meta.env.VITE_BACKEND_API_URL}/api/users/get/${searchQuery}`,
+      `${
+        import.meta.env.VITE_BACKEND_API_URL
+      }/api/${collection}/get/name/${searchQuery}`,
       {
         method: "GET",
         headers: {
@@ -62,19 +66,23 @@ export default function SearchPage() {
       }
     );
 
-    console.log("searchpage.tsx - 65 -got data!");
+    if (!result.ok) {
+      console.error("searchpage.tsx - 63 - search failed", result);
+      return;
+    }
 
     const data = await result.json();
 
-    if (collection === "user") {
+    if (collection === "users") {
       setSearchResults({ people: data, groups: [] });
     } else {
       setSearchResults({ people: [], groups: data });
     }
   };
 
-  const handleUserClick = (user: MiniUser) => {
-    setSelectedUser(user);
+  const handleClick = (user: MiniGroup | MiniUser) => {
+    if ("username" in user) setSelectedUser(user);
+    else if ("group_name" in user) setSelectedGroup(user);
   };
 
   const handleClose = () => {
@@ -150,12 +158,15 @@ export default function SearchPage() {
 
           <Tabs defaultValue="people">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="people" onClick={() => setCollection("user")}>
+              <TabsTrigger
+                value="people"
+                onClick={() => setCollection("users")}
+              >
                 People
               </TabsTrigger>
               <TabsTrigger
                 value="groups"
-                onClick={() => setCollection("group")}
+                onClick={() => setCollection("groups")}
               >
                 Groups
               </TabsTrigger>
@@ -175,7 +186,7 @@ export default function SearchPage() {
                         />
                         <AvatarFallback>{user.username[0]}</AvatarFallback>
                       </Avatar>
-                      <div onClick={() => handleUserClick(user)}>
+                      <div onClick={() => handleClick(user)}>
                         <p className="text-sm font-medium leading-none">
                           {user.username}
                         </p>
@@ -199,6 +210,22 @@ export default function SearchPage() {
                     onSendFriendRequest={handleSendFriendRequest}
                   />
                 )}
+                {/* Group Profile Popup */}
+                {selectedGroup && (
+                  <GroupProfilePopup
+                    isOpen={selectedGroup !== null}
+                    // checks if the user is a member of the group
+                    isMember={
+                      user &&
+                      user.groups &&
+                      selectedGroup.group_uuid in user.groups
+                        ? true
+                        : false
+                    }
+                    group={selectedGroup}
+                    onClose={handleClose}
+                  />
+                )}
               </ScrollArea>
             </TabsContent>
             <TabsContent value="groups">
@@ -206,19 +233,19 @@ export default function SearchPage() {
                 {searchResults.groups.length > 0 ? (
                   searchResults.groups.map((group) => (
                     <div
-                      key={group.id}
+                      key={group.group_uuid}
                       className="flex items-center space-x-4 mb-4"
                     >
                       <Avatar>
-                        <AvatarImage src={group.avatarUrl} alt={group.name} />
-                        <AvatarFallback>{group.name[0]}</AvatarFallback>
+                        <AvatarImage
+                          src={group.group_profile}
+                          alt={group.group_name}
+                        />
+                        <AvatarFallback>{group.group_name[0]}</AvatarFallback>
                       </Avatar>
                       <div>
                         <p className="text-sm font-medium leading-none">
-                          {group.name}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {group.memberCount} members
+                          {group.group_name}
                         </p>
                       </div>
                     </div>
