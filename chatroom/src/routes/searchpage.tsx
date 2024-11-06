@@ -81,12 +81,19 @@ export default function SearchPage() {
   };
 
   const handleClick = (user: MiniGroup | MiniUser) => {
-    if ("username" in user) setSelectedUser(user);
-    else if ("group_name" in user) setSelectedGroup(user);
+    console.log("searchpage.tsx - 84 -user", user);
+    if ("username" in user) {
+      console.log("searchpage.tsx - 86 -group", user);
+      setSelectedUser(user);
+    } else if ("group_name" in user) {
+      console.log("searchpage.tsx - 89 -group", user);
+      setSelectedGroup(user);
+    }
   };
 
   const handleClose = () => {
     setSelectedUser(null);
+    setSelectedGroup(null);
   };
 
   const handleSendFriendRequest = async () => {
@@ -210,22 +217,6 @@ export default function SearchPage() {
                     onSendFriendRequest={handleSendFriendRequest}
                   />
                 )}
-                {/* Group Profile Popup */}
-                {selectedGroup && (
-                  <GroupProfilePopup
-                    isOpen={selectedGroup !== null}
-                    // checks if the user is a member of the group
-                    isMember={
-                      user &&
-                      user.groups &&
-                      selectedGroup.group_uuid in user.groups
-                        ? true
-                        : false
-                    }
-                    group={selectedGroup}
-                    onClose={handleClose}
-                  />
-                )}
               </ScrollArea>
             </TabsContent>
             <TabsContent value="groups">
@@ -235,6 +226,7 @@ export default function SearchPage() {
                     <div
                       key={group.group_uuid}
                       className="flex items-center space-x-4 mb-4"
+                      onClick={() => handleClick(group)}
                     >
                       <Avatar>
                         <AvatarImage
@@ -256,6 +248,22 @@ export default function SearchPage() {
                       ? "No Groups found"
                       : "Loading"}
                   </p>
+                )}
+                {/* Group Profile Popup */}
+                {selectedGroup && (
+                  <GroupProfilePopup
+                    isOpen={selectedGroup !== null}
+                    // checks if the user is a member of the group
+                    isMember={
+                      user &&
+                      user.groups &&
+                      selectedGroup.group_uuid in user.groups
+                        ? true
+                        : false
+                    }
+                    group={selectedGroup}
+                    onClose={handleClose}
+                  />
                 )}
               </ScrollArea>
             </TabsContent>
