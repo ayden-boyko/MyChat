@@ -1,4 +1,3 @@
-// TODO USE AN ADAPTER? TO NOTIFIY WHEN A NEW USER JOINS GROUP
 import User from "../schemas/User.mjs";
 import Chats from "../schemas/Chats.mjs";
 import { addNotification } from "../middleware/notificationhandler.mjs";
@@ -13,6 +12,9 @@ export default class GroupNamespace {
   }
 
   // TODO USER SOCKETIO ROOMS FOR GROUP CHATS
+  // users can just join thier room based on the group id
+  // * ex: socket.join(G63dc82ksj...); would join that group
+  // * to message their group, socket.to(G63dc82ksj...).emit("message", data);
 
   initialize() {
     console.log("initializing group namespace");
