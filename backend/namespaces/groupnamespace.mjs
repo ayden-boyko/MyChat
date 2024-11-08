@@ -5,6 +5,10 @@ import { addNotification } from "../middleware/notificationhandler.mjs";
 // for storing online users and their sockets/uuids
 const usersOnline = {};
 
+const getOnlineGroupMembers = (socket, group_uuid) => {
+  return socket.in(group_uuid).fetchSockets();
+};
+
 export default class GroupNamespace {
   constructor(namespace) {
     this.namespace = namespace;
@@ -15,6 +19,14 @@ export default class GroupNamespace {
   // users can just join thier room based on the group id
   // * ex: socket.join(G63dc82ksj...); would join that group
   // * to message their group, socket.to(G63dc82ksj...).emit("message", data);
+  // get all online group members socket.in(G63dc82ksj...).fetchSockets();
+  // workflow is as follows:
+  // 1. user joins group
+  // 2. user sends message
+  // 3. message is sent to all online group members
+  // 4. get all offline members
+  // 5. all offline group member's notifications are updated
+  // the most recent notification takes precedence over the older ones
 
   initialize() {
     console.log("initializing group namespace");
