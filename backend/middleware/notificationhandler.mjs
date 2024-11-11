@@ -7,19 +7,32 @@ const prenotifCheck = async (userId, notificationData) => {
   let resultType = false;
 
   // TODO CASE 2, 5
-  switch (notificationData.type) {
+  switch (notificationData.catagory) {
     case 1: // for messaging, not needed here in case of future requirements
       //check that the user doesnt already have a message notification from the user
-      resultType = await db.collection("users").findOne({
+      resultType = await User.findOne({
         user_uuid: userId,
         notifications: {
           $elemMatch: {
             user_uuid: notificationData.sender.user_uuid,
-            type: notificationData.type,
+            catagory: notificationData.catagory,
           },
         },
       });
+
       break;
+
+    case 2: // group message
+      //check that the user doesnt already have a message notification from the group
+      resultType = await User.findOne({
+        user_uuid: userId,
+        notifications: {
+          $elemMatch: {
+            group_uuid: notificationData.group.group_uuid,
+            catagory: notificationData.catagory,
+          },
+        },
+      });
 
     case 3: // group invite
       //check that the user isnt already in the group
@@ -40,6 +53,9 @@ const prenotifCheck = async (userId, notificationData) => {
         },
       });
       break;
+
+    case 5: // group request
+      break;
   }
 
   if (resultType) {
@@ -52,7 +68,7 @@ const prenotifCheck = async (userId, notificationData) => {
       {
         $pull: {
           $elemMatch: {
-            type: notificationData.type,
+            catagory: notificationData.catagory,
             "sender.user_uuid": notificationData.sender.user_uuid,
             "sender.username": notificationData.sender.username,
             "sender.user_profile": notificationData.sender.user_profile,
@@ -85,7 +101,7 @@ const prenotifCheck = async (userId, notificationData) => {
       {
         $pull: {
           $elemMatch: {
-            type: notificationData.type,
+            catagory: notificationData.catagory,
             "sender.user_uuid": notificationData.sender.user_uuid,
             "sender.username": notificationData.sender.username,
             "sender.user_profile": notificationData.sender.user_profile,
@@ -108,7 +124,7 @@ const prenotifCheck = async (userId, notificationData) => {
       {
         $pull: {
           $elemMatch: {
-            type: notificationData.type,
+            catagory: notificationData.catagory,
             "sender.user_uuid": notificationData.sender.user_uuid,
             "sender.username": notificationData.sender.username,
             "sender.user_profile": notificationData.sender.user_profile,
@@ -134,7 +150,7 @@ const addNotification = async (userId, notificationData) => {
       return;
     } else {
       console.log(
-        `notificationHandler.mjs - 119 - Notification added for offline user: ${userId}`
+        `notificationHandler.mjs - 119 - Notification added for offline user: ${userId}, notificationData: ${notificationData.catagory}`
       );
       await User.updateOne(
         { user_uuid: userId },

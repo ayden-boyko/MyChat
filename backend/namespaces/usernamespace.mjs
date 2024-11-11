@@ -15,15 +15,16 @@ export default class UserNamespace {
     console.log("initializing user namespace");
 
     this.namespace.on("connection", (socket) => {
-      socket.on("join", (user_uuid) => {
-        usersOnline[user_uuid] = socket.id;
+      socket.on("join", (data) => {
+        usersOnline[data.user_uuid] = socket.id;
         console.log(
-          `usernamespace - 21 - ${socket} joined with uuid: ${user_uuid}`
+          `usernamespace - 21 - ${socket.id} joined with uuid: ${data.user_uuid}`
         );
       });
 
       socket.on("message", async (data) => {
         const sendee = data.sendee;
+        console.log("usernamespace - 27 - data", data);
         //check the user to see if they are online
         const online = usersOnline[sendee];
         if (online) {
@@ -41,41 +42,43 @@ export default class UserNamespace {
               username: data.sender.username,
               user_profile: data.sender.user_profile,
             },
-            type: 1,
+            catagory: 1,
             payload: `${data.sender.username} has sent you a message.`,
             date: new Date(),
             seen: false,
           };
+          console.log("notificationData", notificationData);
           await addNotification(sendee, notificationData);
         }
         //upsert creates the chat if it doesnt exist
         console.log("updating || creating chat - 52 -", data.message);
-        console.log("sender", data.sender);
-        const chat = await Chats.findOne({
-          between: { $all: [sendee, data.sender.user_uuid] },
-        }).exec();
+        console.log("sender", data.sender, "sendee", sendee);
         try {
-          if (chat) {
-            // If a chat exists, update it by pushing the message
+          let result;
+          //check if the chat already exists
+          const chat = await Chats.findOne({
+            between: { $all: [data.sender.user_uuid, sendee] },
+          });
+          if (!chat) {
+            // if it doesn't exist, create a new one
+            const newChat = new Chats({
+              between: [data.sender.user_uuid, sendee],
+              messages: [
+                { sender: data.sender, message: data.message, date: data.date },
+              ],
+            });
+            result = await newChat.save();
+          } else {
+            // if it does exist, update the chat
             chat.messages.push({
               sender: data.sender,
               message: data.message,
               date: data.date,
             });
-            await chat.save();
-          } else {
-            // If no chat exists, create a new one
-            await Chats.create({
-              between: [sendee, data.sender.user_uuid],
-              messages: [
-                {
-                  sender: data.sender,
-                  message: data.message,
-                  date: data.date,
-                },
-              ],
-            });
+            result = await chat.save();
           }
+
+          console.log("result", result);
         } catch (error) {
           console.log(
             `usernamespace - 84 - failed to update chat between ${sendee} and ${data.sender.user_uuid}, caused error: `,
@@ -85,7 +88,13 @@ export default class UserNamespace {
       });
 
       socket.on("disconnect", () => {
-        delete usersOnline[socket.id]; // remove useres form the online array
+        //remove user from online who has a socket.id that matches the diconnected socket
+        const userId = Object.keys(usersOnline).find(
+          (key) => usersOnline[key] === socket.id
+        );
+        if (userId) {
+          delete usersOnline[userId];
+        }
         console.log(
           `usernamespace - 95 - ${socket.id} disconnected from user namespace`
         );

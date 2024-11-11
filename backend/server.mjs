@@ -8,6 +8,7 @@ import friendController from "./controllers/friend.mjs";
 import notificationController from "./controllers/notification.mjs";
 import chatController from "./controllers/chat.mjs";
 import UserNamespace from "./namespaces/usernamespace.mjs";
+import GroupNamespace from "./namespaces/groupnamespace.mjs";
 import groupController from "./controllers/group.mjs";
 
 //external imports
@@ -111,4 +112,4 @@ server.listen(PORT, () => {
 const userNamespace = io.of("/user");
 new UserNamespace(userNamespace);
 const groupNamespace = io.of("/group");
-new UserNamespace(groupNamespace);
+new GroupNamespace(groupNamespace);

@@ -1,12 +1,18 @@
 import User from "../schemas/User.mjs";
 import Chats from "../schemas/Chats.mjs";
 import { addNotification } from "../middleware/notificationhandler.mjs";
+import Group from "../schemas/Group.mjs";
 
 // for storing online users and their sockets/uuids
 const usersOnline = {};
 
-const getOnlineGroupMembers = (socket, group_uuid) => {
-  return socket.in(group_uuid).fetchSockets();
+const getOfflineGroupMembers = (group_uuid) => {
+  //gets all members that are offline
+  return Group.findOne({ group_uuid }).then((group) => {
+    return group.members.filter((member) => {
+      return !usersOnline[member.user_uuid];
+    });
+  });
 };
 
 export default class GroupNamespace {
@@ -32,79 +38,74 @@ export default class GroupNamespace {
     console.log("initializing group namespace");
 
     this.namespace.on("connection", (socket) => {
-      socket.on("join", (user_uuid) => {
-        usersOnline[user_uuid] = socket.id;
+      socket.on("join", (data) => {
+        console.log("user socket id:", socket.id);
+        usersOnline[data.user_uuid] = socket.id;
+        socket.join(data.group_uuid);
         console.log(
-          `groupnamespace - 21 - ${socket} joined with uuid: ${user_uuid}`
+          `groupnamespace - 21 - ${socket.id} joined with uuid: ${data.user_uuid} and has joined group: ${data.group_uuid}`
         );
       });
 
-      socket.on("new join", (user_uuid) => {
-        usersOnline[user_uuid] = socket.id;
+      socket.on("new join", (data) => {
+        usersOnline[data.miniUser.user_uuid] = socket.id;
         console.log(
-          `groupnamespace - 21 - ${socket} has newly joined with uuid: ${user_uuid}`
+          `groupnamespace - 21 - ${socket} has newly joined with uuid: ${data.miniUser.user_uuid}`
         );
         // send message to all online users in the group that the new user has joined
-
+        socket.to(data.group_uuid).emit("new join", data.miniUser);
         // notify offline group members that the new user has joined
+        getOfflineGroupMembers(data.group_uuid).then((res) => {
+          res.forEach((user) => {
+            addNotification(user.user_uuid, {
+              sender: data.miniUser,
+              catagory: 1,
+              payload: `${data.miniUser.username} has joined the group.`,
+              date: new Date(),
+              seen: false,
+            });
+          });
+        });
       });
 
       socket.on("message", async (data) => {
         const sendee = data.sendee;
-        //check the user to see if they are online
-        const online = usersOnline[sendee];
-        if (online) {
-          console.log(
-            `usernamespace - 31 - ${data.sender.username} sent: "${data.message}" to ${sendee} at ${data.date}`
-          );
-          // sent message to all online members
-        } else {
-          console.log(
-            `usernamespace - 36 - ${data.sender.username} could not send: ${data.message} to ${sendee} as they are offline`
-          );
-          const notificationData = {
-            sender: {
-              user_uuid: data.sender.user_uuid,
-              username: data.sender.username,
-              user_profile: data.sender.user_profile,
-            },
-            type: 1,
-            payload: `${data.sender.username} has sent you a message.`,
-            date: new Date(),
-            seen: false,
-          };
-          // notify all offline members of the group
-          // await addNotification(sendee, notificationData);
-        }
+
+        //sends the message to all online users in the group
+        socket.to(data.group_uuid).emit("message", {
+          sender: data.sender,
+          message: data.message,
+          date: data.date,
+        });
+        const notificationData = {
+          sender: data.sender,
+          catagory: 1,
+          payload: `${data.sender.username} has sent you a message.`,
+          date: new Date(),
+          seen: false,
+        };
+        // notify all offline members of the group
+        setImmediate(() => {
+          const offline = getOfflineGroupMembers(data.group_uuid);
+          //update all offline user's notifications
+          offline.then((res) => {
+            res.forEach((user) => {
+              addNotification(user.user_uuid, notificationData);
+            });
+          });
+        });
+
         //upsert creates the chat if it doesnt exist
         console.log("updating || creating chat - 52 -", data.message);
         console.log("sender", data.sender);
-        // update the groups chat
-        const chat = await Chats.findOne({
-          between: { $all: [sendee, data.sender.user_uuid] },
-        }).exec();
+
+        //update chat if it exists, else create it
         try {
-          if (chat) {
-            // If a chat exists, update it by pushing the message
-            chat.messages.push({
-              sender: data.sender,
-              message: data.message,
-              date: data.date,
-            });
-            await chat.save();
-          } else {
-            // If no chat exists, create a new one
-            await Chats.create({
-              between: [sendee, data.sender.user_uuid],
-              messages: [
-                {
-                  sender: data.sender,
-                  message: data.message,
-                  date: data.date,
-                },
-              ],
-            });
-          }
+          await Group.findOneAndUpdate(
+            { group_uuid: data.group_uuid },
+            { $push: { chats: data.message } },
+            { upsert: true }
+          );
         } catch (error) {
           console.log(
             `usernamespace - 84 - failed to update chat between ${sendee} and ${data.sender.user_uuid}, caused error: `,

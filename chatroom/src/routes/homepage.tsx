@@ -27,7 +27,6 @@ export default function HomePage() {
   const [friendChat, setFriendChat] = useState<
     { sender: MiniUser; message: string; date: Date }[]
   >([]); // for use with individual friends or groups
-  const [hasJoined, setHasJoined] = useState<boolean>(false);
   const [selectedFriend, setSelectedFriend] = useState<
     MiniUser | MiniGroup | null
   >(null); // for use with individual friends or groups
@@ -46,38 +45,78 @@ export default function HomePage() {
   const updateFriendChat = useCallback(
     (newMessage: { sender: MiniUser; message: string; date: Date }) => {
       setFriendChat((prevChat) => {
+        // if it's the first message, return an array with the new message
+        if (!Array.isArray(prevChat)) {
+          return [newMessage];
+        }
         return [...prevChat, newMessage];
       });
     },
     [setFriendChat]
   );
 
+  //sets socket namspace
+  useEffect(() => {
+    let namespace;
+
+    if (selectedFriend && "user_uuid" in selectedFriend) {
+      namespace = "user";
+      console.log("user");
+      startChatting(selectedFriend as MiniUser);
+    } else {
+      console.log("group");
+      namespace = "group";
+      startGroupChatting(selectedFriend as MiniGroup);
+    }
+
+    // Connect to the socket with the initial namespace
+    const newSocket = io(
+      `${import.meta.env.VITE_BACKEND_API_URL}/${namespace}`
+    );
+
+    newSocket.emit("join", {
+      user_uuid: user?.user_uuid,
+    });
+
+    //set socket to user
+    setUser({ ...user, socket: newSocket } as User);
+
+    // Clean up the socket connection on component unmount
+    return () => {
+      newSocket.disconnect();
+    };
+  }, [selectedFriend]);
+
+  // checks if selected friend has changed, if it has it updates the friend chat based on that
+  // useEffect(() => {
+  //   if (selectedFriend && "user_uuid" in selectedFriend) {
+  //     startChatting(selectedFriend as MiniUser);
+  //   } else if (selectedFriend && "group_uuid" in selectedFriend) {
+  //     startGroupChatting(selectedFriend as MiniGroup);
+  //   }
+  // }, [selectedFriend]);
+
+  //checks if user state is retained, if not redirects to login
   useEffect(() => {
     if (user?.username === "") {
       navigate("/");
     }
+  });
 
-    if (!hasJoined) {
-      const createSocket = async () => {
-        // instantiate user socket
-        const socket = io("http://localhost:8000/user", {
-          query: {
-            user_uuid: user?.user_uuid, // include user_uuid here
-          },
-        });
-        setUser({ ...user, socket: socket } as User);
-        // join the user namespace
-        socket.emit("join", user?.user_uuid);
-        setHasJoined(true);
-      };
-
-      createSocket();
-    }
-  }, []); // changed from [user] to [] to prevent re-running when user changes
-
+  //waits for incoming messages
   useEffect(() => {
+    if (!user?.socket) {
+      const socket = io(`${import.meta.env.VITE_BACKEND_API_URL}`, {
+        query: {
+          user_uuid: user?.user_uuid, // include user_uuid here
+        },
+      });
+      setUser({ ...user, socket: socket } as User);
+      console.log("joined chatting - 83", socket);
+    }
+
     if (user?.socket) {
-      user.socket.on(
+      user?.socket.on(
         "message",
         (data: { sender: MiniUser; message: string; date: Date }) =>
           updateFriendChat({
@@ -86,11 +125,18 @@ export default function HomePage() {
             date: data.date,
           })
       );
+      user.socket.on("new join", (data: MiniUser) => {
+        updateFriendChat({
+          sender: data,
+          message: `${data.username} has joined the chat`,
+          date: new Date(),
+        });
+      });
     }
   }, [user?.socket, updateFriendChat]);
 
+  // pull data from database and update the user
   useEffect(() => {
-    // pull data from database and update the user
     const updateUser = async () => {
       if (!user?.user_uuid) return;
       const result = await fetch(
@@ -111,7 +157,7 @@ export default function HomePage() {
     updateUser();
   }, [user?.user_uuid]); // changed from [user] to [user?.user_uuid] to prevent re-running when user changes
 
-  console.log("hompage.tsx - 60 - USER-HOME", user);
+  console.log("hompage.tsx - 100 - USER-HOME", user);
 
   const logout = async (user: User | null) => {
     try {
@@ -135,32 +181,17 @@ export default function HomePage() {
   };
 
   const startGroupChatting = async (group: MiniGroup) => {
-    // TODO change user.socket to socket in group namespace
-    console.log("homepage.tsx - 100 - GROUP", group);
-
-    if (selectedFriend && "user_uuid" in selectedFriend) {
-      user?.socket.disconnect();
-      const socket = io("http://localhost:8000/group", {
-        query: {
-          user_uuid: user?.user_uuid, // include user_uuid here
-        },
-      });
-      setUser({ ...user, socket: socket } as User);
-    }
-
-    if (selectedFriend == group) {
-      setViewProfile(true);
-      return;
-    }
+    user?.socket.emit("join", {
+      user_uuid: user?.user_uuid,
+      group_uuid: group.group_uuid,
+    });
 
     if (group === null) {
       alert("Please select a group to start chatting");
       return;
     }
     const chat = await fetch(
-      `${import.meta.env.VITE_BACKEND_API_URL}/api/chat/between/${
-        user?.user_uuid
-      }/${group.group_uuid}`,
+      `${import.meta.env.VITE_BACKEND_API_URL}/api/chat/${group.group_uuid}`,
       {
         method: "GET",
         headers: {
@@ -172,32 +203,19 @@ export default function HomePage() {
 
     console.log("homepage.tsx - 122 - GROUPCHATDATA", chatData);
 
-    setSelectedFriend(group);
-
     //if messages are null, make them empty
     if (chatData === null) {
       setFriendChat([]);
       return;
     }
-    setFriendChat(chatData.messages);
+    setFriendChat([...friendChat, chatData.messages]);
   };
 
   const startChatting = async (friend: MiniUser) => {
-    // change user.socket to socket in user namespace if its not already there
-    if (selectedFriend && "group_uuid" in selectedFriend) {
-      user?.socket.disconnect();
-      const socket = io("http://localhost:8000/user", {
-        query: {
-          user_uuid: user?.user_uuid, // include user_uuid here
-        },
-      });
-      setUser({ ...user, socket: socket } as User);
-    }
+    user?.socket.emit("join", {
+      user_uuid: user?.user_uuid,
+    });
 
-    if (selectedFriend == friend) {
-      setViewProfile(true);
-      return;
-    }
     console.log("homepage.tsx - 80 - FRIEND", friend);
     if (friend === null) {
       alert("Please select a friend to start chatting");
@@ -217,13 +235,12 @@ export default function HomePage() {
     const chatData = await chat.json();
     console.log("homepage.tsx - 103 - CHATDATA", chatData);
 
-    setSelectedFriend(friend); //sets friend regarldess of whether caht is null or not
-
     //if messages are null, make them empty
     if (chatData === null) {
       setFriendChat([]);
       return;
     }
+    //add chatdata to existing friendchat messages
     setFriendChat(chatData.messages);
   };
 
@@ -233,9 +250,21 @@ export default function HomePage() {
     const message = document.getElementById("msg") as HTMLInputElement;
     console.log("homepage.tsx - 104 - MESSAGE", message.value);
 
-    await startChatting(selectedFriend as MiniUser); // to refresh the chat incase they sent something
+    //if the selected friend is MiniUser, then call the code
+    if (selectedFriend && "user_uuid" in selectedFriend) {
+      // to refresh the chat incase they sent something
+      await startChatting(selectedFriend as MiniUser); //as MiniUser
+    } else if (selectedFriend && "group_uuid" in selectedFriend) {
+      //selected frined is a group
+      await startGroupChatting(selectedFriend as MiniGroup);
+    } else {
+      // there is no selected friend
+      alert("Please select a friend or group to start chatting");
+      return;
+    }
 
     if (message.value === "") {
+      alert("Please enter a message");
       return;
     }
 
@@ -251,25 +280,23 @@ export default function HomePage() {
     });
 
     // check if user or group message is being sent
-    if ((selectedFriend as MiniUser)?.user_uuid) {
-      //send message with socket.io, the message will be added to the chat on the backend
-      user?.socket.emit("message", {
-        sendee:
-          (selectedFriend as MiniUser)?.user_uuid ||
-          (selectedFriend as MiniGroup)?.group_uuid,
-        message: message.value,
-        //sender is in the format of a MiniUser
-        sender: {
-          username: user?.username,
-          user_uuid: user?.user_uuid,
-          user_profile: user?.user_profile,
-        },
-        date: new Date(),
-      });
-    } else {
-      //send message with socket.io, the message will be added to the chat on the backend
-      user?.socket.emit("message", {});
-    }
+    const reciever =
+      selectedFriend && "user_uuid" in selectedFriend
+        ? selectedFriend?.user_uuid
+        : selectedFriend?.group_uuid;
+
+    console.log("message sent to - 276- ", reciever);
+    user?.socket.emit("message", {
+      sendee: reciever,
+      message: message.value,
+      //sender is in the format of a MiniUser
+      sender: {
+        username: user?.username,
+        user_uuid: user?.user_uuid,
+        user_profile: user?.user_profile,
+      },
+      date: new Date(),
+    });
 
     //clear input with id 'msg'
     message.value = "";
@@ -295,6 +322,7 @@ export default function HomePage() {
             <Search />
           </button>
           <button
+            //TODO issue with this rendering when the logout button is pressed
             className={cn("p-2 rounded-md bg-gray-500 hover:bg-gray-700", {
               "ring-2 ring-red-500": user?.notifications.length !== 0,
             })}
@@ -334,7 +362,13 @@ export default function HomePage() {
                     <Button
                       variant="ghost"
                       className="w-full justify-start "
-                      onClick={() => startGroupChatting(group)}
+                      onClick={() => {
+                        if (selectedFriend == group) {
+                          setViewProfile(true);
+                          return;
+                        }
+                        setSelectedFriend(group);
+                      }}
                     >
                       <Avatar className="w-6 h-6 mr-2">
                         <AvatarImage
@@ -374,7 +408,13 @@ export default function HomePage() {
                     <Button
                       variant="ghost"
                       className="w-full justify-start"
-                      onClick={() => startChatting(friend)}
+                      onClick={() => {
+                        if (selectedFriend == friend) {
+                          setViewProfile(true);
+                          return;
+                        }
+                        setSelectedFriend(friend);
+                      }}
                     >
                       <Avatar className="w-6 h-6 mr-2">
                         <AvatarImage
@@ -406,9 +446,13 @@ export default function HomePage() {
             {friendChat?.length === 0 || selectedFriend === null ? (
               <p>No messages</p>
             ) : (
+              (console.log("friendChat", friendChat),
               friendChat //sorts the chat by date from newest to oldest then maps it
                 ?.slice()
-                .sort((a, b) => b.date.getTime() - a.date.getTime())
+                .sort(
+                  (a, b) =>
+                    new Date(a.date).getTime() - new Date(b.date).getTime()
+                )
                 .map(
                   (
                     msg: { sender: MiniUser; message: string; date: Date },
@@ -453,7 +497,7 @@ export default function HomePage() {
                       )}
                     </div>
                   )
-                )
+                ))
             )}
           </div>
         </ScrollArea>

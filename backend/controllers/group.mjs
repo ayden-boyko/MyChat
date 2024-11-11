@@ -50,7 +50,6 @@ groupController.get("/get/name/:group_name", async (req, res) => {
 groupController.get("/membercount/:group_uuid", async (req, res) => {
   try {
     const group = await Group.findOne({ group_uuid: req.params.group_uuid });
-    console.log("group -25 -: ", group);
     res.status(200).json({ membercount: group.members.length });
   } catch (error) {
     res.status(500).json({ error: "An error occurred" });
