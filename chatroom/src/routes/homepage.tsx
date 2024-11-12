@@ -20,6 +20,7 @@ import GroupProfilePopup from "../components/pop-ups/GroupProfilePopup";
 // TODO MAKE ALL TEXT BLACK SO IT CAN BE SEEN ON FIREFOX
 
 // TODO TEST GROUP MESSAGING AFTER YOU GET GROUPNAMESPACE FIGURED OUT
+// ! FOR SOME REASON THE USER ISNT JOINING THE GROUP NAMESPACE, THEYRE JOINING THE USERNAMESPACE TWICE!
 
 export default function HomePage() {
   const context = useContext(UserContext);
