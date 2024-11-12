@@ -57,6 +57,16 @@ const prenotifCheck = async (userId, notificationData) => {
       break;
 
     case 5: // group request
+      //check that the user doesn anlready have a group join request from the sender
+      resultType = await db.collection("users").findOne({
+        user_uuid: userId,
+        notifications: {
+          $elemMatch: {
+            payload: notificationData.payload,
+            catagory: notificationData.catagory,
+          },
+        },
+      });
       break;
   }
 
@@ -81,7 +91,7 @@ const prenotifCheck = async (userId, notificationData) => {
     );
     hasbeenNotified = true;
   }
-  // check that the sender data isn't the same
+  // check that the notification data isn't the same
   const resultAlreadySent = await db.collection("users").findOne({
     user_uuid: userId,
     notifications: {
@@ -89,6 +99,8 @@ const prenotifCheck = async (userId, notificationData) => {
         "sender.user_uuid": notificationData.sender.user_uuid,
         "sender.username": notificationData.sender.username,
         "sender.user_profile": notificationData.sender.user_profile,
+        catagory: notificationData.catagory,
+        payload: notificationData.payload,
       },
     },
   });
@@ -169,10 +181,7 @@ const addNotification = async (userId, notificationData) => {
 const addnotificationHandler = (eventType) => {
   return async (req, res, next) => {
     try {
-      console.log(
-        "notificaionHandler.mjs - 137 - Received request",
-        req.body.user_profile
-      );
+      console.log("notificaionHandler.mjs - 137 - Received request");
       // console.log("recipient", req.params.user_uuid);
 
       /* notification text that will be shown to the user
@@ -235,14 +244,21 @@ const addnotificationHandler = (eventType) => {
           await addNotification(req.params.user_uuid, notificationData);
         }
       } else {
+        //get group id from the notification payload
+        const slicedPayload = notificationData.payload.split(",");
+        const groupId = slicedPayload[1].slice(1, -1);
+        console.log("groupId", groupId);
         // check who the owner of the group is
-        const owner = await Group.findOne({
-          group_uuid: req.params.group_num,
-          "owner.user_uuid": 1,
-        });
+        const owner = await Group.findOne(
+          { group_uuid: groupId },
+          {
+            owner: 1,
+          }
+        );
+        console.log("owner", owner.owner);
         // make sure the sender uuid isnt blocked by the owner
         const blockedUser = await User.findOne({
-          user_uuid: owner.user_uuid,
+          user_uuid: owner.owner.user_uuid,
           blocked: { $in: [req.body.user_uuid] },
         });
         // Call the notification handler for offline users, if the user isnt blocked
@@ -392,15 +408,15 @@ const notificationExecuterHandler = async (userId, notificationData, next) => {
           }
         );
 
-        //notify the group that a new user has joined
-        const temp_socket = io(`${import.meta.env.VITE_BACKEND_API_URL}/group`);
-        temp_socket.emit("new join", {
+        //notify the group namespace that a new user has joined
+        // TODO figure out group join notifs
+        const groupNamespace = io.of("/group");
+        groupNamespace.to(group_uuid).emit("new join", {
           group_uuid: group_uuid,
           user_uuid: notificationInstructions.sender.user_uuid,
           username: notificationInstructions.sender.username,
           user_profile: notificationInstructions.sender.user_profile,
         });
-        temp_socket.disconnect();
 
         break;
       default:

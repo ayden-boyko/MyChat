@@ -18,10 +18,7 @@ import { MiniGroup } from "./interfaces/MiniGroup.ts";
 import { FriendContext } from "./lib/FriendContext.ts";
 
 // TODO IMPLEMENT DARK MODE
-/* TODO WHEN A USER ENTERS A NEW PAGE ONLY PULL DATA FROM NOTIFICATIONS SO THAT WAY IT ONLY UPDATES
-  WHEN SAID USER NAVIGATES TO A PAGE THAT HAS A NOTIFICATION ASSOCIATED WITH IT, PULL DATA FOR THAT PAGE ONLY
-  AND THEN REMOVE SAID NOTIFICATION FROM THE NOTIFFAICATION FIELD/PAGE
-*/
+
 function App() {
   const [user, setUser] = useState<User | null>({
     user_uuid: "",

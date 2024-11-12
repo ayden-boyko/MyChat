@@ -5,6 +5,7 @@ import { notificationExecuterHandler } from "../middleware/notificationhandler.m
 
 const NotificationController = express.Router();
 
+//gets the pending notifications
 NotificationController.get("/pending/:user_uuid", async (req, res) => {
   try {
     const user = await User.findOne({ user_uuid: req.params.user_uuid });
@@ -71,11 +72,12 @@ NotificationController.put(
   }
 );
 
-NotificationController.put("/decline/:user_uuid/:date", async (req, res) => {
+NotificationController.put("/decline/:user_uuid", async (req, res) => {
   try {
+    console.log("decline notification", req.body.notification);
     const result = await User.updateOne(
-      { user_uuid: user_uuid },
-      { $pull: { notifications: { date: date } } }
+      { user_uuid: req.params.user_uuid },
+      { $pull: { notifications: req.body.notification } }
     );
     res.status(200).json(result);
   } catch (error) {

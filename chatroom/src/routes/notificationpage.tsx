@@ -38,10 +38,8 @@ import {
 } from "../components/ui/sidebar";
 import { FriendContext } from "../lib/FriendContext";
 import { io } from "socket.io-client";
-import { MiniUser } from "../interfaces/miniuser";
-import { MiniGroup } from "../interfaces/MiniGroup";
 
-// TODO add VIEW buttton functionality
+// TODO accepting group join request dont work
 
 export default function NotificationPage() {
   const context = useContext(UserContext);
@@ -105,15 +103,17 @@ export default function NotificationPage() {
         }
       );
     } else if (action === "decline") {
+      console.log("declining", notification);
       result = await fetch(
         `${import.meta.env.VITE_BACKEND_API_URL}/api/notification/decline/${
           user?.user_uuid
-        }/${notification.date}`,
+        }`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({ notification }),
         }
       );
     }
@@ -303,64 +303,77 @@ export default function NotificationPage() {
                   filteredNotifications?.length === 0 ? (
                     <p>No notifications</p>
                   ) : (
-                    filteredNotifications?.map((notification, index) => (
-                      <div key={index} className="mb-4 last:mb-0">
-                        <Card>
-                          <CardContent className="p-4">
-                            <div className="flex items-start space-x-4">
-                              <Avatar>
-                                <AvatarImage
-                                  src={notification.sender.user_profile}
-                                  alt={notification.sender.username}
-                                />
-                                <AvatarFallback>
-                                  {notification.sender.username[0]}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div className="flex-1 space-y-1">
-                                <p className="text-sm font-medium leading-none">
-                                  {notification.payload}
-                                </p>
-                                <p className="text-sm text-muted-foreground">
-                                  {formatDate(notification.date)}
-                                </p>
+                    (console.log("notif length", filteredNotifications),
+                    filteredNotifications &&
+                      filteredNotifications?.map((notification, index) => (
+                        <div key={index} className="mb-4 last:mb-0">
+                          <Card>
+                            <CardContent className="p-4">
+                              <div className="flex items-start space-x-4">
+                                <Avatar>
+                                  <AvatarImage
+                                    src={notification.sender.user_profile}
+                                    alt={notification.sender.username}
+                                  />
+                                  <AvatarFallback>
+                                    {notification.sender.username[0]}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div className="flex-1 space-y-1">
+                                  {notification.catagory === 5 ? (
+                                    <>
+                                      <p className="text-sm font-medium leading-none">
+                                        {notification.payload.split(",")[0]}
+                                      </p>
+                                      <p className="text-sm leading-none">
+                                        {notification.payload.split(",")[1]}
+                                      </p>
+                                    </>
+                                  ) : (
+                                    <p className="text-sm font-medium leading-none">
+                                      {notification.payload}
+                                    </p>
+                                  )}
+                                  <p className="text-sm text-muted-foreground">
+                                    {formatDate(notification.date)}
+                                  </p>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  {getIcon(notification.catagory)}
+                                  {
+                                    <>
+                                      <Button
+                                        size="sm"
+                                        onClick={() =>
+                                          handleAction(notification, "accept")
+                                        }
+                                      >
+                                        {notification.catagory === 4 ||
+                                        notification.catagory === 5 ||
+                                        notification.catagory === 3
+                                          ? "Accept"
+                                          : "View"}
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        onClick={() =>
+                                          handleAction(notification, "decline")
+                                        }
+                                      >
+                                        {notification.catagory === 4 ||
+                                        notification.catagory === 5 ||
+                                        notification.catagory === 3
+                                          ? "Decline"
+                                          : "Close"}
+                                      </Button>
+                                    </>
+                                  }
+                                </div>
                               </div>
-                              <div className="flex items-center space-x-2">
-                                {getIcon(notification.catagory)}
-                                {
-                                  <>
-                                    <Button
-                                      size="sm"
-                                      onClick={() =>
-                                        handleAction(notification, "accept")
-                                      }
-                                    >
-                                      {notification.catagory === 4 ||
-                                      notification.catagory === 5 ||
-                                      notification.catagory === 3
-                                        ? "Accept"
-                                        : "View"}
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      onClick={() =>
-                                        handleAction(notification, "decline")
-                                      }
-                                    >
-                                      {notification.catagory === 4 ||
-                                      notification.catagory === 5 ||
-                                      notification.catagory === 3
-                                        ? "Decline"
-                                        : "Close"}
-                                    </Button>
-                                  </>
-                                }
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </div>
-                    ))
+                            </CardContent>
+                          </Card>
+                        </div>
+                      )))
                   )}
                 </ScrollArea>
               </CardContent>

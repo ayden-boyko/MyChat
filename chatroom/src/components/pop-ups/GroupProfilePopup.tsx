@@ -39,14 +39,12 @@ export default function GroupProfilePopup({
       {
         method: "PUT",
         headers: {
-          contentType: "application/json",
+          "Content-Type": "application/json", // Fix the capitalization here
         },
         body: JSON.stringify({
-          MiniUser: {
-            user_uuid: user?.user_uuid,
-            username: user?.username,
-            user_profile: user?.user_profile,
-          },
+          user_uuid: user?.user_uuid,
+          username: user?.username,
+          user_profile: user?.user_profile,
         }),
       }
     );
@@ -136,7 +134,7 @@ export default function GroupProfilePopup({
                 </>
               ) : (
                 <>
-                  <UserPlus className="mr-2 h-4 w-4" /> Join Group
+                  <UserPlus className="mr-2 h-4 w-4" /> Request to Join Group
                 </>
               )}
             </Button>
