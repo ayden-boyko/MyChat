@@ -31,8 +31,6 @@ interface FriendProfilePopupProps {
   onClose: () => void;
 }
 
-// TODO get group join request and group chatting too
-
 export default function FriendProfilePopup({
   isOpen,
   friend,

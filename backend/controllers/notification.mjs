@@ -62,7 +62,7 @@ NotificationController.put(
     try {
       const result = await User.updateOne(
         { user_uuid: req.params.user_uuid },
-        { $pull: { notifications: req.body.notification } }
+        { $pull: { notifications: { _id: req.body.notification._id } } }
       );
       res.status(200).json(result);
     } catch (error) {

@@ -15,6 +15,7 @@ import { User } from "./interfaces/userinterface.ts";
 import { MiniUser } from "./interfaces/miniuser.ts";
 import { Socket } from "socket.io-client";
 import { MiniGroup } from "./interfaces/MiniGroup.ts";
+import { FriendContext } from "./lib/FriendContext.ts";
 
 // TODO IMPLEMENT DARK MODE
 /* TODO WHEN A USER ENTERS A NEW PAGE ONLY PULL DATA FROM NOTIFICATIONS SO THAT WAY IT ONLY UPDATES
@@ -38,16 +39,42 @@ function App() {
     socket: {} as Socket,
   });
 
+  const [selectedFriend, setSelectedFriend] = useState<
+    MiniUser | MiniGroup | null
+  >(null); // for use with individual friends or groups
+
   return (
     <div className="App h-screen overflow-hidden">
       <UserContext.Provider value={{ user, setUser }}>
         <Routes>
           <Route path="/" element={<LoginPage />} />
-          <Route path="/home" element={<HomePage />} />
+
+          {/* specifically for handling notifications/chats */}
+
+          <Route
+            path="/home"
+            element={
+              <FriendContext.Provider
+                value={{ selectedFriend, setSelectedFriend }}
+              >
+                <HomePage />
+              </FriendContext.Provider>
+            }
+          />
+          <Route
+            path="/notifications"
+            element={
+              <FriendContext.Provider
+                value={{ selectedFriend, setSelectedFriend }}
+              >
+                <NotificationPage />
+              </FriendContext.Provider>
+            }
+          />
+
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/sign_up" element={<SignUpPage />} />
           <Route path="/search" element={<SearchPage />} />
-          <Route path="/notifications" element={<NotificationPage />} />
         </Routes>
       </UserContext.Provider>
     </div>

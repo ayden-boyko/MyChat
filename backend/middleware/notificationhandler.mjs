@@ -34,6 +34,8 @@ const prenotifCheck = async (userId, notificationData) => {
         },
       });
 
+      break;
+
     case 3: // group invite
       //check that the user isnt already in the group
       resultType = await db.collection("users").findOne({
@@ -269,10 +271,14 @@ const notificationExecuterHandler = async (userId, notificationData, next) => {
     console.log("notificationhandler - 232 - ", notificationData);
     switch (notificationInstructions.catagory) {
       case 1: //message
-      // TODO do something maybe redirect?
+        // redirect to the correct user chatroom
+        result = true;
+        break;
 
       case 2: // group message
-      // TODO do something maybe redirect?
+        // redirect to the correct group chatroom
+        result = true;
+        break;
 
       //group invite
       case 3:
@@ -388,18 +394,13 @@ const notificationExecuterHandler = async (userId, notificationData, next) => {
 
         //notify the group that a new user has joined
         const temp_socket = io(`${import.meta.env.VITE_BACKEND_API_URL}/group`);
-
-        // remove the notification from the user's notification list
-        result = await User.updateOne(
-          { user_uuid: creator_uuid },
-          {
-            $pull: {
-              notifications: {
-                sender: notificationInstructions.sender,
-              },
-            },
-          }
-        );
+        temp_socket.emit("new join", {
+          group_uuid: group_uuid,
+          user_uuid: notificationInstructions.sender.user_uuid,
+          username: notificationInstructions.sender.username,
+          user_profile: notificationInstructions.sender.user_profile,
+        });
+        temp_socket.disconnect();
 
         break;
       default:

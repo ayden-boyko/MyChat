@@ -1,5 +1,4 @@
 import User from "../schemas/User.mjs";
-import Chats from "../schemas/Chats.mjs";
 import { addNotification } from "../middleware/notificationhandler.mjs";
 import Group from "../schemas/Group.mjs";
 
@@ -10,7 +9,6 @@ const getOfflineGroupMembers = (group_uuid) => {
   //gets all members that are offline
   console.log(group_uuid);
   return Group.findOne({ group_uuid }).then((group) => {
-    console.log("group members", group);
     return group.members.filter((member) => {
       return !usersOnline[member.user_uuid];
     });
@@ -48,19 +46,24 @@ export default class GroupNamespace {
         );
       });
 
-      socket.on("new join", (data) => {
+      socket.on("new join", async (data) => {
         usersOnline[data.miniUser.user_uuid] = socket.id;
         console.log(
           `groupnamespace - 21 - ${socket} has newly joined with uuid: ${data.miniUser.user_uuid}`
         );
+        socket.join(data.group_uuid);
         // send message to all online users in the group that the new user has joined
         socket.to(data.group_uuid).emit("new join", data.miniUser);
         // notify offline group members that the new user has joined
+        const minigroup = await Group.findOne(
+          { group_uuid: sendee },
+          { _id: 1, group_uuid: 1, group_name: 1, group_profile: 1 }
+        );
         getOfflineGroupMembers(data.group_uuid).then((res) => {
           res.forEach((user) => {
             addNotification(user.user_uuid, {
-              sender: data.miniUser,
-              catagory: 1,
+              sender: minigroup,
+              catagory: 2,
               payload: `${data.miniUser.username} has joined the group.`,
               date: new Date(),
               seen: false,
@@ -80,13 +83,28 @@ export default class GroupNamespace {
           message: data.message,
           date: data.date,
         });
+        // get minigroup data from the sendee
+        const minigroup = await Group.findOne(
+          { group_uuid: sendee },
+          { _id: 1, group_uuid: 1, group_name: 1, group_profile: 1 }
+        );
+
+        console.log("minigroup", minigroup);
+
+        // sender is the group, this is needed for notifications page routing to work
         const notificationData = {
-          sender: data.sender,
+          sender: {
+            user_uuid: minigroup.group_uuid,
+            username: minigroup.group_name,
+            user_profile: minigroup.group_profile || "",
+          },
           catagory: 2,
           payload: `${data.sender.username} has sent a message to the group.`,
           date: new Date(),
           seen: false,
         };
+
+        console.log("notificationData to be sent", notificationData);
         // notify all offline members of the group
         setImmediate(() => {
           const offline = getOfflineGroupMembers(sendee);

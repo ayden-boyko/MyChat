@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import MiniUser from "./MiniUser.mjs";
+import MiniGroup from "./Minigroup.mjs";
 
 const { Schema } = mongoose;
 const Notifications = new Schema({

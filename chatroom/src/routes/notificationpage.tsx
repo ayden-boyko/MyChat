@@ -16,6 +16,9 @@ import {
   Bell,
   UserCircle,
   Home,
+  TicketCheck,
+  UserPen,
+  MessagesSquare,
 } from "lucide-react";
 import { UserContext } from "../lib/UserContext";
 import { User } from "../interfaces/userinterface";
@@ -33,11 +36,16 @@ import {
   SidebarMenuButton,
   SidebarProvider,
 } from "../components/ui/sidebar";
+import { FriendContext } from "../lib/FriendContext";
+import { io } from "socket.io-client";
+import { MiniUser } from "../interfaces/miniuser";
+import { MiniGroup } from "../interfaces/MiniGroup";
 
 // TODO add VIEW buttton functionality
 
 export default function NotificationPage() {
   const context = useContext(UserContext);
+  const friendContext = useContext(FriendContext);
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<number | "all">("all");
 
@@ -45,7 +53,12 @@ export default function NotificationPage() {
     throw new Error("UserContext is not available");
   }
 
+  if (!friendContext) {
+    throw new Error("FriendContext is not available");
+  }
+
   const { user, setUser } = context;
+  const { setSelectedFriend } = friendContext;
 
   if (user?.username === "") {
     navigate("/");
@@ -109,6 +122,61 @@ export default function NotificationPage() {
         ...user,
         notifications: user?.notifications?.filter((n) => n !== notification),
       } as User);
+      // then redirect to chat with said user/group
+      console.log("notification", notification);
+      if (
+        (action === "accept" && notification.catagory === 1) ||
+        notification.catagory === 2 ||
+        notification.catagory === 3
+      ) {
+        // also must check if user has an existing socket, otherwise create on for them
+        if (user?.socket) {
+          const newSocket = io(
+            `${import.meta.env.VITE_BACKEND_API_URL}/${
+              notification.sender && "U" === notification.sender.user_uuid[0]
+                ? "user"
+                : "group"
+            }`
+          );
+
+          // join if its not a group invite
+          if (notification.catagory !== 3) {
+            newSocket.emit("join", {
+              user_uuid: user?.user_uuid,
+            });
+          } else {
+            //special join message for users who join a new group
+            const end_portion = notification.payload.split(",")[1];
+            const group_uuid = end_portion.slice(1, -1);
+            newSocket.emit("new join", {
+              group_uuid: group_uuid,
+              miniUser: {
+                user_uuid: user?.user_uuid,
+                username: user?.username,
+                user_profile: user?.user_profile,
+              },
+            });
+          }
+
+          await setUser({ ...user, socket: newSocket } as User);
+        }
+
+        //set selectedfriend to the user and set friendchat to their respective chat
+        //must check if the notification is from a MiniUser or a MiniGroup
+        setSelectedFriend(
+          notification.sender && "U" === notification.sender.user_uuid[0]
+            ? user?.friends.find(
+                (friend) => friend.user_uuid === notification.sender.user_uuid
+              ) ?? null
+            : user?.groups.find(
+                (group) => group.group_uuid === notification.sender.user_uuid
+              ) ?? null
+        );
+
+        console.log("notification viewed: ", notification);
+
+        navigate("/home");
+      }
     } else {
       console.log(result);
       alert("Unable to process notification");
@@ -118,14 +186,16 @@ export default function NotificationPage() {
 
   const getIcon = (type: Notifications["catagory"]) => {
     switch (type) {
-      case 4:
+      case 4: // friend request
         return <UserPlus className="h-4 w-4" />;
-      case 3:
-      case 5:
+      case 3: // group invite
+        return <TicketCheck className="h-4 w-4" />;
+      case 5: //group join request
         return <Users className="h-4 w-4" />;
-      case 1:
-      case 2:
-        return <MessageSquare className="h-4 w-4" />;
+      case 1: //user message
+        return <UserPen className="h-4 w-4" />;
+      case 2: // group message
+        return <MessagesSquare className="h-4 w-4" />;
       default:
         return <Bell className="h-4 w-4" />;
     }

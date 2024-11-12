@@ -1,9 +1,0 @@
-groups will have profiles of the following format
-
-GROUP
-group_num: int
-group_name: string (this is their name associated with the group)
-group_profile: Image (MAYBE?????)
-members: [id] or {username : id} (im opting for arrays for performance reasons, the names can be displayed based off of ids)
-chat: {member_id : message} x50
-SHOULD GROUPS HAVE A CHAT HISTORY? I THINK IT SHOULD LIKE DISCORD

@@ -16,20 +16,17 @@ import { MiniGroup } from "../interfaces/MiniGroup";
 import FriendProfilePopup from "../components/pop-ups/FriendProfilePopup";
 import { formatDate } from "../lib/dateformater";
 import GroupProfilePopup from "../components/pop-ups/GroupProfilePopup";
+import { FriendContext } from "../lib/FriendContext";
 
 // TODO MAKE ALL TEXT BLACK SO IT CAN BE SEEN ON FIREFOX
 
-// TODO TEST GROUP MESSAGING AFTER YOU GET GROUPNAMESPACE FIGURED OUT
-// ! FOR SOME REASON THE USER ISNT JOINING THE GROUP NAMESPACE, THEYRE JOINING THE USERNAMESPACE TWICE!
-
 export default function HomePage() {
   const context = useContext(UserContext);
+  const friendContext = useContext(FriendContext);
   const [friendChat, setFriendChat] = useState<
     { sender: MiniUser; message: string; date: Date }[]
   >([]); // for use with individual friends or groups
-  const [selectedFriend, setSelectedFriend] = useState<
-    MiniUser | MiniGroup | null
-  >(null); // for use with individual friends or groups
+
   const [createGroup, setCreateGroup] = useState<boolean>(false);
   const [viewProfile, setViewProfile] = useState<boolean>(false);
 
@@ -40,7 +37,20 @@ export default function HomePage() {
     throw new Error("SomeChildComponent must be used within a UserProvider");
   }
 
+  if (!friendContext) {
+    // Handle the case where the component is rendered outside the provider
+    throw new Error("SomeChildComponent must be used within a FriendProvider");
+  }
+
   const { user, setUser } = context;
+  const { selectedFriend, setSelectedFriend } = friendContext;
+
+  //checks if user state is retained, if not redirects to login
+  useEffect(() => {
+    if (user?.username === "") {
+      navigate("/");
+    }
+  });
 
   const updateFriendChat = useCallback(
     (newMessage: { sender: MiniUser; message: string; date: Date }) => {
@@ -97,13 +107,6 @@ export default function HomePage() {
   //   }
   // }, [selectedFriend]);
 
-  //checks if user state is retained, if not redirects to login
-  useEffect(() => {
-    if (user?.username === "") {
-      navigate("/");
-    }
-  });
-
   //waits for incoming messages
   useEffect(() => {
     if (user?.socket) {
@@ -152,7 +155,7 @@ export default function HomePage() {
     updateUser();
   }, [user?.user_uuid]); // changed from [user] to [user?.user_uuid] to prevent re-running when user changes
 
-  console.log("hompage.tsx - 100 - USER-HOME", user);
+  //console.log("hompage.tsx - 100 - USER-HOME", user);
 
   const logout = async (user: User | null) => {
     try {
@@ -245,11 +248,13 @@ export default function HomePage() {
       return;
     }
     setFriendChat([]); // Set friendChat to an empty array
-    chatData.chat.forEach(
-      (message: { sender: MiniUser; message: string; date: Date }) => {
-        updateFriendChat(message); // Update friendChat with each message
-      }
-    );
+    if (chatData.messages !== 0) {
+      chatData.messages.forEach(
+        (message: { sender: MiniUser; message: string; date: Date }) => {
+          updateFriendChat(message); // Update friendChat with each message
+        }
+      );
+    }
   };
 
   const sendMessage = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -461,7 +466,6 @@ export default function HomePage() {
             {friendChat?.length === 0 || selectedFriend === null ? (
               <p>No messages</p>
             ) : (
-              (console.log("friendChat", friendChat, friendChat.length),
               friendChat //sorts the chat by date from oldest to newest then maps it
                 ?.slice()
                 .sort(
@@ -473,49 +477,47 @@ export default function HomePage() {
                     msg: { sender: MiniUser; message: string; date: Date },
                     index
                   ) => (
-                    console.log("msg", msg),
-                    (
-                      <div key={index} className="flex space-x-2 w-full">
-                        {msg.sender.user_uuid === user?.user_uuid ? (
-                          <div className="flex-1 flex justify-end">
-                            <div className="flex space-x-2">
-                              <div className="max-w-xs p-2 rounded-md bg-blue-400 text-white">
-                                <p className="text-xs font-semibold ">
-                                  {user?.username}
-                                </p>
-                                <p className="text-base">{msg.message}</p>
-                                <p>{formatDate(msg.date)}</p>
-                              </div>
-                              <Avatar>
-                                <AvatarImage src={msg.sender.user_profile} />
-                                <AvatarFallback>
-                                  {msg.sender.username[0]}
-                                </AvatarFallback>
-                              </Avatar>
+                    //console.log("msg", msg),
+                    <div key={index} className="flex space-x-2 w-full">
+                      {msg.sender.user_uuid === user?.user_uuid ? (
+                        <div className="flex-1 flex justify-end">
+                          <div className="flex space-x-2">
+                            <div className="max-w-xs p-2 rounded-md bg-blue-400 text-white">
+                              <p className="text-xs font-semibold ">
+                                {user?.username}
+                              </p>
+                              <p className="text-base">{msg.message}</p>
+                              <p>{formatDate(msg.date)}</p>
                             </div>
-                          </div>
-                        ) : (
-                          <div className="flex-1 flex justify-start">
                             <Avatar>
                               <AvatarImage src={msg.sender.user_profile} />
                               <AvatarFallback>
                                 {msg.sender.username[0]}
                               </AvatarFallback>
                             </Avatar>
-                            <div className="max-w-xs p-2 rounded-md bg-gray-200 text-black">
-                              <p className="text-xs font-semibold ">
-                                {(selectedFriend as MiniUser)?.username ||
-                                  (selectedFriend as MiniGroup)?.group_name}
-                              </p>
-                              <p className="text-base">{msg.message}</p>
-                              <p>{formatDate(msg.date)}</p>
-                            </div>
                           </div>
-                        )}
-                      </div>
-                    )
+                        </div>
+                      ) : (
+                        <div className="flex-1 flex justify-start">
+                          <Avatar>
+                            <AvatarImage src={msg.sender.user_profile} />
+                            <AvatarFallback>
+                              {msg.sender.username[0]}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="max-w-xs p-2 rounded-md bg-gray-200 text-black">
+                            <p className="text-xs font-semibold ">
+                              {(selectedFriend as MiniUser)?.username ||
+                                (selectedFriend as MiniGroup)?.group_name}
+                            </p>
+                            <p className="text-base">{msg.message}</p>
+                            <p>{formatDate(msg.date)}</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   )
-                ))
+                )
             )}
           </div>
         </ScrollArea>
