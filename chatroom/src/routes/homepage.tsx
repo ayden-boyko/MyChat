@@ -32,7 +32,6 @@ export default function HomePage() {
   >(null); // for use with individual friends or groups
   const [createGroup, setCreateGroup] = useState<boolean>(false);
   const [viewProfile, setViewProfile] = useState<boolean>(false);
-  const [namespace, setNamespace] = useState<string>("/");
 
   const navigate = useNavigate();
 
@@ -56,42 +55,38 @@ export default function HomePage() {
     [setFriendChat]
   );
 
-  //sets socket namspace
-  useEffect(() => {
-    //assign namespace to user or group based on selected friend containing user_uuid or group_uuid
-    setNamespace(
-      selectedFriend && "user_uuid" in selectedFriend ? "user" : "group"
-    );
-
-    // Connect to the socket with the initial namespace
+  const handleSocketNamespaceSwitch = async () => {
     const newSocket = io(
-      `${import.meta.env.VITE_BACKEND_API_URL}/${namespace}`
+      `${import.meta.env.VITE_BACKEND_API_URL}/${
+        selectedFriend && "user_uuid" in selectedFriend ? "user" : "group"
+      }`
     );
 
     newSocket.emit("join", {
       user_uuid: user?.user_uuid,
     });
 
-    //set socket to user
-    setUser({ ...user, socket: newSocket } as User);
+    await setUser({ ...user, socket: newSocket } as User);
+  };
 
-    if (selectedFriend && "user_uuid" in selectedFriend) {
-      console.log("user");
-      startChatting(selectedFriend as MiniUser);
-    } else if (selectedFriend && "group_uuid" in selectedFriend) {
-      console.log("group");
-      startGroupChatting(selectedFriend as MiniGroup);
-    } else {
-      // there is no selected friend and no reason for the socket to join any namespace
-      console.log("no selected friend");
-      return;
-    }
-
-    // Clean up the socket connection on component unmount
-    return () => {
-      newSocket.disconnect();
-    };
+  useEffect(() => {
+    handleSocketNamespaceSwitch();
   }, [selectedFriend]);
+
+  useEffect(() => {
+    if (user?.socket) {
+      if (selectedFriend && "user_uuid" in selectedFriend) {
+        console.log("user");
+        startChatting(selectedFriend as MiniUser);
+      } else if (selectedFriend && "group_uuid" in selectedFriend) {
+        console.log("group");
+        startGroupChatting(selectedFriend as MiniGroup);
+      } else {
+        // there is no selected friend and no reason for the socket to join any namespace
+        console.log("no selected friend");
+      }
+    }
+  }, [user?.socket, selectedFriend]);
 
   // checks if selected friend has changed, if it has it updates the friend chat based on that
   // useEffect(() => {
@@ -112,8 +107,12 @@ export default function HomePage() {
   //waits for incoming messages
   useEffect(() => {
     if (user?.socket) {
+      const messageType =
+        selectedFriend && "user_uuid" in selectedFriend
+          ? "message"
+          : "group message";
       user?.socket.on(
-        "message",
+        messageType,
         (data: { sender: MiniUser; message: string; date: Date }) =>
           updateFriendChat({
             sender: data.sender,
@@ -198,18 +197,20 @@ export default function HomePage() {
     );
     const chatData = await chat.json();
 
-    console.log(
-      "homepage.tsx - 122 - GROUPCHATDATA",
-      chatData.chat,
-      chatData.messages
-    );
+    console.log("homepage.tsx - 122 - GROUPCHATDATA", chatData);
 
     //if messages are null, make them empty
     if (chatData.chat.length === 0) {
+      console.log("set chata data to []");
       setFriendChat([]);
       return;
     }
-    setFriendChat([chatData.messages]);
+    setFriendChat([]); // Set friendChat to an empty array
+    chatData.chat.forEach(
+      (message: { sender: MiniUser; message: string; date: Date }) => {
+        updateFriendChat(message); // Update friendChat with each message
+      }
+    );
   };
 
   const startChatting = async (friend: MiniUser) => {
@@ -243,8 +244,12 @@ export default function HomePage() {
       setFriendChat([]);
       return;
     }
-    //add chatdata to existing friendchat messages
-    setFriendChat(chatData.messages);
+    setFriendChat([]); // Set friendChat to an empty array
+    chatData.chat.forEach(
+      (message: { sender: MiniUser; message: string; date: Date }) => {
+        updateFriendChat(message); // Update friendChat with each message
+      }
+    );
   };
 
   const sendMessage = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -457,7 +462,7 @@ export default function HomePage() {
               <p>No messages</p>
             ) : (
               (console.log("friendChat", friendChat, friendChat.length),
-              friendChat //sorts the chat by date from newest to oldest then maps it
+              friendChat //sorts the chat by date from oldest to newest then maps it
                 ?.slice()
                 .sort(
                   (a, b) =>
@@ -468,44 +473,47 @@ export default function HomePage() {
                     msg: { sender: MiniUser; message: string; date: Date },
                     index
                   ) => (
-                    <div key={index} className="flex space-x-2 w-full">
-                      {msg.sender.user_uuid === user?.user_uuid ? (
-                        <div className="flex-1 flex justify-end">
-                          <div className="flex space-x-2">
-                            <div className="max-w-xs p-2 rounded-md bg-blue-400 text-white">
-                              <p className="text-xs font-semibold ">
-                                {user?.username}
-                              </p>
-                              <p className="text-base">{msg.message}</p>
-                              <p>{formatDate(msg.date)}</p>
+                    console.log("msg", msg),
+                    (
+                      <div key={index} className="flex space-x-2 w-full">
+                        {msg.sender.user_uuid === user?.user_uuid ? (
+                          <div className="flex-1 flex justify-end">
+                            <div className="flex space-x-2">
+                              <div className="max-w-xs p-2 rounded-md bg-blue-400 text-white">
+                                <p className="text-xs font-semibold ">
+                                  {user?.username}
+                                </p>
+                                <p className="text-base">{msg.message}</p>
+                                <p>{formatDate(msg.date)}</p>
+                              </div>
+                              <Avatar>
+                                <AvatarImage src={msg.sender.user_profile} />
+                                <AvatarFallback>
+                                  {msg.sender.username[0]}
+                                </AvatarFallback>
+                              </Avatar>
                             </div>
+                          </div>
+                        ) : (
+                          <div className="flex-1 flex justify-start">
                             <Avatar>
                               <AvatarImage src={msg.sender.user_profile} />
                               <AvatarFallback>
                                 {msg.sender.username[0]}
                               </AvatarFallback>
                             </Avatar>
+                            <div className="max-w-xs p-2 rounded-md bg-gray-200 text-black">
+                              <p className="text-xs font-semibold ">
+                                {(selectedFriend as MiniUser)?.username ||
+                                  (selectedFriend as MiniGroup)?.group_name}
+                              </p>
+                              <p className="text-base">{msg.message}</p>
+                              <p>{formatDate(msg.date)}</p>
+                            </div>
                           </div>
-                        </div>
-                      ) : (
-                        <div className="flex-1 flex justify-start">
-                          <Avatar>
-                            <AvatarImage src={msg.sender.user_profile} />
-                            <AvatarFallback>
-                              {msg.sender.username[0]}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="max-w-xs p-2 rounded-md bg-gray-200 text-black">
-                            <p className="text-xs font-semibold ">
-                              {(selectedFriend as MiniUser)?.username ||
-                                (selectedFriend as MiniGroup)?.group_name}
-                            </p>
-                            <p className="text-base">{msg.message}</p>
-                            <p>{formatDate(msg.date)}</p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                        )}
+                      </div>
+                    )
                   )
                 ))
             )}

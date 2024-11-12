@@ -28,7 +28,7 @@ const prenotifCheck = async (userId, notificationData) => {
         user_uuid: userId,
         notifications: {
           $elemMatch: {
-            group_uuid: notificationData.group.group_uuid,
+            payload: notificationData.payload,
             catagory: notificationData.catagory,
           },
         },
@@ -39,7 +39,7 @@ const prenotifCheck = async (userId, notificationData) => {
       resultType = await db.collection("users").findOne({
         user_uuid: userId,
         groups: {
-          $elemMatch: { group_uuid: notificationData.group.group_uuid },
+          $elemMatch: { group_uuid: notificationData.sender.user_uuid },
         },
       });
       break;
@@ -187,7 +187,7 @@ const addnotificationHandler = (eventType) => {
           eventData = `${req.body.username} has sent you a message.`;
           break;
         case 2:
-          eventData = `A new message has been sent to ${req.body.username}.`;
+          eventData = `A new message has been sent to ${req.params.group_num}.`;
           break;
         case 3:
           eventData = `You have been invited to join group ${req.body.username}.`;
@@ -268,6 +268,12 @@ const notificationExecuterHandler = async (userId, notificationData, next) => {
     let result;
     console.log("notificationhandler - 232 - ", notificationData);
     switch (notificationInstructions.catagory) {
+      case 1: //message
+      // TODO do something maybe redirect?
+
+      case 2: // group message
+      // TODO do something maybe redirect?
+
       //group invite
       case 3:
         // get Miniuser information
@@ -379,6 +385,9 @@ const notificationExecuterHandler = async (userId, notificationData, next) => {
             },
           }
         );
+
+        //notify the group that a new user has joined
+        const temp_socket = io(`${import.meta.env.VITE_BACKEND_API_URL}/group`);
 
         // remove the notification from the user's notification list
         result = await User.updateOne(

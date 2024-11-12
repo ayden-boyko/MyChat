@@ -8,6 +8,7 @@ const usersOnline = {};
 
 const getOfflineGroupMembers = (group_uuid) => {
   //gets all members that are offline
+  console.log(group_uuid);
   return Group.findOne({ group_uuid }).then((group) => {
     console.log("group members", group);
     return group.members.filter((member) => {
@@ -24,7 +25,7 @@ export default class GroupNamespace {
 
   // users can just join thier room based on the group id
   // * ex: socket.join(G63dc82ksj...); would join that group
-  // * to message their group, socket.to(G63dc82ksj...).emit("message", data);
+  // * to message their group, socket.to(G63dc82ksj...).emit("group message", data);
   // get all online group members socket.in(G63dc82ksj...).fetchSockets();
   // workflow is as follows:
   // 1. user joins group
@@ -69,24 +70,26 @@ export default class GroupNamespace {
       });
 
       socket.on("group message", async (data) => {
+        console.log("group message sent", data);
+
         const sendee = data.sendee;
 
         //sends the message to all online users in the group
-        socket.to(data.group_uuid).emit("message", {
+        socket.to(sendee).emit("group message", {
           sender: data.sender,
           message: data.message,
           date: data.date,
         });
         const notificationData = {
           sender: data.sender,
-          catagory: 1,
-          payload: `${data.sender.username} has sent you a message.`,
+          catagory: 2,
+          payload: `${data.sender.username} has sent a message to the group.`,
           date: new Date(),
           seen: false,
         };
         // notify all offline members of the group
         setImmediate(() => {
-          const offline = getOfflineGroupMembers(data.group_uuid);
+          const offline = getOfflineGroupMembers(sendee);
           //update all offline user's notifications
           offline.then((res) => {
             res.forEach((user) => {
@@ -95,17 +98,21 @@ export default class GroupNamespace {
           });
         });
 
-        //upsert creates the chat if it doesnt exist
-        console.log("updating || creating chat - 52 -", data.message);
-        console.log("sender", data.sender);
-
         //update chat if it exists, else create it
         try {
-          await Group.findOneAndUpdate(
-            { group_uuid: data.group_uuid },
-            { $push: { chats: data.message } },
-            { upsert: true }
-          );
+          console.log("updating || creating chat - 55 -", sendee, data.message);
+          const group = await Group.findOne({ group_uuid: sendee });
+          if (group) {
+            group.chat.push({
+              sender: data.sender,
+              message: data.message,
+              date: data.date,
+            });
+            await group.save();
+            console.log("Chat updated successfully");
+          } else {
+            console.log("Group not found");
+          }
         } catch (error) {
           console.log(
             `usernamespace - 84 - failed to update chat between ${sendee} and ${data.sender.user_uuid}, caused error: `,

@@ -34,6 +34,8 @@ import {
   SidebarProvider,
 } from "../components/ui/sidebar";
 
+// TODO add VIEW buttton functionality
+
 export default function NotificationPage() {
   const context = useContext(UserContext);
   const navigate = useNavigate();
