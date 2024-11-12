@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { X, UserPlus, UserMinus } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { useToast } from "../../hooks/use-toast";
 import { MiniGroup } from "../../interfaces/MiniGroup";
+import { UserContext } from "../../lib/UserContext";
 
 interface GroupProfilePopupProps {
   isOpen: boolean;
@@ -19,18 +19,41 @@ export default function GroupProfilePopup({
   onClose,
   isMember,
 }: GroupProfilePopupProps) {
-  const [memberStatus, setMemberStatus] = useState(isMember);
   const [members, setMembers] = useState<number>(0);
-  const { toast } = useToast();
+  const context = useContext(UserContext);
 
-  const handleMembershipAction = () => {
-    setMemberStatus(!memberStatus);
-    toast({
-      title: memberStatus ? "Left Group" : "Joined Group",
-      description: memberStatus
-        ? `You have left ${group.group_name}.`
-        : `You have joined ${group.group_name}.`,
-    });
+  if (!context) {
+    // Handle the case where the component is rendered outside the provider
+    throw new Error("SomeChildComponent must be used within a UserProvider");
+  }
+
+  const { user } = context;
+
+  // TODO check the join request option from a blocked and non-blocked user
+  const handleMembershipAction = async () => {
+    // send join request to group
+    const result = await fetch(
+      `${import.meta.env.VITE_BACKEND_API_URL}/api/groups/request/${
+        group.group_uuid
+      }`,
+      {
+        method: "PUT",
+        headers: {
+          contentType: "application/json",
+        },
+        body: JSON.stringify({
+          MiniUser: {
+            user_uuid: user?.user_uuid,
+            username: user?.username,
+            user_profile: user?.user_profile,
+          },
+        }),
+      }
+    );
+
+    console.log("group join result", result);
+
+    alert("Join request sent!");
   };
 
   useEffect(() => {
@@ -105,9 +128,9 @@ export default function GroupProfilePopup({
             <Button
               onClick={handleMembershipAction}
               className="w-full"
-              variant={memberStatus ? "destructive" : "default"}
+              variant={isMember ? "destructive" : "default"}
             >
-              {memberStatus ? (
+              {isMember ? (
                 <>
                   <UserMinus className="mr-2 h-4 w-4" /> Leave Group
                 </>

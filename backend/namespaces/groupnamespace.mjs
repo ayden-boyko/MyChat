@@ -9,6 +9,7 @@ const usersOnline = {};
 const getOfflineGroupMembers = (group_uuid) => {
   //gets all members that are offline
   return Group.findOne({ group_uuid }).then((group) => {
+    console.log("group members", group);
     return group.members.filter((member) => {
       return !usersOnline[member.user_uuid];
     });
@@ -21,7 +22,6 @@ export default class GroupNamespace {
     this.initialize();
   }
 
-  // TODO USER SOCKETIO ROOMS FOR GROUP CHATS
   // users can just join thier room based on the group id
   // * ex: socket.join(G63dc82ksj...); would join that group
   // * to message their group, socket.to(G63dc82ksj...).emit("message", data);
@@ -38,7 +38,7 @@ export default class GroupNamespace {
     console.log("initializing group namespace");
 
     this.namespace.on("connection", (socket) => {
-      socket.on("join", (data) => {
+      socket.on("group join", (data) => {
         console.log("user socket id:", socket.id);
         usersOnline[data.user_uuid] = socket.id;
         socket.join(data.group_uuid);
@@ -68,7 +68,7 @@ export default class GroupNamespace {
         });
       });
 
-      socket.on("message", async (data) => {
+      socket.on("group message", async (data) => {
         const sendee = data.sendee;
 
         //sends the message to all online users in the group

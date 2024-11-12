@@ -19,7 +19,6 @@ import GroupProfilePopup from "../components/pop-ups/GroupProfilePopup";
 
 // TODO MAKE ALL TEXT BLACK SO IT CAN BE SEEN ON FIREFOX
 
-// TODO TEST USER MESSAGING TO MAKE SURE IT STILL WORKS
 // TODO TEST GROUP MESSAGING AFTER YOU GET GROUPNAMESPACE FIGURED OUT
 
 export default function HomePage() {
@@ -32,6 +31,7 @@ export default function HomePage() {
   >(null); // for use with individual friends or groups
   const [createGroup, setCreateGroup] = useState<boolean>(false);
   const [viewProfile, setViewProfile] = useState<boolean>(false);
+  const [namespace, setNamespace] = useState<string>("/");
 
   const navigate = useNavigate();
 
@@ -57,17 +57,10 @@ export default function HomePage() {
 
   //sets socket namspace
   useEffect(() => {
-    let namespace;
-
-    if (selectedFriend && "user_uuid" in selectedFriend) {
-      namespace = "user";
-      console.log("user");
-      startChatting(selectedFriend as MiniUser);
-    } else {
-      console.log("group");
-      namespace = "group";
-      startGroupChatting(selectedFriend as MiniGroup);
-    }
+    //assign namespace to user or group based on selected friend containing user_uuid or group_uuid
+    setNamespace(
+      selectedFriend && "user_uuid" in selectedFriend ? "user" : "group"
+    );
 
     // Connect to the socket with the initial namespace
     const newSocket = io(
@@ -80,6 +73,18 @@ export default function HomePage() {
 
     //set socket to user
     setUser({ ...user, socket: newSocket } as User);
+
+    if (selectedFriend && "user_uuid" in selectedFriend) {
+      console.log("user");
+      startChatting(selectedFriend as MiniUser);
+    } else if (selectedFriend && "group_uuid" in selectedFriend) {
+      console.log("group");
+      startGroupChatting(selectedFriend as MiniGroup);
+    } else {
+      // there is no selected friend and no reason for the socket to join any namespace
+      console.log("no selected friend");
+      return;
+    }
 
     // Clean up the socket connection on component unmount
     return () => {
@@ -105,16 +110,6 @@ export default function HomePage() {
 
   //waits for incoming messages
   useEffect(() => {
-    if (!user?.socket) {
-      const socket = io(`${import.meta.env.VITE_BACKEND_API_URL}`, {
-        query: {
-          user_uuid: user?.user_uuid, // include user_uuid here
-        },
-      });
-      setUser({ ...user, socket: socket } as User);
-      console.log("joined chatting - 83", socket);
-    }
-
     if (user?.socket) {
       user?.socket.on(
         "message",
@@ -181,7 +176,8 @@ export default function HomePage() {
   };
 
   const startGroupChatting = async (group: MiniGroup) => {
-    user?.socket.emit("join", {
+    console.log("homepage.tsx - 107 - GROUP", group);
+    user?.socket.emit("group join", {
       user_uuid: user?.user_uuid,
       group_uuid: group.group_uuid,
     });
@@ -201,17 +197,23 @@ export default function HomePage() {
     );
     const chatData = await chat.json();
 
-    console.log("homepage.tsx - 122 - GROUPCHATDATA", chatData);
+    console.log(
+      "homepage.tsx - 122 - GROUPCHATDATA",
+      chatData.chat,
+      chatData.messages
+    );
 
     //if messages are null, make them empty
-    if (chatData === null) {
+    if (chatData.chat.length === 0) {
       setFriendChat([]);
       return;
     }
-    setFriendChat([...friendChat, chatData.messages]);
+    setFriendChat([chatData.messages]);
   };
 
   const startChatting = async (friend: MiniUser) => {
+    console.log("178 home socket.io.uri", user?.socket?.io?.opts?.path);
+
     user?.socket.emit("join", {
       user_uuid: user?.user_uuid,
     });
@@ -269,7 +271,8 @@ export default function HomePage() {
     }
 
     //update friendchat to have the message we are about to send
-    updateFriendChat({
+
+    const newMessage = {
       sender: {
         username: user?.username,
         user_uuid: user?.user_uuid,
@@ -277,7 +280,8 @@ export default function HomePage() {
       } as MiniUser,
       message: message.value,
       date: new Date(),
-    });
+    };
+    setFriendChat((prevChat) => [...prevChat, newMessage]);
 
     // check if user or group message is being sent
     const reciever =
@@ -285,8 +289,13 @@ export default function HomePage() {
         ? selectedFriend?.user_uuid
         : selectedFriend?.group_uuid;
 
+    const message_type =
+      selectedFriend && "user_uuid" in selectedFriend
+        ? "message"
+        : "group message";
+
     console.log("message sent to - 276- ", reciever);
-    user?.socket.emit("message", {
+    user?.socket.emit(message_type, {
       sendee: reciever,
       message: message.value,
       //sender is in the format of a MiniUser
@@ -446,7 +455,7 @@ export default function HomePage() {
             {friendChat?.length === 0 || selectedFriend === null ? (
               <p>No messages</p>
             ) : (
-              (console.log("friendChat", friendChat),
+              (console.log("friendChat", friendChat, friendChat.length),
               friendChat //sorts the chat by date from newest to oldest then maps it
                 ?.slice()
                 .sort(

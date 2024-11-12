@@ -24,6 +24,10 @@ export default class UserNamespace {
 
       socket.on("message", async (data) => {
         const sendee = data.sendee;
+        if (sendee[0] === "G") {
+          console.log("THIS IS A GROUP ID, WRONG NAMESPACE");
+          return;
+        }
         console.log("usernamespace - 27 - data", data);
         //check the user to see if they are online
         const online = usersOnline[sendee];

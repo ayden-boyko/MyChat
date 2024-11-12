@@ -136,15 +136,17 @@ groupController.put("/update/:group_num", async (req, res) => {
 });
 
 // request ( to join ) group
-groupController.put("/request/:group_num", async (req, res) => {
-  try {
-    // send a notification to the group creator
-
-    res.status(200).json(result);
-  } catch (error) {
-    res.status(500).json({ error: "An error occurred, request not sent" });
+groupController.put(
+  "/request/:group_num",
+  addnotificationHandler(5),
+  async (req, res) => {
+    try {
+      res.status(200).json(`request sent to group ${req.params.group_num}`);
+    } catch (error) {
+      res.status(500).json({ error: "An error occurred, request not sent" });
+    }
   }
-});
+);
 
 // leave group
 groupController.put("/leave/:group_num", async (req, res) => {

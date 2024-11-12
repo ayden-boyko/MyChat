@@ -6,7 +6,7 @@ const prenotifCheck = async (userId, notificationData) => {
   let hasbeenNotified = false;
   let resultType = false;
 
-  // TODO CASE 2, 5
+  // TODO CASE 5
   switch (notificationData.catagory) {
     case 1: // for messaging, not needed here in case of future requirements
       //check that the user doesnt already have a message notification from the user
@@ -196,7 +196,7 @@ const addnotificationHandler = (eventType) => {
           eventData = `${req.body.username} has sent you a friend request.`;
           break;
         case 5:
-          eventData = `${req.body.username} wants to join your group.`;
+          eventData = `${req.body.username} wants to join your group, ${req.params.group_num}.`;
           break;
         default:
           break;
@@ -222,14 +222,31 @@ const addnotificationHandler = (eventType) => {
       );
 
       //check that request isnt from a user within the blocked users list of the user
-      const blockedUser = await User.findOne({
-        user_uuid: req.params.user_uuid,
-        blocked: { $in: [req.body.user_uuid] },
-      });
+      if (eventType !== 5) {
+        const blockedUser = await User.findOne({
+          user_uuid: req.params.user_uuid,
+          blocked: { $in: [req.body.user_uuid] },
+        });
 
-      // Call the notification handler for offline users, if the user isnt blocked
-      if (blockedUser === null) {
-        await addNotification(req.params.user_uuid, notificationData);
+        // Call the notification handler for offline users, if the user isnt blocked
+        if (blockedUser === null) {
+          await addNotification(req.params.user_uuid, notificationData);
+        }
+      } else {
+        // check who the owner of the group is
+        const owner = await Group.findOne({
+          group_uuid: req.params.group_num,
+          "owner.user_uuid": 1,
+        });
+        // make sure the sender uuid isnt blocked by the owner
+        const blockedUser = await User.findOne({
+          user_uuid: owner.user_uuid,
+          blocked: { $in: [req.body.user_uuid] },
+        });
+        // Call the notification handler for offline users, if the user isnt blocked
+        if (blockedUser === null) {
+          await addNotification(owner.owner.user_uuid, notificationData);
+        }
       }
 
       // Proceed to the next middleware or route handler
@@ -246,7 +263,6 @@ const addnotificationHandler = (eventType) => {
 //executes what the notifaction requires, i.e. accepts the friend/group request or join group request
 // userID is the user who accepted the notification the notification.sender is the user who sent the notification
 const notificationExecuterHandler = async (userId, notificationData, next) => {
-  // TODO MAKE EACH CASE A FUNCTION (Might not be needed)
   try {
     const notificationInstructions = notificationData;
     let result;
@@ -343,6 +359,39 @@ const notificationExecuterHandler = async (userId, notificationData, next) => {
         break;
       //group join request
       case 5:
+        // accept the user's join request
+        // get userid, group creator id, and group id
+        const creator_uuid = userId;
+        // group id must be gotten from te payload string
+        let end_portion = notificationInstructions.payload.split(",")[1];
+        const group_uuid = end_portion.slice(1, -1);
+
+        //add the requester to the group as miniuser
+        result = await Group.updateOne(
+          { group_uuid: group_uuid },
+          {
+            $addToSet: {
+              members: {
+                user_uuid: notificationInstructions.sender.user_uuid,
+                username: notificationInstructions.sender.username,
+                user_profile: notificationInstructions.sender.user_profile,
+              },
+            },
+          }
+        );
+
+        // remove the notification from the user's notification list
+        result = await User.updateOne(
+          { user_uuid: creator_uuid },
+          {
+            $pull: {
+              notifications: {
+                sender: notificationInstructions.sender,
+              },
+            },
+          }
+        );
+
         break;
       default:
         throw new Error("Invalid notification type");
