@@ -39,8 +39,6 @@ import {
 import { FriendContext } from "../lib/FriendContext";
 import { io } from "socket.io-client";
 
-// TODO accepting group join request dont work
-
 export default function NotificationPage() {
   const context = useContext(UserContext);
   const friendContext = useContext(FriendContext);

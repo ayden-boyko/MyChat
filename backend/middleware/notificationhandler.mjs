@@ -388,8 +388,6 @@ const notificationExecuterHandler = async (userId, notificationData, next) => {
       //group join request
       case 5:
         // accept the user's join request
-        // get userid, group creator id, and group id
-        const creator_uuid = userId;
         // group id must be gotten from te payload string
         let end_portion = notificationInstructions.payload.split(",")[1];
         const group_uuid = end_portion.slice(1, -1);
@@ -408,15 +406,26 @@ const notificationExecuterHandler = async (userId, notificationData, next) => {
           }
         );
 
-        //notify the group namespace that a new user has joined
-        // TODO figure out group join notifs
-        const groupNamespace = io.of("/group");
-        groupNamespace.to(group_uuid).emit("new join", {
-          group_uuid: group_uuid,
-          user_uuid: notificationInstructions.sender.user_uuid,
-          username: notificationInstructions.sender.username,
-          user_profile: notificationInstructions.sender.user_profile,
-        });
+        //create a minigroup based off of the group id
+        const group = await Group.findOne({ group_uuid: group_uuid });
+        console.log("group", group);
+        const newGroup = {
+          group_uuid: group.group_uuid,
+          group_name: group.group_name,
+          group_profile: group.group_profile,
+        };
+
+        //add the group to the user's groups
+        result = await User.updateOne(
+          { user_uuid: notificationInstructions.sender.user_uuid },
+          {
+            $addToSet: {
+              groups: {
+                newGroup,
+              },
+            },
+          }
+        );
 
         break;
       default:

@@ -80,7 +80,7 @@ export default function GroupCreationPopup({
 
       console.log("groupCreationPopup.tsx - 71 - result", groupData);
       setGroupName("");
-      setGroupAvatar(null);
+      setGroupAvatar("");
       setUser({
         //adds group to user frontend
         ...user,

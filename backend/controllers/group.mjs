@@ -68,6 +68,7 @@ groupController.post("/create/:group_name", async (req, res) => {
     };
     const newGroup = new Group({
       group_name: req.params.group_name,
+      group_profile: req.body.group_avatar,
       members: [groupMaker],
       owner: groupMaker,
       group_profile:
@@ -154,6 +155,11 @@ groupController.put("/leave/:group_num", async (req, res) => {
     const result = await Group.updateOne(
       { group_num: req.params.group_num },
       { $pull: { members: { user_uuid: req.body.user_uuid } } }
+    );
+    //remove group from users froup list
+    await User.updateOne(
+      { user_uuid: req.body.user_uuid },
+      { $pull: { groups: { group_num: req.params.group_num } } }
     );
     res.status(200).json(result);
   } catch (error) {

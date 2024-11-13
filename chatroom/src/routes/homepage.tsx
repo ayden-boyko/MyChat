@@ -135,6 +135,7 @@ export default function HomePage() {
 
   // pull data from database and update the user
   useEffect(() => {
+    console.log("updating user");
     const updateUser = async () => {
       if (!user?.user_uuid) return;
       const result = await fetch(
@@ -153,7 +154,7 @@ export default function HomePage() {
       setUser({ ...user, ...data } as User);
     };
     updateUser();
-  }, [user?.user_uuid]); // changed from [user] to [user?.user_uuid] to prevent re-running when user changes
+  }, []); // changed from [user] to [user?.user_uuid] to prevent re-running when user changes
 
   //console.log("hompage.tsx - 100 - USER-HOME", user);
 
