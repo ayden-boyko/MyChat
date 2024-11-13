@@ -18,7 +18,6 @@ import { MiniGroup } from "./interfaces/MiniGroup.ts";
 import { FriendContext } from "./lib/FriendContext.ts";
 
 /* TODO make the following pages responsive:
-  SIGN UP
   SEARCH
   NOTIFICATIONS
   SETTINGS

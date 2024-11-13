@@ -80,61 +80,79 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="container mx-auto flex h-screen items-center justify-center">
+    <div className="container mx-auto flex min-h-screen items-center justify-center px-4 py-8">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">
+          <CardTitle className="text-2xl font-bold text-center sm:text-3xl">
             Create an account
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-center">
             Enter your details below to create your account
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit}>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
-                <Input id="username" placeholder="johndoe" required />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="john@example.com"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" required />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirmedpassword">Confirm Password</Label>
-                <Input id="confirmedpassword" type="password" required />
-              </div>
-              <Button
-                className="w-full hover:bg-gray-300"
-                type="submit"
-                disabled={isLoading}
-              >
-                {isLoading && (
-                  <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                Sign Up
-              </Button>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                placeholder="johndoe"
+                required
+                className="w-full"
+              />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="john@example.com"
+                required
+                className="w-full"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                required
+                className="w-full"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmedpassword">Confirm Password</Label>
+              <Input
+                id="confirmedpassword"
+                type="password"
+                required
+                className="w-full"
+              />
+            </div>
+            <Button
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+              type="submit"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                  Signing Up...
+                </>
+              ) : (
+                "Sign Up"
+              )}
+            </Button>
           </form>
         </CardContent>
         <CardFooter>
-          <p className="text-sm text-muted-foreground text-center w-full">
+          <p className="text-sm text-muted-foreground text-center w-full px-4 sm:px-0">
             By clicking Sign Up, you agree to our{" "}
-            <a href="#" className="underline">
+            <a href="#" className="underline hover:text-primary">
               Terms of Service
             </a>{" "}
             and{" "}
-            <a href="#" className="underline">
+            <a href="#" className="underline hover:text-primary">
               Privacy Policy
             </a>
             .
