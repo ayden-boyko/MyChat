@@ -16,7 +16,6 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../lib/UserContext";
 import { User } from "../interfaces/userinterface";
-import { cn } from "../lib/utils";
 import { MiniUser } from "../interfaces/miniuser";
 import { io } from "socket.io-client";
 import GroupCreationPopup from "../components/pop-ups/createGroupPopup";
@@ -564,6 +563,35 @@ export default function HomePage() {
               </Button>
             </form>
           </footer>
+        )}
+        <GroupCreationPopup
+          isOpen={createGroup}
+          onClose={() => {
+            setCreateGroup(false);
+          }}
+        />
+
+        {/* checks that viewProfile is not null and is not a MiniGroup before rendering the friend popup */}
+        {viewProfile && selectedFriend && "user_uuid" in selectedFriend && (
+          <FriendProfilePopup
+            isOpen={viewProfile}
+            onClose={() => {
+              setViewProfile(false);
+            }}
+            friend={selectedFriend as MiniUser}
+          />
+        )}
+
+        {/* checks that viewProfile is not null and is a MiniGroup before rendering the group popup */}
+        {viewProfile && selectedFriend && "group_name" in selectedFriend && (
+          <GroupProfilePopup
+            isOpen={viewProfile}
+            onClose={() => {
+              setViewProfile(false);
+            }}
+            group={selectedFriend as MiniGroup}
+            isMember={true}
+          />
         )}
       </main>
     </div>
