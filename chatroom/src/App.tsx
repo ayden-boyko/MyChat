@@ -41,7 +41,7 @@ function App() {
   >(null); // for use with individual friends or groups
 
   return (
-    <div className="App h-screen overflow-hidden">
+    <div className="App min-h-screen w-full overflow-x-hidden">
       <UserContext.Provider value={{ user, setUser }}>
         <Routes>
           <Route path="/" element={<LoginPage />} />

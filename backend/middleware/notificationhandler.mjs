@@ -6,7 +6,6 @@ const prenotifCheck = async (userId, notificationData) => {
   let hasbeenNotified = false;
   let resultType = false;
 
-  // TODO CASE 5
   switch (notificationData.catagory) {
     case 1: // for messaging, not needed here in case of future requirements
       //check that the user doesnt already have a message notification from the user

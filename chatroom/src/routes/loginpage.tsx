@@ -64,15 +64,14 @@ export default function LoginPage() {
       console.error("An error occurred:", err);
     }
   };
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center text-black">
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <Card className="w-full max-w-[90%] sm:max-w-md md:max-w-lg lg:max-w-xl">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-xl sm:text-2xl font-bold text-center">
             Welcome Back
           </CardTitle>
-          <CardDescription className="text-center text-black">
+          <CardDescription className="text-center text-sm sm:text-base">
             Login to your account
           </CardDescription>
         </CardHeader>
@@ -82,82 +81,78 @@ export default function LoginPage() {
             action="api/login/password"
             method="post"
             onSubmit={handleSubmit}
+            className="space-y-4"
           >
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label
-                  htmlFor="email"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-black"
-                >
-                  Email
-                </label>
+            <div className="space-y-2">
+              <label
+                htmlFor="email"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Email
+              </label>
+              <Input
+                id="email"
+                type="email"
+                name="email"
+                placeholder="test@example.com"
+                required
+                autoFocus
+                className="w-full"
+              />
+            </div>
+            <div className="space-y-2">
+              <label
+                htmlFor="username"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                User Name
+              </label>
+              <Input
+                id="username"
+                name="username"
+                type="text"
+                placeholder="User123"
+                required
+                className="w-full"
+              />
+            </div>
+            <div className="space-y-2">
+              <label
+                htmlFor="password"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Password
+              </label>
+              <div className="relative w-full">
                 <Input
-                  id="email"
-                  type="email"
-                  name="email"
-                  placeholder="test@example.com"
+                  id="password"
+                  type="password"
+                  name="password"
                   required
-                  autoFocus
-                  className="text-gray-600"
+                  className="w-full pr-10"
                 />
-              </div>
-              <div className="space-y-2">
-                <label
-                  htmlFor="username"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-black"
-                >
-                  User Name
-                </label>
-                <Input
-                  id="username"
-                  name="username"
-                  type="text" // Changed from 'username' to 'text'
-                  placeholder="User123"
-                  required
-                  className="text-gray-600"
+                <img
+                  src="./src/assets/eye_closed.svg"
+                  alt="Toggle password visibility"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer h-5 w-5"
+                  id="toggle-password"
+                  onClick={() => {
+                    const icon = document.getElementById(
+                      "toggle-password"
+                    ) as HTMLImageElement;
+                    const passwordInput =
+                      icon.parentElement?.querySelector("input");
+                    if (icon.src.includes("closed")) {
+                      icon.src = "./src/assets/eye_open.svg";
+                      icon.alt = "Hide password";
+                      passwordInput?.setAttribute("type", "text");
+                    } else {
+                      icon.src = "./src/assets/eye_closed.svg";
+                      icon.alt = "Show password";
+                      passwordInput?.setAttribute("type", "password");
+                    }
+                  }}
                 />
-              </div>
-              <div className="space-y-2">
-                <label
-                  htmlFor="password"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-black"
-                >
-                  Password
-                </label>
-                <div className="relative w-full">
-                  <Input
-                    id="password"
-                    type="password"
-                    name="password"
-                    required
-                    className="w-full pr-10 text-gray-600"
-                  />
-                  <img
-                    src="./src/assets/eye_closed.svg"
-                    alt="open eye"
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer h-full"
-                    id="toggle-password"
-                    onClick={() => {
-                      const icon = document.getElementById(
-                        "toggle-password"
-                      ) as HTMLImageElement;
-                      // Toggles between 'open eye' and 'closed eye'
-                      if (icon.src.includes("closed")) {
-                        icon.src = "./src/assets/eye_open.svg";
-                        icon.alt = "closed eye";
-                        icon.parentElement
-                          ?.querySelector("input")
-                          ?.setAttribute("type", "text");
-                      } else {
-                        icon.setAttribute("src", "./src/assets/eye_closed.svg");
-                        icon.alt = "open eye";
-                        icon.parentElement
-                          ?.querySelector("input")
-                          ?.setAttribute("type", "password");
-                      }
-                    }}
-                  />
-                </div>
               </div>
             </div>
           </form>
@@ -165,14 +160,14 @@ export default function LoginPage() {
         <CardFooter className="flex flex-col space-y-4">
           <Button
             type="submit"
-            className="w-full hover:bg-gray-300 text-black"
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
             form="login-form"
           >
             Login
           </Button>
-          <p className="text-sm text-center text-gray-600 ">
+          <p className="text-sm text-center text-muted-foreground">
             Don't have an account?{" "}
-            <a href="/sign_up" className="text-blue-600 hover:underline">
+            <a href="/sign_up" className="text-primary hover:underline">
               Sign up
             </a>
           </p>

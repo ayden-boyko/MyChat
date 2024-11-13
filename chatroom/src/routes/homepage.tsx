@@ -3,7 +3,15 @@ import { Input } from "../components/ui/input";
 import { ScrollArea } from "../components/ui/scroll-area";
 import { Separator } from "../components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
-import { Settings, LogOut, Search, Send, Bell, PlusCircle } from "lucide-react";
+import {
+  Settings,
+  LogOut,
+  Search,
+  Send,
+  Bell,
+  PlusCircle,
+  ChevronDown,
+} from "lucide-react";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../lib/UserContext";
@@ -17,6 +25,13 @@ import FriendProfilePopup from "../components/pop-ups/FriendProfilePopup";
 import { formatDate } from "../lib/dateformater";
 import GroupProfilePopup from "../components/pop-ups/GroupProfilePopup";
 import { FriendContext } from "../lib/FriendContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../components/ui/dropdown-menu";
 
 // TODO MAKE ALL TEXT BLACK SO IT CAN BE SEEN ON FIREFOX
 
@@ -324,6 +339,86 @@ export default function HomePage() {
     message.value = "";
   };
 
+  const SidebarContent = ({ inDropdown = false }) => (
+    <>
+      <div className={inDropdown ? "" : "p-4"}>
+        <h2 className="text-lg font-semibold mb-2">Groups</h2>
+        <ul className="space-y-2">
+          {user?.groups === undefined ||
+          user?.groups === null ||
+          user?.groups.length === 0 ? (
+            user?.groups.map((group, index) => (
+              <li key={index}>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    if (selectedFriend === group) {
+                      setViewProfile(true);
+                      return;
+                    }
+                    setSelectedFriend(group);
+                  }}
+                >
+                  <Avatar className="w-6 h-6 mr-2">
+                    <AvatarImage
+                      src={`https://api.dicebear.com/6.x/initials/svg?seed=${group.group_name[0]}`}
+                    />
+                    <AvatarFallback>{group.group_name[0]}</AvatarFallback>
+                  </Avatar>
+                  {group.group_name}
+                </Button>
+              </li>
+            ))
+          ) : (
+            <li>No groups found</li>
+          )}
+          <li>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => setCreateGroup(true)}
+            >
+              <PlusCircle className="mr-2" />
+              Create Group
+            </Button>
+          </li>
+        </ul>
+        <Separator className="my-4" />
+        <h2 className="text-lg font-semibold mb-2">Direct Messages</h2>
+        <ul className="space-y-2">
+          {user?.friends === undefined ||
+          user?.friends === null ||
+          user?.friends.length !== 0 ? (
+            user?.friends.map((friend, index) => (
+              <li key={index}>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    if (selectedFriend === friend) {
+                      setViewProfile(true);
+                      return;
+                    }
+                    setSelectedFriend(friend);
+                  }}
+                >
+                  <Avatar className="w-6 h-6 mr-2">
+                    <AvatarImage src={friend.user_profile} />
+                    <AvatarFallback>{friend.username[0]}</AvatarFallback>
+                  </Avatar>
+                  {friend.username}
+                </Button>
+              </li>
+            ))
+          ) : (
+            <li>No direct messages found</li>
+          )}
+        </ul>
+      </div>
+    </>
+  );
+
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Settings Sidebar */}
@@ -344,10 +439,9 @@ export default function HomePage() {
             <Search />
           </button>
           <button
-            //TODO issue with this rendering when the logout button is pressed
-            className={cn("p-2 rounded-md bg-gray-500 hover:bg-gray-700", {
-              "ring-2 ring-red-500": user?.notifications.length !== 0,
-            })}
+            className={`p-2 rounded-md bg-gray-500 hover:bg-gray-700 ${
+              user?.notifications?.length !== 0 ? "ring-2 ring-red-500" : ""
+            }`}
             aria-label="Notifications"
             onClick={() => navigate("/notifications")}
           >
@@ -357,109 +451,47 @@ export default function HomePage() {
         <button
           className="p-2 rounded-md bg-gray-500 hover:bg-gray-700"
           aria-label="Logout"
+          onClick={() => {
+            logout(user);
+            setUser(null);
+          }}
         >
-          <LogOut
-            onClick={() => {
-              logout(user);
-              setUser(null);
-            }}
-          />
+          <LogOut />
         </button>
       </aside>
 
       {/* Group and Direct Messages Sidebar */}
-      <aside className="w-64 bg-white border-r">
+      <aside className="w-64 bg-white border-r hidden md:block">
         <ScrollArea className="h-full">
-          <div className="p-4">
-            <h2 className="text-lg font-semibold mb-2">Groups</h2>
-            <ul className="space-y-2">
-              {/* Render the list of groups here, if none render "No groups found" */}
-              {user?.groups === undefined ||
-              user?.groups === null ||
-              user?.groups.length === 0 ? (
-                <li>No groups found</li>
-              ) : (
-                user?.groups.map((group, index) => (
-                  <li key={index}>
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start "
-                      onClick={() => {
-                        if (selectedFriend == group) {
-                          setViewProfile(true);
-                          return;
-                        }
-                        setSelectedFriend(group);
-                      }}
-                    >
-                      <Avatar className="w-6 h-6 mr-2">
-                        <AvatarImage
-                          src={`https://api.dicebear.com/6.x/initials/svg?seed=${group.group_name[0]}`}
-                        />
-                        <AvatarFallback>{group.group_name[0]}</AvatarFallback>
-                      </Avatar>
-                      {group.group_name}
-                    </Button>
-                  </li>
-                ))
-              )}
-              <li>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start"
-                  onClick={() => {
-                    setCreateGroup(true);
-                  }}
-                >
-                  <PlusCircle />
-                  Create Group
-                </Button>
-              </li>
-            </ul>
-            <Separator className="my-4" />
-            <h2 className="text-lg font-semibold mb-2">Direct Messages</h2>
-            <ul className="space-y-2">
-              {/* Render the list of direct messages here, if none render "No direct messages found" */}
-              {user?.friends === undefined ||
-              user?.friends === null ||
-              user?.friends.length === 0 ? (
-                <li>No direct messages found</li>
-              ) : (
-                user?.friends.map((friend, index) => (
-                  <li key={index}>
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start"
-                      onClick={() => {
-                        if (selectedFriend == friend) {
-                          setViewProfile(true);
-                          return;
-                        }
-                        setSelectedFriend(friend);
-                      }}
-                    >
-                      <Avatar className="w-6 h-6 mr-2">
-                        <AvatarImage src={friend.user_profile} />
-                        <AvatarFallback>{friend.username[0]}</AvatarFallback>
-                      </Avatar>
-                      {friend.username}
-                    </Button>
-                  </li>
-                ))
-              )}
-            </ul>
-          </div>
+          <SidebarContent />
         </ScrollArea>
       </aside>
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col">
         <header className="bg-white border-b p-4">
-          <h1 className="text-xl font-semibold">
-            Messages to{" "}
-            {(selectedFriend as MiniUser)?.username ||
-              (selectedFriend as MiniGroup)?.group_name}
-          </h1>
+          <div className="flex justify-between items-center">
+            <h1 className="text-xl font-semibold">
+              Messages to{" "}
+              {(selectedFriend as MiniUser)?.username ||
+                (selectedFriend as MiniGroup)?.group_name}{" "}
+            </h1>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="md:hidden">
+                  Chats <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 bg-white">
+                <DropdownMenuLabel>Chats</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <ScrollArea className="h-[400px]">
+                  <SidebarContent inDropdown={true} />
+                </ScrollArea>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </header>
         <ScrollArea className="flex-1 p-4">
           <div className="space-y-4">
@@ -467,93 +499,58 @@ export default function HomePage() {
               <p>No messages</p>
             ) : (
               friendChat
-                ?.filter((msg) => user?.blocked.includes(msg.sender)) //filters out blocked users
-                .slice()
+                ?.filter((msg) => !user?.blocked?.includes(msg.sender))
                 .sort(
                   (a, b) =>
-                    new Date(a.date).getTime() - new Date(b.date).getTime() //sorts the chat by date from oldest to newest then maps it
+                    new Date(a.date).getTime() - new Date(b.date).getTime()
                 )
-                .map(
-                  (
-                    msg: { sender: MiniUser; message: string; date: Date },
-                    index
-                  ) => (
-                    //console.log("msg", msg),
-                    <div key={index} className="flex space-x-2 w-full">
-                      {msg.sender.user_uuid === user?.user_uuid ? (
-                        <div className="flex-1 flex justify-end">
-                          <div className="flex space-x-2">
-                            <div className="max-w-xs p-2 rounded-md bg-blue-400 text-white">
-                              <p className="text-xs font-semibold ">
-                                {user?.username}
-                              </p>
-                              <p className="text-base">{msg.message}</p>
-                              <p>{formatDate(msg.date)}</p>
-                            </div>
-                            <Avatar>
-                              <AvatarImage src={msg.sender.user_profile} />
-                              <AvatarFallback>
-                                {msg.sender.username[0]}
-                              </AvatarFallback>
-                            </Avatar>
+                .map((msg, index) => (
+                  <div key={index} className="flex space-x-2 w-full">
+                    {msg.sender.user_uuid === user?.user_uuid ? (
+                      <div className="flex-1 flex justify-end">
+                        <div className="flex space-x-2">
+                          <div className="max-w-xs p-2 rounded-md bg-blue-400 text-white">
+                            <p className="text-xs font-semibold">
+                              {user?.username}
+                            </p>
+                            <p className="text-base">{msg.message}</p>
+                            <p className="text-xs">{formatDate(msg.date)}</p>
                           </div>
-                        </div>
-                      ) : (
-                        <div className="flex-1 flex justify-start">
                           <Avatar>
                             <AvatarImage src={msg.sender.user_profile} />
                             <AvatarFallback>
                               {msg.sender.username[0]}
                             </AvatarFallback>
                           </Avatar>
-                          <div className="max-w-xs p-2 rounded-md bg-gray-200 text-black">
-                            <p className="text-xs font-semibold ">
-                              {(selectedFriend as MiniUser)?.username ||
-                                (selectedFriend as MiniGroup)?.group_name}
-                            </p>
-                            <p className="text-base">{msg.message}</p>
-                            <p>{formatDate(msg.date)}</p>
-                          </div>
                         </div>
-                      )}
-                    </div>
-                  )
-                )
+                      </div>
+                    ) : (
+                      <div className="flex-1 flex justify-start">
+                        <Avatar>
+                          <AvatarImage src={msg.sender.user_profile} />
+                          <AvatarFallback>
+                            {msg.sender.username[0]}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="max-w-xs p-2 rounded-md bg-gray-200 text-black">
+                          <p className="text-xs font-semibold">
+                            {(selectedFriend as MiniUser)?.username ||
+                              (selectedFriend as MiniGroup)?.group_name}
+                          </p>
+                          <p className="text-base">{msg.message}</p>
+                          <p className="text-xs">{formatDate(msg.date)}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))
             )}
           </div>
         </ScrollArea>
-        <GroupCreationPopup
-          isOpen={createGroup}
-          onClose={() => {
-            setCreateGroup(false);
-          }}
-        />
-
-        {/* checks that viewProfile is not null and is not a MiniGroup before rendering the friend popup */}
-        {viewProfile && selectedFriend && "user_uuid" in selectedFriend && (
-          <FriendProfilePopup
-            isOpen={viewProfile}
-            onClose={() => {
-              setViewProfile(false);
-            }}
-            friend={selectedFriend as MiniUser}
-          />
-        )}
-
-        {/* checks that viewProfile is not null and is a MiniGroup before rendering the group popup */}
-        {viewProfile && selectedFriend && "group_name" in selectedFriend && (
-          <GroupProfilePopup
-            isOpen={viewProfile}
-            onClose={() => {
-              setViewProfile(false);
-            }}
-            group={selectedFriend as MiniGroup}
-            isMember={true}
-          />
-        )}
-
         {selectedFriend === null ? (
-          <p>Select a friend or group to start chatting</p>
+          <p className="text-center p-4">
+            Select a friend or group to start chatting
+          </p>
         ) : (
           <footer className="bg-white border-t p-4">
             <form className="flex space-x-2" onSubmit={sendMessage}>

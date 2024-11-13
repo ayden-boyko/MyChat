@@ -105,6 +105,12 @@ groupController.post("/create/:group_name", async (req, res) => {
 groupController.delete("/delete/:group_num", async (req, res) => {
   try {
     const result = await Group.deleteOne({ group_num: req.params.group_num });
+    // remove group from members group list
+    await User.updateMany(
+      { "groups.group_num": req.params.group_num },
+      { $pull: { groups: { group_num: req.params.group_num } } }
+    );
+
     res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ error: "An error occurred, group not deleted" });
