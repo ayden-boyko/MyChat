@@ -467,11 +467,12 @@ export default function HomePage() {
             {friendChat?.length === 0 || selectedFriend === null ? (
               <p>No messages</p>
             ) : (
-              friendChat //sorts the chat by date from oldest to newest then maps it
-                ?.slice()
+              friendChat
+                ?.filter((msg) => user?.blocked.includes(msg.sender)) //filters out blocked users
+                .slice()
                 .sort(
                   (a, b) =>
-                    new Date(a.date).getTime() - new Date(b.date).getTime()
+                    new Date(a.date).getTime() - new Date(b.date).getTime() //sorts the chat by date from oldest to newest then maps it
                 )
                 .map(
                   (

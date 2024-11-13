@@ -29,7 +29,6 @@ export default function GroupProfilePopup({
 
   const { user } = context;
 
-  // TODO check the join request option from a blocked and non-blocked user
   const handleMembershipAction = async () => {
     // send join request to group
     const result = await fetch(
