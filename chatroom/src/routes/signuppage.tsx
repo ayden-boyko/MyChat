@@ -14,9 +14,6 @@ import { Icons } from "../components/ui/icons.tsx";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../lib/UserContext.ts";
 
-// TODO make sign up page white like the other pages
-// TODO MAKE ALL TEXT BLACK SO IT CAN BE SEEN ON FIREFOX
-
 export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();

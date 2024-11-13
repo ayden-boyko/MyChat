@@ -28,8 +28,6 @@ import { useNavigate } from "react-router-dom";
 import { Home } from "lucide-react";
 import imageCompression from "browser-image-compression";
 
-// TODO MAKE ALL TEXT BLACK SO IT CAN BE SEEN ON FIREFOX
-
 export default function SettingsPage() {
   const context = useContext(UserContext);
   const navigate = useNavigate();

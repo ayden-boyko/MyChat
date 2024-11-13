@@ -32,8 +32,6 @@ import {
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
 
-// TODO MAKE ALL TEXT BLACK SO IT CAN BE SEEN ON FIREFOX
-
 export default function HomePage() {
   const context = useContext(UserContext);
   const friendContext = useContext(FriendContext);
