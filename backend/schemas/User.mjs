@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from "uuid";
 import MiniUser from "./MiniUser.mjs";
 import MiniGroup from "./Minigroup.mjs";
 import Notifications from "./Notifications.mjs";
-// TODO IMPLEMENT USER PROFILES IMAGES, USE MULTER?
 
 const { Schema, model } = mongoose;
 const userSchema = new Schema({

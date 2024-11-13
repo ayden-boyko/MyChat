@@ -66,6 +66,7 @@ export default function HomePage() {
   );
 
   const handleSocketNamespaceSwitch = async () => {
+    //then join the new namespace
     const newSocket = io(
       `${import.meta.env.VITE_BACKEND_API_URL}/${
         selectedFriend && "user_uuid" in selectedFriend ? "user" : "group"
@@ -438,9 +439,7 @@ export default function HomePage() {
                       }}
                     >
                       <Avatar className="w-6 h-6 mr-2">
-                        <AvatarImage
-                          src={`https://api.dicebear.com/6.x/initials/svg?seed=${friend.username[0]}`}
-                        />
+                        <AvatarImage src={friend.user_profile} />
                         <AvatarFallback>{friend.username[0]}</AvatarFallback>
                       </Avatar>
                       {friend.username}

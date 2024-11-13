@@ -59,6 +59,22 @@ userController.get("/get/id/:user_uuid", async (req, res) => {
   }
 });
 
+//GET MiniUser version of user
+userController.get("/get/mini/:user_uuid", async (req, res) => {
+  try {
+    const user = await db
+      .collection("users")
+      .findOne(
+        { user_uuid: req.params.user_uuid },
+        { projection: { username: 1, user_uuid: 1, user_profile: 1 } }
+      );
+    console.log("retrieved", user);
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: "An error while getting MiniuUser by ID" });
+  }
+});
+
 // POST create new users
 userController.post("/create", async (req, res) => {
   console.log("account.mjs - 94 -starting");
@@ -131,19 +147,50 @@ userController.put("/update/:user_uuid", checkRights, async (req, res) => {
     req.params
   ); // Log parameters
   try {
-    const result = await db.collection("users").updateOne(
-      { user_uuid: req.params.user_uuid },
-      //updates name if it is not empty
-      req.params.username != ""
-        ? { $set: { username: req.body.username } }
-        : {},
-      //updates profile if it is not empty
-      req.params.user_profile != ""
-        ? { $set: { user_profile: req.body.user_profile } }
-        : {}
-    );
+    const updateObj = {};
+    if (req.body.username !== "") {
+      updateObj.username = req.body.username;
+    }
+    if (req.body.user_profile !== "") {
+      updateObj.user_profile = req.body.user_profile;
+    }
+    //console.log("to be updated", updateObj);
+    const result = await db
+      .collection("users")
+      .updateOne({ user_uuid: req.params.user_uuid }, { $set: updateObj });
+
+    console.log("user updated!");
+
+    // update friends of user to house the changes too
+    const user = await db.collection("users").findOne({
+      user_uuid: req.params.user_uuid,
+    });
+    // Check if `user.friends` is defined and is an array
+    if (Array.isArray(user.friends)) {
+      // Iterate over each friend
+      for (const friend of user.friends) {
+        // Update each friend's Miniuser object in their friends array
+        console.log("updating friend", friend);
+        await db.collection("users").updateOne(
+          { user_uuid: friend.user_uuid },
+          {
+            $set: {
+              "friends.$[elem].username": updateObj.username || user.username,
+              "friends.$[elem].user_profile":
+                updateObj.user_profile || user.user_profile,
+            },
+          },
+          {
+            arrayFilters: [{ "elem.user_uuid": req.params.user_uuid }], // Use the user_uuid of the current user
+          }
+        );
+      }
+    } else {
+      console.log("user.friends is not an array or is undefined.");
+    }
     res.json(result);
   } catch (error) {
+    console.error("Error updating user profile:", error);
     res.status(500).json({ error: "An error while updating the user profile" });
   }
 });

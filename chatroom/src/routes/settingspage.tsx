@@ -26,6 +26,7 @@ import { useContext } from "react";
 import { User } from "../interfaces/userinterface";
 import { useNavigate } from "react-router-dom";
 import { Home } from "lucide-react";
+import imageCompression from "browser-image-compression";
 
 // TODO MAKE ALL TEXT BLACK SO IT CAN BE SEEN ON FIREFOX
 
@@ -45,14 +46,22 @@ export default function SettingsPage() {
 
   let changedProfile = "";
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+
+    const options = {
+      maxSizeMB: 1,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true,
+    };
     if (file) {
+      //compresses the profile image
+      const compressedFile = await imageCompression(file, options);
       const reader = new FileReader();
       reader.onloadend = () => {
-        reader.readAsDataURL(file);
         changedProfile = reader.result as string;
       };
+      reader.readAsDataURL(compressedFile);
     }
     e.preventDefault();
   };
@@ -82,6 +91,7 @@ export default function SettingsPage() {
     );
 
     if (result.ok) {
+      console.log(result);
       alert("Your changes have been saved.");
       setUser({
         ...user,
