@@ -5,13 +5,14 @@ import { io } from "socket.io-client";
 import {
   UserPlus,
   Users,
-  MessageSquare,
   Bell,
-  UserCircle,
   Home,
   TicketCheck,
   UserPen,
   MessagesSquare,
+  Filter,
+  MessageSquare,
+  UserCircle,
 } from "lucide-react";
 
 //internal
@@ -29,19 +30,14 @@ import { UserContext } from "../lib/UserContext";
 import { User } from "../interfaces/userinterface";
 import { Notifications } from "../interfaces/notifications";
 import { formatDate } from "../lib/dateformater";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarProvider,
-  SidebarTrigger,
-} from "../components/ui/sidebar";
+
 import { FriendContext } from "../lib/FriendContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../components/ui/dropdown-menu";
 
 // TODO FIX STYLING
 
@@ -212,184 +208,145 @@ export default function NotificationPage() {
           (notification) => notification.catagory === activeFilter
         );
 
+  const filterOptions = [
+    { value: 0, label: "All", icon: Bell },
+    { value: 4, label: "Friend Requests", icon: UserPlus },
+    { value: 3, label: "Group Invites", icon: Users },
+    { value: 1, label: "Direct Messages", icon: MessageSquare },
+    { value: 2, label: "Group Messages", icon: Users },
+    { value: 5, label: "Group Join Requests", icon: UserCircle },
+  ];
+
   return (
-    <SidebarProvider>
-      <div className="flex h-screen">
-        <Sidebar className="hidden md:block">
-          <SidebarContent className="bg-white">
-            <SidebarGroup>
-              <SidebarGroupLabel>Filter</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      onClick={() => setActiveFilter("all")}
-                      isActive={activeFilter === "all"}
-                    >
-                      <Bell className="mr-2 h-4 w-4" />
-                      <span>All</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      onClick={() => setActiveFilter(4)}
-                      isActive={activeFilter === 4}
-                    >
-                      <UserPlus className="mr-2 h-4 w-4" />
-                      <span>Friend Requests</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      onClick={() => setActiveFilter(3)}
-                      isActive={activeFilter === 3}
-                    >
-                      <Users className="mr-2 h-4 w-4" />
-                      <span>Group Invites</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      onClick={() => setActiveFilter(1)}
-                      isActive={activeFilter === 1}
-                    >
-                      <MessageSquare className="mr-2 h-4 w-4" />
-                      <span>Direct Messages</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      onClick={() => setActiveFilter(2)}
-                      isActive={activeFilter === 2}
-                    >
-                      <Users className="mr-2 h-4 w-4" />
-                      <span>Group Messages</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      onClick={() => setActiveFilter(5)}
-                      isActive={activeFilter === 5}
-                    >
-                      <UserCircle className="mr-2 h-4 w-4" />
-                      <span>Group Join Requests</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </SidebarContent>
-        </Sidebar>
-        <div className="flex-1 flex flex-col">
-          <div className="flex justify-between items-center p-4 border-b">
-            <SidebarTrigger className="md:hidden">
-              <Button variant="outline" size="icon">
-                <Bell className="h-4 w-4" />
+    <div className="flex flex-col h-screen">
+      <header className="flex justify-between items-center p-4 border-b">
+        <div className="flex items-center space-x-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon" className="md:hidden">
+                <Filter className="h-4 w-4" />
               </Button>
-            </SidebarTrigger>
-            <h1 className="text-2xl font-bold">Notifications</h1>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => {
-                navigate("/home");
-              }}
-              aria-label="Go to homepage"
-            >
-              <Home className="h-4 w-4" />
-            </Button>
-          </div>
-          <div className="flex-1 p-4 overflow-auto">
-            <div className="max-w-full md:max-w-4xl lg:max-w-6xl mx-auto">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-xl sm:text-2xl font-bold">
-                    Notifications
-                  </CardTitle>
-                  <CardDescription>
-                    Stay updated with your latest activities
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ScrollArea className="h-[calc(100vh-300px)] w-full rounded-md border p-4">
-                    {filteredNotifications?.length === 0 ? (
-                      <p>No notifications</p>
-                    ) : (
-                      filteredNotifications?.map((notification, index) => (
-                        <div key={index} className="mb-4 last:mb-0">
-                          <Card>
-                            <CardContent className="p-4">
-                              <div className="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-4">
-                                <Avatar>
-                                  <AvatarImage
-                                    src={notification.sender.user_profile}
-                                    alt={notification.sender.username}
-                                  />
-                                  <AvatarFallback>
-                                    {notification.sender.username[0]}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <div className="flex-1 space-y-1">
-                                  {notification.catagory === 5 ? (
-                                    <>
-                                      <p className="text-sm font-medium leading-none">
-                                        {notification.payload.split(",")[0]}
-                                      </p>
-                                      <p className="text-sm leading-none">
-                                        {notification.payload.split(",")[1]}
-                                      </p>
-                                    </>
-                                  ) : (
-                                    <p className="text-sm font-medium leading-none">
-                                      {notification.payload}
-                                    </p>
-                                  )}
-                                  <p className="text-sm text-muted-foreground">
-                                    {formatDate(notification.date)}
-                                  </p>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  {getIcon(notification.catagory)}
-                                  <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-                                    <Button
-                                      size="sm"
-                                      onClick={() =>
-                                        handleAction(notification, "accept")
-                                      }
-                                    >
-                                      {notification.catagory === 4 ||
-                                      notification.catagory === 5 ||
-                                      notification.catagory === 3
-                                        ? "Accept"
-                                        : "View"}
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      onClick={() =>
-                                        handleAction(notification, "decline")
-                                      }
-                                    >
-                                      {notification.catagory === 4 ||
-                                      notification.catagory === 5 ||
-                                      notification.catagory === 3
-                                        ? "Decline"
-                                        : "Close"}
-                                    </Button>
-                                  </div>
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        </div>
-                      ))
-                    )}
-                  </ScrollArea>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-white">
+              {filterOptions.map((option) => (
+                <DropdownMenuItem
+                  key={option.value}
+                  onSelect={() => setActiveFilter(option.value)}
+                  className={option.value === activeFilter ? "bg-gray-200" : ""}
+                >
+                  <option.icon className="mr-2 h-4 w-4" />
+                  <span>{option.label}</span>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <h1 className="text-2xl font-bold">Notifications</h1>
         </div>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => navigate("/home")}
+          aria-label="Go to homepage"
+        >
+          <Home className="h-4 w-4" />
+        </Button>
+      </header>
+      <div className="flex flex-1 overflow-hidden">
+        <aside className="hidden md:block w-64 p-4 border-r overflow-y-auto">
+          <nav>
+            <ul className="space-y-2">
+              {filterOptions.map((option) => (
+                <li key={option.value}>
+                  <Button
+                    variant={
+                      activeFilter === option.value ? "default" : "ghost"
+                    }
+                    className="w-full justify-start"
+                    onClick={() => setActiveFilter(option.value)}
+                  >
+                    <option.icon className="mr-2 h-4 w-4" />
+                    {option.label}
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </aside>
+        <main className="flex-1 p-4 overflow-auto">
+          <Card className="w-full max-w-4xl mx-auto">
+            <CardHeader>
+              <CardDescription className="text-xl sm:text-2xl font-bold">
+                Stay updated with your latest activities
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-[calc(100vh-250px)] w-full rounded-md border p-4">
+                {filteredNotifications?.length === 0 ? (
+                  <p>No notifications</p>
+                ) : (
+                  filteredNotifications?.map((notification, index) => (
+                    <div key={index} className="mb-4 last:mb-0">
+                      <Card>
+                        <CardContent className="p-4">
+                          <div className="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-4">
+                            <Avatar>
+                              <AvatarImage
+                                src={notification.sender.user_profile}
+                                alt={notification.sender.username}
+                              />
+                              <AvatarFallback>
+                                {notification.sender.username[0]}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 space-y-1">
+                              <p className="text-sm font-medium leading-none">
+                                {notification.payload}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                {formatDate(notification.date)}
+                              </p>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              {getIcon(notification.catagory)}
+                              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                                <Button
+                                  size="sm"
+                                  onClick={() =>
+                                    handleAction(notification, "accept")
+                                  }
+                                >
+                                  {notification.catagory === 4 ||
+                                  notification.catagory === 5 ||
+                                  notification.catagory === 3
+                                    ? "Accept"
+                                    : "View"}
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() =>
+                                    handleAction(notification, "decline")
+                                  }
+                                >
+                                  {notification.catagory === 4 ||
+                                  notification.catagory === 5 ||
+                                  notification.catagory === 3
+                                    ? "Decline"
+                                    : "Close"}
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  ))
+                )}
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </main>
       </div>
-    </SidebarProvider>
+    </div>
   );
 }
