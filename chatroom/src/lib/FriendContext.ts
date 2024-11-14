@@ -1,6 +1,6 @@
 import { createContext } from "react";
 import { Dispatch, SetStateAction } from "react";
-import { MiniGroup } from "../interfaces/MiniGroup";
+import { MiniGroup } from "../interfaces/minigroup";
 import { MiniUser } from "../interfaces/miniuser";
 
 // Define the type of the context

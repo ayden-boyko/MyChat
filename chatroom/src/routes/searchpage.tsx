@@ -21,7 +21,7 @@ import { MiniUser } from "../interfaces/miniuser";
 import UserProfilePopup from "../components/pop-ups/UserProfilePopup";
 import { UserContext } from "../lib/UserContext";
 import { useNavigate } from "react-router-dom";
-import { MiniGroup } from "../interfaces/MiniGroup";
+import { MiniGroup } from "../interfaces/minigroup";
 import GroupProfilePopup from "../components/pop-ups/GroupProfilePopup";
 
 export default function SearchPage() {

@@ -23,7 +23,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { MiniGroup } from "../../interfaces/MiniGroup";
+import { MiniGroup } from "../../interfaces/minigroup";
 
 interface FriendProfilePopupProps {
   isOpen: boolean;

@@ -19,7 +19,7 @@ import { User } from "../interfaces/userinterface";
 import { MiniUser } from "../interfaces/miniuser";
 import { io } from "socket.io-client";
 import GroupCreationPopup from "../components/pop-ups/createGroupPopup";
-import { MiniGroup } from "../interfaces/MiniGroup";
+import { MiniGroup } from "../interfaces/minigroup";
 import FriendProfilePopup from "../components/pop-ups/FriendProfilePopup";
 import { formatDate } from "../lib/dateformater";
 import GroupProfilePopup from "../components/pop-ups/GroupProfilePopup";

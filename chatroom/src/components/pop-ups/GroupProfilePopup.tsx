@@ -3,7 +3,7 @@ import { X, UserPlus, UserMinus } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { MiniGroup } from "../../interfaces/MiniGroup";
+import { MiniGroup } from "../../interfaces/minigroup";
 import { UserContext } from "../../lib/UserContext";
 
 interface GroupProfilePopupProps {

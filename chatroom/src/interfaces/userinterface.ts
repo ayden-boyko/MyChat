@@ -1,7 +1,7 @@
 import { Socket } from "socket.io-client";
 import { MiniUser } from "./miniuser";
 import { Notifications } from "./notifications";
-import { MiniGroup } from "./MiniGroup";
+import { MiniGroup } from "./minigroup";
 
 export interface User {
   user_uuid?: string;
