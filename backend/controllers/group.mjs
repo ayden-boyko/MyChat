@@ -1,4 +1,5 @@
 // TODO WHEN SERVING GROUP'S MEMEBERS AND CHAT HISTORY USE DATA COMPRESSSION MAY BE ABLE TO SEND MORE MESSAGES IN HISTORY
+// https://www.npmjs.com/package/compression
 
 import express from "express";
 import User from "../schemas/User.mjs"; // Import the User schema
