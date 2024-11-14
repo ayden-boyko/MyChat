@@ -14,7 +14,7 @@ import NotificationPage from "./routes/notificationpage.tsx";
 import { User } from "./interfaces/userinterface.ts";
 import { MiniUser } from "./interfaces/miniuser.ts";
 import { Socket } from "socket.io-client";
-import { MiniGroup } from "./interfaces/MiniGroup.ts";
+import { MiniGroup } from "./interfaces/minigroup.ts";
 import { FriendContext } from "./lib/FriendContext.ts";
 
 function App() {
