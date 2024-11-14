@@ -121,12 +121,14 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
       <div className="absolute top-4 right-4">
         <Button
           variant="outline"
           size="icon"
-          onClick={() => navigate("/home")}
+          onClick={() => {
+            navigate("/home");
+          }}
           aria-label="Go to homepage"
         >
           <Home className="h-4 w-4" />
@@ -134,7 +136,9 @@ export default function SettingsPage() {
       </div>
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
-          <CardTitle>Account Settings</CardTitle>
+          <CardTitle className="text-2xl sm:text-3xl">
+            Account Settings
+          </CardTitle>
           <CardDescription>
             Manage your account settings and set email preferences.
           </CardDescription>
@@ -142,12 +146,9 @@ export default function SettingsPage() {
         <CardContent className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="avatar">Profile Picture</Label>
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
               <Avatar className="w-20 h-20">
-                <AvatarImage
-                  src={user!.user_profile ?? ""}
-                  alt={user!.username ?? ""}
-                />
+                <AvatarImage src={user?.user_profile} alt={user?.username} />
                 <AvatarFallback>{"NONE"}</AvatarFallback>
               </Avatar>
               <Input
@@ -155,23 +156,34 @@ export default function SettingsPage() {
                 type="file"
                 accept="image/*"
                 onChange={handleAvatarChange}
+                className="w-full sm:w-auto"
               />
             </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="username">Username</Label>
-            <Input id="username" defaultValue={user!.username ?? ""} />
+            <Input
+              id="username"
+              defaultValue={user?.username}
+              className="w-full"
+            />
           </div>
         </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button variant="outline" onClick={handleSaveChanges}>
+        <CardFooter className="flex flex-col sm:flex-row justify-between space-y-4 sm:space-y-0">
+          <Button
+            variant="outline"
+            onClick={handleSaveChanges}
+            className="w-full sm:w-auto"
+          >
             Save Changes
           </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive">Delete Account</Button>
+              <Button variant="destructive" className="w-full sm:w-auto">
+                Delete Account
+              </Button>
             </AlertDialogTrigger>
-            <AlertDialogContent>
+            <AlertDialogContent className="max-w-md mx-auto bg-white">
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                 <AlertDialogDescription>
@@ -179,9 +191,14 @@ export default function SettingsPage() {
                   your account and remove your data from our servers.
                 </AlertDialogDescription>
               </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDeleteAccount}>
+              <AlertDialogFooter className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2">
+                <AlertDialogCancel className="w-full sm:w-auto">
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleDeleteAccount}
+                  className="w-full sm:w-auto"
+                >
                   Yes, delete my account
                 </AlertDialogAction>
               </AlertDialogFooter>

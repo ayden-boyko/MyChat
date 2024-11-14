@@ -17,12 +17,6 @@ import { Socket } from "socket.io-client";
 import { MiniGroup } from "./interfaces/MiniGroup.ts";
 import { FriendContext } from "./lib/FriendContext.ts";
 
-/* TODO make the following pages responsive:
-  SEARCH
-  NOTIFICATIONS
-  SETTINGS
-*/
-
 function App() {
   const [user, setUser] = useState<User | null>({
     user_uuid: "",

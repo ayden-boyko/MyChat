@@ -35,9 +35,12 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarProvider,
+  SidebarTrigger,
 } from "../components/ui/sidebar";
 import { FriendContext } from "../lib/FriendContext";
 import { io } from "socket.io-client";
+
+// TODO FIX STYLING
 
 export default function NotificationPage() {
   const context = useContext(UserContext);
@@ -209,8 +212,8 @@ export default function NotificationPage() {
   return (
     <SidebarProvider>
       <div className="flex h-screen">
-        <Sidebar>
-          <SidebarContent>
+        <Sidebar className="hidden md:block">
+          <SidebarContent className="bg-white">
             <SidebarGroup>
               <SidebarGroupLabel>Filter</SidebarGroupLabel>
               <SidebarGroupContent>
@@ -274,40 +277,46 @@ export default function NotificationPage() {
             </SidebarGroup>
           </SidebarContent>
         </Sidebar>
-        <div className="flex-1">
-          <div className="absolute top-4 right-4">
+        <div className="flex-1 flex flex-col">
+          <div className="flex justify-between items-center p-4 border-b">
+            <SidebarTrigger className="md:hidden">
+              <Button variant="outline" size="icon">
+                <Bell className="h-4 w-4" />
+              </Button>
+            </SidebarTrigger>
+            <h1 className="text-2xl font-bold">Notifications</h1>
             <Button
               variant="outline"
               size="icon"
-              onClick={() => navigate("/home")}
+              onClick={() => {
+                navigate("/home");
+              }}
               aria-label="Go to homepage"
             >
               <Home className="h-4 w-4" />
             </Button>
           </div>
-          <div className="container mx-auto py-10 w-max">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-2xl font-bold">
-                  Notifications
-                </CardTitle>
-                <CardDescription>
-                  Stay updated with your latest activities
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-[calc(100vh-200px)] w-full rounded-md border p-4">
-                  {filteredNotifications === null ||
-                  filteredNotifications?.length === 0 ? (
-                    <p>No notifications</p>
-                  ) : (
-                    (console.log("notif length", filteredNotifications),
-                    filteredNotifications &&
+          <div className="flex-1 p-4 overflow-auto">
+            <div className="max-w-full md:max-w-4xl lg:max-w-6xl mx-auto">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl sm:text-2xl font-bold">
+                    Notifications
+                  </CardTitle>
+                  <CardDescription>
+                    Stay updated with your latest activities
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ScrollArea className="h-[calc(100vh-300px)] w-full rounded-md border p-4">
+                    {filteredNotifications?.length === 0 ? (
+                      <p>No notifications</p>
+                    ) : (
                       filteredNotifications?.map((notification, index) => (
                         <div key={index} className="mb-4 last:mb-0">
                           <Card>
                             <CardContent className="p-4">
-                              <div className="flex items-start space-x-4">
+                              <div className="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-4">
                                 <Avatar>
                                   <AvatarImage
                                     src={notification.sender.user_profile}
@@ -338,44 +347,43 @@ export default function NotificationPage() {
                                 </div>
                                 <div className="flex items-center space-x-2">
                                   {getIcon(notification.catagory)}
-                                  {
-                                    <>
-                                      <Button
-                                        size="sm"
-                                        onClick={() =>
-                                          handleAction(notification, "accept")
-                                        }
-                                      >
-                                        {notification.catagory === 4 ||
-                                        notification.catagory === 5 ||
-                                        notification.catagory === 3
-                                          ? "Accept"
-                                          : "View"}
-                                      </Button>
-                                      <Button
-                                        size="sm"
-                                        onClick={() =>
-                                          handleAction(notification, "decline")
-                                        }
-                                      >
-                                        {notification.catagory === 4 ||
-                                        notification.catagory === 5 ||
-                                        notification.catagory === 3
-                                          ? "Decline"
-                                          : "Close"}
-                                      </Button>
-                                    </>
-                                  }
+                                  <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                                    <Button
+                                      size="sm"
+                                      onClick={() =>
+                                        handleAction(notification, "accept")
+                                      }
+                                    >
+                                      {notification.catagory === 4 ||
+                                      notification.catagory === 5 ||
+                                      notification.catagory === 3
+                                        ? "Accept"
+                                        : "View"}
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      onClick={() =>
+                                        handleAction(notification, "decline")
+                                      }
+                                    >
+                                      {notification.catagory === 4 ||
+                                      notification.catagory === 5 ||
+                                      notification.catagory === 3
+                                        ? "Decline"
+                                        : "Close"}
+                                    </Button>
+                                  </div>
                                 </div>
                               </div>
                             </CardContent>
                           </Card>
                         </div>
-                      )))
-                  )}
-                </ScrollArea>
-              </CardContent>
-            </Card>
+                      ))
+                    )}
+                  </ScrollArea>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </div>

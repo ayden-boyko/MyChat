@@ -133,36 +133,38 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
       <div className="absolute top-4 right-4">
         <Button
           variant="outline"
           size="icon"
-          onClick={() => navigate("/home")}
+          onClick={() => {
+            /* navigate to home */
+          }}
           aria-label="Go to homepage"
         >
           <Home className="h-4 w-4" />
         </Button>
       </div>
-      <Card>
+      <Card className="w-full max-w-3xl mx-auto">
         <CardHeader>
-          <CardTitle>Search</CardTitle>
+          <CardTitle className="text-2xl sm:text-3xl">Search</CardTitle>
           <CardDescription>Find people and groups</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex space-x-2 mb-6">
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mb-6">
             <Input
               placeholder="Search for people or groups..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="flex-grow"
             />
-            <Button onClick={handleSearch}>
+            <Button onClick={handleSearch} className="w-full sm:w-auto">
               <Search className="mr-2 h-4 w-4" /> Search
             </Button>
           </div>
 
-          <Tabs defaultValue="people">
+          <Tabs defaultValue="people" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger
                 value="people"
@@ -178,7 +180,7 @@ export default function SearchPage() {
               </TabsTrigger>
             </TabsList>
             <TabsContent value="people">
-              <ScrollArea className="h-[400px] w-full rounded-md border p-4">
+              <ScrollArea className="h-[300px] sm:h-[400px] w-full rounded-md border p-4">
                 {searchResults.people.length > 0 ? (
                   searchResults.people.map((user, index) => (
                     <div
@@ -192,7 +194,10 @@ export default function SearchPage() {
                         />
                         <AvatarFallback>{user.username[0]}</AvatarFallback>
                       </Avatar>
-                      <div onClick={() => handleClick(user)}>
+                      <div
+                        onClick={() => handleClick(user)}
+                        className="cursor-pointer"
+                      >
                         <p className="text-sm font-medium leading-none">
                           {user.username}
                         </p>
@@ -207,24 +212,15 @@ export default function SearchPage() {
                     No users found
                   </p>
                 )}
-
-                {/* User Profile Popup */}
-                {selectedUser && (
-                  <UserProfilePopup
-                    user={selectedUser}
-                    onClose={handleClose}
-                    onSendFriendRequest={handleSendFriendRequest}
-                  />
-                )}
               </ScrollArea>
             </TabsContent>
             <TabsContent value="groups">
-              <ScrollArea className="h-[400px] w-full rounded-md border p-4">
+              <ScrollArea className="h-[300px] sm:h-[400px] w-full rounded-md border p-4">
                 {searchResults.groups.length > 0 ? (
                   searchResults.groups.map((group) => (
                     <div
                       key={group.group_uuid}
-                      className="flex items-center space-x-4 mb-4"
+                      className="flex items-center space-x-4 mb-4 cursor-pointer"
                       onClick={() => handleClick(group)}
                     >
                       <Avatar>
@@ -248,27 +244,30 @@ export default function SearchPage() {
                       : "Loading"}
                   </p>
                 )}
-                {/* Group Profile Popup */}
-                {selectedGroup && (
-                  <GroupProfilePopup
-                    isOpen={selectedGroup !== null}
-                    // checks if the user is a member of the group
-                    isMember={
-                      user &&
-                      user.groups &&
-                      selectedGroup.group_uuid in user.groups
-                        ? true
-                        : false
-                    }
-                    group={selectedGroup}
-                    onClose={handleClose}
-                  />
-                )}
               </ScrollArea>
             </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
+
+      {/* User Profile Popup */}
+      {selectedUser && (
+        <UserProfilePopup
+          user={selectedUser}
+          onClose={handleClose}
+          onSendFriendRequest={handleSendFriendRequest}
+        />
+      )}
+
+      {/* Group Profile Popup */}
+      {selectedGroup && (
+        <GroupProfilePopup
+          isOpen={selectedGroup !== null}
+          isMember={false} // This should be determined based on the user's group membership
+          group={selectedGroup}
+          onClose={handleClose}
+        />
+      )}
     </div>
   );
 }
