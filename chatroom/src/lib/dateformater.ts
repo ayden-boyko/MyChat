@@ -1,3 +1,4 @@
+//used for formating Date object
 export function formatDate(date: Date) {
   const rawDate = new Date(date);
   const year = rawDate.getFullYear();

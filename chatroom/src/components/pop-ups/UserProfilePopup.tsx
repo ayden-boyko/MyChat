@@ -1,4 +1,6 @@
+//external
 import { X, UserPlus } from "lucide-react";
+//internal
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";

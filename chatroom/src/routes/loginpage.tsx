@@ -1,3 +1,8 @@
+//external
+import React, { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+
+//internal
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import {
@@ -8,8 +13,6 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import React, { useContext } from "react";
-import { useNavigate } from "react-router-dom";
 import { UserContext } from "../lib/UserContext";
 
 export default function LoginPage() {

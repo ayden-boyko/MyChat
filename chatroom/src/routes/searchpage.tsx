@@ -1,4 +1,9 @@
+//external
 import { useContext, useEffect, useState } from "react";
+import { Home, Search } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
+//internal
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import {
@@ -16,11 +21,9 @@ import {
 } from "../components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { ScrollArea } from "../components/ui/scroll-area";
-import { Home, Search } from "lucide-react";
 import { MiniUser } from "../interfaces/miniuser";
 import UserProfilePopup from "../components/pop-ups/UserProfilePopup";
 import { UserContext } from "../lib/UserContext";
-import { useNavigate } from "react-router-dom";
 import { MiniGroup } from "../interfaces/minigroup";
 import GroupProfilePopup from "../components/pop-ups/GroupProfilePopup";
 

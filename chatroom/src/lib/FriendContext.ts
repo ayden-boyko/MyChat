@@ -1,5 +1,7 @@
+//external
 import { createContext } from "react";
 import { Dispatch, SetStateAction } from "react";
+//internal
 import { MiniGroup } from "../interfaces/minigroup";
 import { MiniUser } from "../interfaces/miniuser";
 

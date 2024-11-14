@@ -1,7 +1,11 @@
+// external
 import { useState } from "react";
-import "./output.css";
-//import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
+import { Socket } from "socket.io-client";
+
+//internal
+import "./output.css";
+import { FriendContext } from "./lib/FriendContext.ts";
 import { UserContext } from "./lib/UserContext.ts";
 
 //routes
@@ -11,11 +15,11 @@ import SettingsPage from "./routes/settingspage.tsx";
 import SignUpPage from "./routes/signuppage.tsx";
 import SearchPage from "./routes/searchpage.tsx";
 import NotificationPage from "./routes/notificationpage.tsx";
+
+//interfaces
 import { User } from "./interfaces/userinterface.ts";
 import { MiniUser } from "./interfaces/miniuser.ts";
-import { Socket } from "socket.io-client";
 import { MiniGroup } from "./interfaces/minigroup.ts";
-import { FriendContext } from "./lib/FriendContext.ts";
 
 function App() {
   const [user, setUser] = useState<User | null>({

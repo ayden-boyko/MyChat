@@ -1,8 +1,4 @@
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { ScrollArea } from "../components/ui/scroll-area";
-import { Separator } from "../components/ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
+//external
 import {
   Settings,
   LogOut,
@@ -14,10 +10,17 @@ import {
 } from "lucide-react";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { io } from "socket.io-client";
+
+//internal
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { ScrollArea } from "../components/ui/scroll-area";
+import { Separator } from "../components/ui/separator";
+import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { UserContext } from "../lib/UserContext";
 import { User } from "../interfaces/userinterface";
 import { MiniUser } from "../interfaces/miniuser";
-import { io } from "socket.io-client";
 import GroupCreationPopup from "../components/pop-ups/createGroupPopup";
 import { MiniGroup } from "../interfaces/minigroup";
 import FriendProfilePopup from "../components/pop-ups/FriendProfilePopup";

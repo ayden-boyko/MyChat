@@ -1,3 +1,10 @@
+//external
+import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { Home } from "lucide-react";
+import imageCompression from "browser-image-compression";
+
+//internal
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
@@ -22,11 +29,7 @@ import {
   AlertDialogTrigger,
 } from "../components/ui/alert-dialog";
 import { UserContext } from "../lib/UserContext";
-import { useContext } from "react";
 import { User } from "../interfaces/userinterface";
-import { useNavigate } from "react-router-dom";
-import { Home } from "lucide-react";
-import imageCompression from "browser-image-compression";
 
 export default function SettingsPage() {
   const context = useContext(UserContext);

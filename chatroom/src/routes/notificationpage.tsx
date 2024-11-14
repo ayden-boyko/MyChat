@@ -1,14 +1,7 @@
+//external
 import { useContext, useEffect, useState } from "react";
-import { Button } from "../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
-import { ScrollArea } from "../components/ui/scroll-area";
+import { useNavigate } from "react-router-dom";
+import { io } from "socket.io-client";
 import {
   UserPlus,
   Users,
@@ -20,10 +13,21 @@ import {
   UserPen,
   MessagesSquare,
 } from "lucide-react";
+
+//internal
+import { Button } from "../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
+import { ScrollArea } from "../components/ui/scroll-area";
 import { UserContext } from "../lib/UserContext";
 import { User } from "../interfaces/userinterface";
 import { Notifications } from "../interfaces/notifications";
-import { useNavigate } from "react-router-dom";
 import { formatDate } from "../lib/dateformater";
 import {
   Sidebar,
@@ -38,7 +42,6 @@ import {
   SidebarTrigger,
 } from "../components/ui/sidebar";
 import { FriendContext } from "../lib/FriendContext";
-import { io } from "socket.io-client";
 
 // TODO FIX STYLING
 

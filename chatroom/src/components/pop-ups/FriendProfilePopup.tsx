@@ -1,19 +1,10 @@
+//external
 import { useContext, useEffect } from "react";
 import { X, UserMinus, Ban, PlusCircleIcon } from "lucide-react";
+//internal
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-// import {
-//   AlertDialog,
-//   AlertDialogAction,
-//   AlertDialogCancel,
-//   AlertDialogContent,
-//   AlertDialogDescription,
-//   AlertDialogFooter,
-//   AlertDialogHeader,
-//   AlertDialogTitle,
-//   AlertDialogTrigger,
-// } from "../ui/alert-dialog";
 import { UserContext } from "../../lib/UserContext";
 import { MiniUser } from "../../interfaces/miniuser";
 import { User } from "../../interfaces/userinterface";

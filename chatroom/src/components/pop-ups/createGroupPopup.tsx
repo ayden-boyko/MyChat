@@ -1,9 +1,11 @@
+//external
 import React, { useState, useEffect, useRef, useContext } from "react";
+import { PlusCircle } from "lucide-react";
+//internal
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { PlusCircle } from "lucide-react";
 import { GroupCreationPopupProps } from "../../interfaces/createGroup";
 import { UserContext } from "../../lib/UserContext";
 import { MiniGroup } from "../../interfaces/minigroup";

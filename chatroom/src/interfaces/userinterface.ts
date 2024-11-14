@@ -1,4 +1,6 @@
+//external
 import { Socket } from "socket.io-client";
+//internal
 import { MiniUser } from "./miniuser";
 import { Notifications } from "./notifications";
 import { MiniGroup } from "./minigroup";

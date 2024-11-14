@@ -1,6 +1,7 @@
-import { createContext } from "react";
+//external
+import { Dispatch, SetStateAction, createContext } from "react";
+//internal
 import { User } from "../interfaces/userinterface";
-import { Dispatch, SetStateAction } from "react";
 
 // Define the type of the context
 interface UserContextType {
