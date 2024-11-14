@@ -39,8 +39,6 @@ import {
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
 
-// TODO FIX STYLING
-
 export default function NotificationPage() {
   const context = useContext(UserContext);
   const friendContext = useContext(FriendContext);
