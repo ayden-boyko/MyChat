@@ -7,6 +7,9 @@ const NotificationController = express.Router();
 
 //gets the pending notifications
 NotificationController.get("/pending/:user_uuid", async (req, res) => {
+  if (req.session.cookie.expired) {
+    return res.sendStatus(401);
+  }
   try {
     const user = await User.findOne({ user_uuid: req.params.user_uuid });
     res.status(200).json({ notifications: user.notifications });

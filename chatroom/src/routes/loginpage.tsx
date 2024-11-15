@@ -40,6 +40,7 @@ export default function LoginPage() {
         `${import.meta.env.VITE_BACKEND_API_URL}/api/login/password`,
         {
           method: "POST",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },

@@ -10,6 +10,7 @@ import chatController from "./controllers/chat.mjs";
 import UserNamespace from "./namespaces/usernamespace.mjs";
 import GroupNamespace from "./namespaces/groupnamespace.mjs";
 import groupController from "./controllers/group.mjs";
+import SessionController from "./controllers/session.mjs";
 
 //external imports
 import express from "express";
@@ -20,6 +21,7 @@ import passport from "passport";
 import { Server } from "socket.io";
 import { createServer } from "http";
 import { configDotenv } from "dotenv";
+import crypto from "crypto";
 
 // TODO HAVE BACKEND SEND FRONTEND FILES
 /*
@@ -34,22 +36,30 @@ const PORT = process.env.PORT || 8000;
 
 const app = express();
 
-app.use(express.json());
-app.use(cors());
+const corsOptions = {
+  origin: "http://localhost:5173", // Explicitly allow your frontend's origin
+  credentials: true, // Allow credentials
+};
 
-//TODO check out express sessions, can they be used on the front end?
+app.use(express.json());
+app.use(cors(corsOptions));
+
 // Express session setup
+console.log("creating sessions!");
 app.use(
   session({
+    genid: (req) => crypto.randomBytes(16).toString("hex"),
     secret: process.env.SESSION_SECRET_KEY, //signs the session ID cookie
     resave: false, //tells express to save session even if it wasnt modified
-    saveUninitialized: false, //When false, it avoids storing sessions that haven’t been modified (user isn’t logged in).
+    saveUninitialized: true, //When false, it avoids storing sessions that haven’t been modified (user isn’t logged in).
     cookie: {
       //options for the session cookie
-      maxAge: 1000 * 60 * 60 * 24, // expires in 1 day
+      maxAge: 1000 * 60 * 60 * 12, // expires in 12 hours
     },
     store: new mongoStore({
       mongoUrl: process.env.ATLAS_URI,
+      // chatroom db
+      dbName: "Chatroom",
       collection: "sessions",
     }),
   })
@@ -76,17 +86,13 @@ app.use("/api/chat", chatController);
 // Use the group controller
 app.use("/api/groups", groupController);
 
+// Use the session controller
+app.use("/api/session", SessionController);
+
 // TODO SERVE LOGIN PAGE
 app.get("/", async (req, res) => {
   try {
-    console.log("server.mjs - 64 - GET", req.body);
-    // Set CORS headers
-    res.setHeader("Access-Control-Allow-Origin", "*");
-
-    // Fetch data from the database
-    const result = await db.collection("users").find({}).toArray();
-
-    // Send data as JSON (automatically sets Content-Type and ends the response)
+    // serve reirect to login page
     res.json(result);
   } catch (error) {
     // Handle any errors and send appropriate response

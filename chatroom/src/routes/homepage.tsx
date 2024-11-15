@@ -60,39 +60,21 @@ export default function HomePage() {
   const { user, setUser } = context;
   const { selectedFriend, setSelectedFriend } = friendContext;
 
-  //checks if user state is retained, if not redirects to login
-  useEffect(() => {
-    if (user?.username === "") {
-      navigate("/");
-    }
-  });
-
   const updateFriendChat = useCallback(
     (newMessage: { sender: MiniUser; message: string; date: Date }) => {
-      setFriendChat((prevChat) => {
-        // if it's the first message, return an array with the new message
-        if (!Array.isArray(prevChat)) {
-          return [newMessage];
-        }
-        return [...prevChat, newMessage];
-      });
+      setFriendChat((prevChat) => [...prevChat, newMessage]);
     },
-    [setFriendChat]
+    []
   );
 
   const handleSocketNamespaceSwitch = async () => {
-    //then join the new namespace
     const newSocket = io(
       `${import.meta.env.VITE_BACKEND_API_URL}/${
         selectedFriend && "user_uuid" in selectedFriend ? "user" : "group"
       }`
     );
-
-    newSocket.emit("join", {
-      user_uuid: user?.user_uuid,
-    });
-
-    await setUser({ ...user, socket: newSocket } as User);
+    newSocket.emit("join", { user_uuid: user?.user_uuid });
+    setUser({ ...user, socket: newSocket } as User);
   };
 
   useEffect(() => {
@@ -114,38 +96,34 @@ export default function HomePage() {
     }
   }, [user?.socket, selectedFriend]);
 
-  // checks if selected friend has changed, if it has it updates the friend chat based on that
-  // useEffect(() => {
-  //   if (selectedFriend && "user_uuid" in selectedFriend) {
-  //     startChatting(selectedFriend as MiniUser);
-  //   } else if (selectedFriend && "group_uuid" in selectedFriend) {
-  //     startGroupChatting(selectedFriend as MiniGroup);
-  //   }
-  // }, [selectedFriend]);
-
   //waits for incoming messages
   useEffect(() => {
-    if (user?.socket) {
-      const messageType =
-        selectedFriend && "user_uuid" in selectedFriend
-          ? "message"
-          : "group message";
-      user?.socket.on(
-        messageType,
-        (data: { sender: MiniUser; message: string; date: Date }) =>
+    try {
+      if (user?.socket) {
+        const messageType =
+          selectedFriend && "user_uuid" in selectedFriend
+            ? "message"
+            : "group message";
+        user?.socket.on(
+          messageType,
+          (data: { sender: MiniUser; message: string; date: Date }) =>
+            updateFriendChat({
+              sender: data.sender,
+              message: data.message,
+              date: data.date,
+            })
+        );
+        user?.socket.on("new join", (data: MiniUser) => {
           updateFriendChat({
-            sender: data.sender,
-            message: data.message,
-            date: data.date,
-          })
-      );
-      user.socket.on("new join", (data: MiniUser) => {
-        updateFriendChat({
-          sender: data,
-          message: `${data.username} has joined the chat`,
-          date: new Date(),
+            sender: data,
+            message: `${data.username} has joined the chat`,
+            date: new Date(),
+          });
         });
-      });
+      }
+    } catch {
+      console.log("socket error");
+      navigate("/");
     }
   }, [user?.socket, updateFriendChat]);
 
@@ -452,6 +430,7 @@ export default function HomePage() {
           className="p-2 rounded-md bg-gray-500 hover:bg-gray-700"
           aria-label="Logout"
           onClick={() => {
+            localStorage.clear();
             logout(user);
             setUser(null);
           }}

@@ -79,10 +79,10 @@ loginController.post("/password", (req, res, next) => {
         .collection("users")
         .findOne({ email: user.email }, { projection: { chat: 0 } });
 
-      console.log(
-        "login.mjs - 81 -pulled user from login credentials",
-        returnedUser
-      );
+      // console.log(
+      //   "login.mjs - 81 -pulled user from login credentials",
+      //   returnedUser
+      // );
 
       await User.updateOne(
         { user_uuid: returnedUser.user_uuid },
@@ -97,8 +97,17 @@ loginController.post("/password", (req, res, next) => {
         }
       );
 
-      console.log("login.mjs - 88 - logged in"); // Log after successful login
-      res.status(200).json({ pulledUser: returnedUser, token: jwttoken });
+      req.session.token = jwttoken;
+      req.session.user = returnedUser;
+      req.session.isLoggedOut = false;
+      req.session.save((err) => {
+        if (err) {
+          console.error("Error saving session:", err);
+        } else {
+          console.log("Session saved with session ID:", req.sessionID);
+          res.status(200).json({ pulledUser: returnedUser, token: jwttoken });
+        }
+      });
     });
   })(req, res, next);
 });
@@ -112,6 +121,15 @@ loginController.post("/sign_out", (req, res, next) => {
       { user_uuid: req.body.user_uuid },
       { $set: { online: false } }
     );
+
+    req.session.isLoggedOut = true;
+    req.session.save((err) => {
+      if (err) {
+        console.error("Error saving session:", err);
+      } else {
+        console.log("Session saved with session ID:", req.sessionID);
+      }
+    });
     res.redirect("/");
   });
 });
