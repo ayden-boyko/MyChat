@@ -420,7 +420,7 @@ export default function HomePage() {
   );
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen ">
       {/* Settings Sidebar */}
       <aside className="w-16 bg-gray-800 text-white p-4 flex flex-col items-center justify-between">
         <div className="space-y-4">
@@ -461,7 +461,7 @@ export default function HomePage() {
       </aside>
 
       {/* Group and Direct Messages Sidebar */}
-      <aside className="w-64 bg-white border-r hidden md:block">
+      <aside className="w-64  border-r hidden md:block">
         <ScrollArea className="h-full">
           <SidebarContent />
         </ScrollArea>
@@ -469,7 +469,7 @@ export default function HomePage() {
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col">
-        <header className="bg-white border-b p-4">
+        <header className="border-b p-4">
           <div className="flex justify-between items-center">
             <h1 className="text-xl font-semibold">
               Messages to{" "}
@@ -483,7 +483,7 @@ export default function HomePage() {
                   Chats <ChevronDown className="ml-2 h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 bg-white">
+              <DropdownMenuContent className="w-56 ">
                 <DropdownMenuLabel>Chats</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <ScrollArea className="h-[400px]">
@@ -532,7 +532,7 @@ export default function HomePage() {
                             {msg.sender.username[0]}
                           </AvatarFallback>
                         </Avatar>
-                        <div className="max-w-xs p-2 rounded-md bg-gray-200 text-black">
+                        <div className="max-w-xs p-2 rounded-md  text-black">
                           <p className="text-xs font-semibold">
                             {(selectedFriend as MiniUser)?.username ||
                               (selectedFriend as MiniGroup)?.group_name}

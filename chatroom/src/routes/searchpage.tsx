@@ -142,7 +142,7 @@ export default function SearchPage() {
           variant="outline"
           size="icon"
           onClick={() => {
-            /* navigate to home */
+            navigate("/home");
           }}
           aria-label="Go to homepage"
         >

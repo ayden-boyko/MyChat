@@ -42,6 +42,8 @@ function App() {
     MiniUser | MiniGroup | null
   >(null); // for use with individual friends or groups
 
+  // TODO set colors for the pages
+
   return (
     <div className="App min-h-screen w-full overflow-x-hidden">
       <UserContext.Provider value={{ user, setUser }}>
