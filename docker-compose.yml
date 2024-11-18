@@ -9,8 +9,16 @@ services:
       - backend
     env_file:
       - .env.docker
+    networks:
+      - app-network
 
   backend:
     build: ./backend
     ports:
       - "8000:8000"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

@@ -1,7 +1,6 @@
 "use strict";
 //local imports
 import "./loadEnviroment.mjs"; // Load environment variables
-import db from "./db/conn.mjs";
 import userController from "./controllers/account.mjs";
 import loginController from "./controllers/login.mjs";
 import friendController from "./controllers/friend.mjs";

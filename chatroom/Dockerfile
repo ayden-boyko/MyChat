@@ -20,4 +20,4 @@ COPY .env.docker ./.env
 EXPOSE 5173
 
 # Run the command to start the web app when the container launches
-CMD ["npm", "run", "dev", "--", "--host"]
+CMD ["npm", "run", "build"]
