@@ -70,8 +70,8 @@ export default function LoginPage() {
   };
   return (
     <div className="min-h-screen flex items-center justify-center p-4  dark:from-gray-900 dark:to-gray-800">
-      <Card className="w-full max-w-[90%] sm:max-w-md md:max-w-lg lg:max-w-xl bg-white dark:bg-gray-800 shadow-lg">
-        <CardHeader className="space-y-1 bg-blue-50 dark:bg-gray-700 rounded-t-lg">
+      <Card className="w-full max-w-[90%] sm:max-w-md md:max-w-lg lg:max-w-xl bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+        <CardHeader className="space-y-1 bg-blue-50 dark:bg-gray-700 ">
           <CardTitle className="text-xl sm:text-2xl font-bold text-center text-blue-700 dark:text-blue-300">
             Welcome Back
           </CardTitle>
@@ -101,7 +101,7 @@ export default function LoginPage() {
                 placeholder="test@example.com"
                 required
                 autoFocus
-                className="w-full border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
+                className="w-full border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 text-gray-700 dark:text-gray-200"
               />
             </div>
             <div className="space-y-2">
@@ -117,7 +117,7 @@ export default function LoginPage() {
                 type="text"
                 placeholder="User123"
                 required
-                className="w-full border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
+                className="w-full border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 text-gray-700 dark:text-gray-200"
               />
             </div>
             <div className="space-y-2">
@@ -133,7 +133,7 @@ export default function LoginPage() {
                   type="password"
                   name="password"
                   required
-                  className="w-full pr-10 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
+                  className="w-full pr-10 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 text-gray-700 dark:text-gray-200"
                 />
                 <img
                   src="./src/assets/eye_closed.svg"

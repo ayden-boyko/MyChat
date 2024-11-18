@@ -356,7 +356,7 @@ export default function HomePage() {
           <li>
             <Button
               variant="ghost"
-              className="w-full justify-start text-blue-600 dark:text-blue-400 bg-blue-100 hover:bg-blue-200 dark:hover:bg-blue-900"
+              className="w-full justify-start text-blue-600 dark:text-blue-600 bg-blue-100 hover:bg-blue-200 dark:hover:bg-blue-900 dark:hover:text-gray-300"
               onClick={() => setCreateGroup(true)}
             >
               <PlusCircle className="mr-2" />
@@ -374,7 +374,7 @@ export default function HomePage() {
               <li key={index}>
                 <Button
                   variant="ghost"
-                  className="w-full justify-start text-gray-700 dark:text-gray-300 bg-blue-100 hover:bg-blue-200 dark:hover:bg-blue-900"
+                  className="w-full justify-start text-gray-700 dark:text-gray-900 bg-blue-100 hover:bg-blue-200 dark:hover:bg-blue-900 dark:hover:text-gray-300"
                   onClick={() => {
                     if (selectedFriend === friend) {
                       setViewProfile(true);

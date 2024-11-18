@@ -590,6 +590,9 @@ body {
   width: 100%;
   overflow-x: hidden;
   background-image: linear-gradient(to bottom right, #ebf8ff, #e9d8fd);
+  dark {
+    background-image: linear-gradient(to bottom right, #363636, #1a1a1a);
+  }
 }
 
 a {

@@ -150,12 +150,12 @@ export default function SearchPage() {
           <Home className="h-4 w-4" />
         </Button>
       </div>
-      <Card className="w-full max-w-3xl mx-auto bg-white dark:bg-gray-800 shadow-lg">
-        <CardHeader className=" dark:bg-gray-700 rounded-t-lg">
+      <Card className="w-full max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+        <CardHeader className=" dark:bg-gray-700 ">
           <CardTitle className="text-2xl sm:text-3xl text-blue-700 dark:text-blue-300">
             Search
           </CardTitle>
-          <CardDescription className="text-gray-600 dark:text-gray-300">
+          <CardDescription className="text-gray-700 dark:text-gray-300 ">
             Find people and groups
           </CardDescription>
         </CardHeader>
@@ -165,7 +165,7 @@ export default function SearchPage() {
               placeholder="Search for people or groups..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-grow border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
+              className="flex-grow text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
             />
             <Button
               onClick={handleSearch}
@@ -180,14 +180,14 @@ export default function SearchPage() {
               <TabsTrigger
                 value="people"
                 onClick={() => setCollection("users")}
-                className="data-[state=active]:bg-white data-[state=inactive]:bg-gray-200 dark:data-[state=active]:bg-gray-200 data-[state=active]:text-blue-700 dark:data-[state=active]:text-blue-300"
+                className="data-[state=active]:bg-white data-[state=inactive]:bg-gray-200 dark:data-[state=inactive]:bg-gray-700 dark:data-[state=active]:bg-gray-200 data-[state=active]:text-blue-700 dark:data-[state=active]:text-blue-700"
               >
                 People
               </TabsTrigger>
               <TabsTrigger
                 value="groups"
                 onClick={() => setCollection("groups")}
-                className="data-[state=active]:bg-white data-[state=inactive]:bg-gray-200 dark:data-[state=active]:bg-gray-200 data-[state=active]:text-blue-700 dark:data-[state=active]:text-blue-300"
+                className="data-[state=active]:bg-white data-[state=inactive]:bg-gray-200 dark:data-[state=inactive]:bg-gray-700 dark:data-[state=active]:bg-gray-200 data-[state=active]:text-blue-700 dark:data-[state=active]:text-blue-700"
               >
                 Groups
               </TabsTrigger>

@@ -1,7 +1,7 @@
 //external
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { Home } from "lucide-react";
+import { Home, Moon, Sun } from "lucide-react";
 import imageCompression from "browser-image-compression";
 
 //internal
@@ -30,9 +30,11 @@ import {
 } from "../components/ui/alert-dialog";
 import { UserContext } from "../lib/UserContext";
 import { User } from "../interfaces/userinterface";
+import { DarkContext } from "../lib/DarkContext";
 
 export default function SettingsPage() {
   const context = useContext(UserContext);
+  const themeContext = useContext(DarkContext);
   const navigate = useNavigate();
 
   if (!context) {
@@ -40,6 +42,7 @@ export default function SettingsPage() {
     throw new Error("SomeChildComponent must be used within a UserProvider");
   }
   const { user, setUser } = context;
+  const { darkMode, setDarkMode } = themeContext;
 
   if (user?.username === "") {
     navigate("/");
@@ -124,7 +127,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8 min-h-screen  dark:from-gray-900 dark:to-gray-800">
+    <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8 min-h-screen   dark:from-gray-900 dark:to-gray-800">
       <div className="absolute top-4 right-4">
         <Button
           variant="outline"
@@ -138,8 +141,8 @@ export default function SettingsPage() {
           <Home className="h-4 w-4" />
         </Button>
       </div>
-      <Card className="max-w-2xl mx-auto bg-white dark:bg-gray-800 shadow-lg">
-        <CardHeader className="bg-blue-50 dark:bg-gray-700 rounded-t-lg">
+      <Card className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+        <CardHeader className="bg-blue-50 dark:bg-gray-700 ">
           <CardTitle className="text-2xl sm:text-3xl text-blue-700 dark:text-blue-300">
             Account Settings
           </CardTitle>
@@ -167,7 +170,7 @@ export default function SettingsPage() {
                 type="file"
                 accept="image/*"
                 onChange={handleAvatarChange}
-                className="w-full sm:w-auto border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
+                className="w-full sm:w-auto border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 dark:text-gray-300 texy-gray-700"
               />
             </div>
           </div>
@@ -181,8 +184,25 @@ export default function SettingsPage() {
             <Input
               id="username"
               defaultValue={user?.username}
-              className="w-full border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
+              className="w-full border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 dark:text-gray-300 texy-gray-700"
             />
+          </div>
+          <div className="space-y-2 flex items-center gap-4 ">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setDarkMode(!darkMode)}
+              className="bg-white hover:bg-gray-100 "
+            >
+              {darkMode ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
+            </Button>
+            <Label className="text-gray-700 dark:text-gray-200">
+              Dark Mode
+            </Label>
           </div>
         </CardContent>
         <CardFooter className="flex flex-col sm:flex-row justify-between space-y-4 sm:space-y-0 bg-gray-50 dark:bg-gray-700 rounded-b-lg">

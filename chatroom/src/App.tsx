@@ -7,6 +7,7 @@ import { Socket } from "socket.io-client";
 import "./output.css";
 import { FriendContext } from "./lib/FriendContext.ts";
 import { UserContext } from "./lib/UserContext.ts";
+import { DarkContext } from "./lib/DarkContext.ts";
 
 //routes
 import HomePage from "./routes/homepage.tsx";
@@ -106,40 +107,56 @@ function App() {
     }
   }, [location, navigate, user, isSessionLoaded]);
 
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+      document.body.style.backgroundImage =
+        "linear-gradient(to bottom right, #363636, #1a1a1a)";
+    } else {
+      document.documentElement.classList.remove("dark");
+      document.body.style.backgroundImage =
+        "linear-gradient(to bottom right, #ebf8ff, #e9d8fd)";
+    }
+  }, [darkMode]);
+
   return (
     <div className="App min-h-screen w-full overflow-x-hidden">
-      <UserContext.Provider value={{ user, setUser }}>
-        <Routes>
-          <Route path="/" element={<LoginPage />} />
+      <DarkContext.Provider value={{ darkMode, setDarkMode }}>
+        <UserContext.Provider value={{ user, setUser }}>
+          <Routes>
+            <Route path="/" element={<LoginPage />} />
 
-          {/* specifically for handling notifications/chats */}
+            {/* specifically for handling notifications/chats */}
 
-          <Route
-            path="/home"
-            element={
-              <FriendContext.Provider
-                value={{ selectedFriend, setSelectedFriend }}
-              >
-                <HomePage />
-              </FriendContext.Provider>
-            }
-          />
-          <Route
-            path="/notifications"
-            element={
-              <FriendContext.Provider
-                value={{ selectedFriend, setSelectedFriend }}
-              >
-                <NotificationPage />
-              </FriendContext.Provider>
-            }
-          />
+            <Route
+              path="/home"
+              element={
+                <FriendContext.Provider
+                  value={{ selectedFriend, setSelectedFriend }}
+                >
+                  <HomePage />
+                </FriendContext.Provider>
+              }
+            />
+            <Route
+              path="/notifications"
+              element={
+                <FriendContext.Provider
+                  value={{ selectedFriend, setSelectedFriend }}
+                >
+                  <NotificationPage />
+                </FriendContext.Provider>
+              }
+            />
 
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/sign_up" element={<SignUpPage />} />
-          <Route path="/search" element={<SearchPage />} />
-        </Routes>
-      </UserContext.Provider>
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/sign_up" element={<SignUpPage />} />
+            <Route path="/search" element={<SearchPage />} />
+          </Routes>
+        </UserContext.Provider>
+      </DarkContext.Provider>
     </div>
   );
 }
