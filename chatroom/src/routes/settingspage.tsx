@@ -124,7 +124,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8 min-h-screen  dark:from-gray-900 dark:to-gray-800">
       <div className="absolute top-4 right-4">
         <Button
           variant="outline"
@@ -133,74 +133,92 @@ export default function SettingsPage() {
             navigate("/home");
           }}
           aria-label="Go to homepage"
+          className="bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700"
         >
           <Home className="h-4 w-4" />
         </Button>
       </div>
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle className="text-2xl sm:text-3xl">
+      <Card className="max-w-2xl mx-auto bg-white dark:bg-gray-800 shadow-lg">
+        <CardHeader className="bg-blue-50 dark:bg-gray-700 rounded-t-lg">
+          <CardTitle className="text-2xl sm:text-3xl text-blue-700 dark:text-blue-300">
             Account Settings
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-gray-600 dark:text-gray-300">
             Manage your account settings and set email preferences.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 pt-6">
           <div className="space-y-2">
-            <Label htmlFor="avatar">Profile Picture</Label>
+            <Label
+              htmlFor="avatar"
+              className="text-gray-700 dark:text-gray-200"
+            >
+              Profile Picture
+            </Label>
             <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
-              <Avatar className="w-20 h-20">
+              <Avatar className="w-20 h-20 border-2 border-blue-200 dark:border-blue-700">
                 <AvatarImage src={user?.user_profile} alt={user?.username} />
-                <AvatarFallback>{"NONE"}</AvatarFallback>
+                <AvatarFallback className="bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300">
+                  {"NONE"}
+                </AvatarFallback>
               </Avatar>
               <Input
                 id="avatar"
                 type="file"
                 accept="image/*"
                 onChange={handleAvatarChange}
-                className="w-full sm:w-auto"
+                className="w-full sm:w-auto border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
               />
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
+            <Label
+              htmlFor="username"
+              className="text-gray-700 dark:text-gray-200"
+            >
+              Username
+            </Label>
             <Input
               id="username"
               defaultValue={user?.username}
-              className="w-full"
+              className="w-full border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
             />
           </div>
         </CardContent>
-        <CardFooter className="flex flex-col sm:flex-row justify-between space-y-4 sm:space-y-0">
+        <CardFooter className="flex flex-col sm:flex-row justify-between space-y-4 sm:space-y-0 bg-gray-50 dark:bg-gray-700 rounded-b-lg">
           <Button
             variant="outline"
             onClick={handleSaveChanges}
-            className="w-full sm:w-auto"
+            className="w-full sm:w-auto bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
           >
             Save Changes
           </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive" className="w-full sm:w-auto">
+              <Button
+                variant="destructive"
+                className="w-full sm:w-auto bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 transition-colors"
+              >
                 Delete Account
               </Button>
             </AlertDialogTrigger>
-            <AlertDialogContent className="max-w-md mx-auto bg-white">
+            <AlertDialogContent className="max-w-md mx-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
               <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
+                <AlertDialogTitle className="text-gray-900 dark:text-gray-100">
+                  Are you absolutely sure?
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-gray-600 dark:text-gray-300">
                   This action cannot be undone. This will permanently delete
                   your account and remove your data from our servers.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2">
-                <AlertDialogCancel className="w-full sm:w-auto">
+                <AlertDialogCancel className="w-full sm:w-auto bg-gray-100 text-gray-900 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600">
                   Cancel
                 </AlertDialogCancel>
                 <AlertDialogAction
                   onClick={handleDeleteAccount}
-                  className="w-full sm:w-auto"
+                  className="w-full sm:w-auto bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
                 >
                   Yes, delete my account
                 </AlertDialogAction>

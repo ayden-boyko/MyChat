@@ -106,8 +106,6 @@ function App() {
     }
   }, [location, navigate, user, isSessionLoaded]);
 
-  // TODO set colors for the pages
-
   return (
     <div className="App min-h-screen w-full overflow-x-hidden">
       <UserContext.Provider value={{ user, setUser }}>

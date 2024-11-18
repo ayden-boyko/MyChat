@@ -215,21 +215,29 @@ export default function NotificationPage() {
   ];
 
   return (
-    <div className="flex flex-col h-screen">
-      <header className="flex justify-between items-center p-4 border-b">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-900 dark:to-gray-800">
+      <header className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
         <div className="flex items-center space-x-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon" className="md:hidden">
+              <Button
+                variant="outline"
+                size="icon"
+                className="md:hidden bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700"
+              >
                 <Filter className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-white">
+            <DropdownMenuContent className="bg-white dark:bg-gray-800">
               {filterOptions.map((option) => (
                 <DropdownMenuItem
                   key={option.value}
                   onSelect={() => setActiveFilter(option.value)}
-                  className={option.value === activeFilter ? "bg-gray-200" : ""}
+                  className={`${
+                    option.value === activeFilter
+                      ? "bg-blue-100 dark:bg-blue-900"
+                      : ""
+                  } text-gray-700 dark:text-gray-300`}
                 >
                   <option.icon className="mr-2 h-4 w-4" />
                   <span>{option.label}</span>
@@ -237,19 +245,22 @@ export default function NotificationPage() {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          <h1 className="text-2xl font-bold">Notifications</h1>
+          <h1 className="text-2xl font-bold text-blue-700 dark:text-blue-300">
+            Notifications
+          </h1>
         </div>
         <Button
           variant="outline"
           size="icon"
           onClick={() => navigate("/home")}
           aria-label="Go to homepage"
+          className="bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700"
         >
           <Home className="h-4 w-4" />
         </Button>
       </header>
       <div className="flex flex-1 overflow-hidden">
-        <aside className="hidden md:block w-64 p-4 border-r overflow-y-auto">
+        <aside className="hidden md:block w-64 p-4 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-y-auto">
           <nav>
             <ul className="space-y-2">
               {filterOptions.map((option) => (
@@ -258,7 +269,11 @@ export default function NotificationPage() {
                     variant={
                       activeFilter === option.value ? "default" : "ghost"
                     }
-                    className="w-full justify-start"
+                    className={`w-full justify-start ${
+                      activeFilter === option.value
+                        ? "bg-blue-600 text-white"
+                        : "text-gray-700 dark:text-gray-300"
+                    }`}
                     onClick={() => setActiveFilter(option.value)}
                   >
                     <option.icon className="mr-2 h-4 w-4" />
@@ -270,20 +285,22 @@ export default function NotificationPage() {
           </nav>
         </aside>
         <main className="flex-1 p-4 overflow-auto">
-          <Card className="w-full max-w-4xl mx-auto">
-            <CardHeader>
-              <CardDescription className="text-xl sm:text-2xl font-bold">
+          <Card className="w-full max-w-4xl mx-auto bg-white dark:bg-gray-800 shadow-lg">
+            <CardHeader className="bg-blue-50 dark:bg-gray-700 rounded-t-lg">
+              <CardDescription className="text-xl sm:text-2xl font-bold text-blue-700 dark:text-blue-300">
                 Stay updated with your latest activities
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ScrollArea className="h-[calc(100vh-250px)] w-full rounded-md border p-4">
+              <ScrollArea className="h-[calc(100vh-250px)] w-full rounded-md border border-gray-200 dark:border-gray-700 p-4">
                 {filteredNotifications?.length === 0 ? (
-                  <p>No notifications</p>
+                  <p className="text-gray-500 dark:text-gray-400">
+                    No notifications
+                  </p>
                 ) : (
                   filteredNotifications?.map((notification, index) => (
                     <div key={index} className="mb-4 last:mb-0">
-                      <Card>
+                      <Card className="bg-white dark:bg-gray-800 shadow">
                         <CardContent className="p-4">
                           <div className="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-4">
                             <Avatar>
@@ -291,15 +308,15 @@ export default function NotificationPage() {
                                 src={notification.sender.user_profile}
                                 alt={notification.sender.username}
                               />
-                              <AvatarFallback>
+                              <AvatarFallback className="bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300">
                                 {notification.sender.username[0]}
                               </AvatarFallback>
                             </Avatar>
                             <div className="flex-1 space-y-1">
-                              <p className="text-sm font-medium leading-none">
+                              <p className="text-sm font-medium leading-none text-gray-900 dark:text-gray-100">
                                 {notification.payload}
                               </p>
-                              <p className="text-sm text-muted-foreground">
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
                                 {formatDate(notification.date)}
                               </p>
                             </div>
@@ -311,6 +328,7 @@ export default function NotificationPage() {
                                   onClick={() =>
                                     handleAction(notification, "accept")
                                   }
+                                  className="bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
                                 >
                                   {notification.catagory === 4 ||
                                   notification.catagory === 5 ||
@@ -324,6 +342,7 @@ export default function NotificationPage() {
                                   onClick={() =>
                                     handleAction(notification, "decline")
                                   }
+                                  className="border-blue-600 text-blue-600 hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-gray-700"
                                 >
                                   {notification.catagory === 4 ||
                                   notification.catagory === 5 ||

@@ -142,56 +142,71 @@ export default function FriendProfilePopup({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <Card className="w-full max-w-md bg-white">
-        <CardHeader className="relative">
+      <Card className="w-full max-w-md bg-white dark:bg-gray-800 rounded shadow-lg">
+        <CardHeader className="relative bg-blue-50 dark:bg-gray-700 ">
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-2 top-2"
+            className="absolute right-2 top-2 bg-gray-400 text-gray-700 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             onClick={onClose}
             aria-label="Close profile"
           >
             <X className="h-4 w-4" />
           </Button>
           <div className="flex items-center space-x-4">
-            <Avatar className="h-20 w-20">
+            <Avatar className="h-20 w-20 border-2 border-blue-200 dark:border-blue-700">
               <AvatarImage src={friend.user_profile || ""} />
-              <AvatarFallback>{friend.username[0]}</AvatarFallback>
+              <AvatarFallback className="bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300">
+                {friend.username[0]}
+              </AvatarFallback>
             </Avatar>
             <div>
-              <CardTitle>{friend.username}</CardTitle>
-              <p className="text-sm text-muted-foreground">
+              <CardTitle className="text-blue-700 dark:text-blue-300">
+                {friend.username}
+              </CardTitle>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 @{friend.username}
               </p>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <div className="space-y-4">
             <div className="flex space-x-2">
-              <Button onClick={handleFriendAction} variant={"default"}>
+              <Button
+                onClick={handleFriendAction}
+                variant="default"
+                className="bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
+              >
                 <UserMinus className="mr-2 h-4 w-4" /> Unfriend
               </Button>
-              <Button onClick={handleBlockAction} variant={"secondary"}>
+              <Button
+                onClick={handleBlockAction}
+                variant="secondary"
+                className="bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+              >
                 <Ban className="mr-2 h-4 w-4" /> Block
               </Button>
             </div>
-            {/* group invite menu */}
-
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant={"outline"}>Invite to Group</Button>
+                <Button
+                  variant="outline"
+                  className="w-full border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                >
+                  Invite to Group
+                </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-white">
+              <DropdownMenuContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
                 {user?.groups?.map((group, index) => (
                   <DropdownMenuItem
                     onClick={() => handleInviteToGroup(group)}
                     key={index}
+                    className="text-gray-700 hover:bg-blue-100 dark:text-gray-300 dark:hover:bg-blue-900"
                   >
                     <PlusCircleIcon className="mr-2 h-4 w-4" />
-                    {`Invite to
-                    ${group.group_name}`}
-                    <Avatar className="ml-2 h-4 w-4 border border-black p-3">
+                    {`Invite to ${group.group_name}`}
+                    <Avatar className="ml-2 h-4 w-4 border border-gray-300 dark:border-gray-600 p-3">
                       <AvatarImage src={group.group_profile} />
                       <AvatarFallback
                         style={{
@@ -199,6 +214,7 @@ export default function FriendProfilePopup({
                           alignItems: "center",
                           justifyContent: "center",
                         }}
+                        className="bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300"
                       >
                         {group.group_name[0]}
                       </AvatarFallback>

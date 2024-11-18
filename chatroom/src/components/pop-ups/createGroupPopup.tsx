@@ -64,6 +64,7 @@ export default function GroupCreationPopup({
         }/api/groups/create/${groupName}`,
         {
           method: "POST",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
@@ -98,6 +99,17 @@ export default function GroupCreationPopup({
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
+
+      //checks that image isn tlarger than 500x500
+      const image = new Image();
+      image.src = URL.createObjectURL(file);
+      image.onload = () => {
+        if (image.width > 500 || image.height > 500) {
+          alert("Please choose an image with a size smaller than 500 x 500");
+          setGroupAvatar("");
+        }
+      };
+
       reader.onloadend = () => {
         setGroupAvatar(reader.result as string);
       };
@@ -117,32 +129,46 @@ export default function GroupCreationPopup({
     >
       <div
         ref={modalRef}
-        className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md"
+        className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md shadow-lg"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 id="modal-title" className="text-2xl font-bold mb-4">
+        <h2
+          id="modal-title"
+          className="text-2xl font-bold mb-4 text-blue-700 dark:text-blue-300"
+        >
           Create New Group
         </h2>
         <form onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="groupName">Name</Label>
+              <Label
+                htmlFor="groupName"
+                className="text-gray-700 dark:text-gray-300"
+              >
+                Name
+              </Label>
               <Input
                 id="groupName"
                 value={groupName}
                 onChange={(e) => setGroupName(e.target.value)}
                 required
+                className="border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
               />
             </div>
             <div>
-              <Label htmlFor="groupAvatar">Avatar</Label>
+              <Label
+                htmlFor="groupAvatar"
+                className="text-gray-700 dark:text-gray-300"
+              >
+                Avatar
+              </Label>
               <div className="flex items-center gap-4">
-                <Avatar className="h-16 w-16">
+                <Avatar className="h-16 w-16 border-2 border-blue-200 dark:border-blue-700">
                   <AvatarImage
                     src={groupAvatar || undefined}
                     alt="Group Avatar"
                   />
-                  <AvatarFallback>
+                  <AvatarFallback className="bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300">
                     <PlusCircle className="h-8 w-8" />
                   </AvatarFallback>
                 </Avatar>
@@ -155,7 +181,7 @@ export default function GroupCreationPopup({
                 />
                 <Label
                   htmlFor="groupAvatar"
-                  className="cursor-pointer text-sm text-muted-foreground hover:text-primary"
+                  className="cursor-pointer text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                 >
                   Upload Image
                 </Label>
@@ -163,10 +189,20 @@ export default function GroupCreationPopup({
             </div>
           </div>
           <div className="mt-6 flex justify-end space-x-2">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              className="border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+            >
               Cancel
             </Button>
-            <Button type="submit">Create Group</Button>
+            <Button
+              type="submit"
+              className="bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
+            >
+              Create Group
+            </Button>
           </div>
         </form>
       </div>

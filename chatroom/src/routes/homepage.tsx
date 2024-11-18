@@ -320,16 +320,16 @@ export default function HomePage() {
   const SidebarContent = ({ inDropdown = false }) => (
     <>
       <div className={inDropdown ? "" : "p-4"}>
-        <h2 className="text-lg font-semibold mb-2">Groups</h2>
+        <h2 className="text-lg font-semibold mb-2 text-blue-700 dark:text-blue-300">
+          Groups
+        </h2>
         <ul className="space-y-2">
-          {user?.groups === undefined ||
-          user?.groups === null ||
-          user?.groups.length === 0 ? (
-            user?.groups.map((group, index) => (
+          {user?.groups && user.groups.length > 0 ? (
+            user.groups.map((group: MiniGroup, index: number) => (
               <li key={index}>
                 <Button
                   variant="ghost"
-                  className="w-full justify-start"
+                  className="w-full justify-start text-gray-700 dark:text-gray-300 bg-blue-100 hover:bg-blue-200 dark:hover:bg-blue-900 "
                   onClick={() => {
                     if (selectedFriend === group) {
                       setViewProfile(true);
@@ -349,12 +349,14 @@ export default function HomePage() {
               </li>
             ))
           ) : (
-            <li>No groups found</li>
+            <li className="text-gray-500 dark:text-gray-400">
+              No groups found
+            </li>
           )}
           <li>
             <Button
               variant="ghost"
-              className="w-full justify-start"
+              className="w-full justify-start text-blue-600 dark:text-blue-400 bg-blue-100 hover:bg-blue-200 dark:hover:bg-blue-900"
               onClick={() => setCreateGroup(true)}
             >
               <PlusCircle className="mr-2" />
@@ -362,17 +364,17 @@ export default function HomePage() {
             </Button>
           </li>
         </ul>
-        <Separator className="my-4" />
-        <h2 className="text-lg font-semibold mb-2">Direct Messages</h2>
+        <Separator className="my-4 bg-gray-200 dark:bg-gray-700" />
+        <h2 className="text-lg font-semibold mb-2 text-blue-700 dark:text-blue-300">
+          Direct Messages
+        </h2>
         <ul className="space-y-2">
-          {user?.friends === undefined ||
-          user?.friends === null ||
-          user?.friends.length !== 0 ? (
-            user?.friends.map((friend, index) => (
+          {user?.friends && user.friends.length > 0 ? (
+            user.friends.map((friend: MiniUser, index: number) => (
               <li key={index}>
                 <Button
                   variant="ghost"
-                  className="w-full justify-start"
+                  className="w-full justify-start text-gray-700 dark:text-gray-300 bg-blue-100 hover:bg-blue-200 dark:hover:bg-blue-900"
                   onClick={() => {
                     if (selectedFriend === friend) {
                       setViewProfile(true);
@@ -381,7 +383,7 @@ export default function HomePage() {
                     setSelectedFriend(friend);
                   }}
                 >
-                  <Avatar className="w-6 h-6 mr-2">
+                  <Avatar className="w-6 h-6 mr-2 border-black border-2">
                     <AvatarImage src={friend.user_profile} />
                     <AvatarFallback>{friend.username[0]}</AvatarFallback>
                   </Avatar>
@@ -390,7 +392,9 @@ export default function HomePage() {
               </li>
             ))
           ) : (
-            <li>No direct messages found</li>
+            <li className="text-gray-500 dark:text-gray-400">
+              No direct messages found
+            </li>
           )}
         </ul>
       </div>
@@ -398,27 +402,27 @@ export default function HomePage() {
   );
 
   return (
-    <div className="flex h-screen ">
+    <div className="flex h-screen bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-900 dark:to-gray-800">
       {/* Settings Sidebar */}
-      <aside className="w-16 bg-gray-800 text-white p-4 flex flex-col items-center justify-between">
+      <aside className="w-16 bg-blue-600 dark:bg-gray-800 text-white p-4 flex flex-col items-center justify-between">
         <div className="space-y-4">
           <button
-            className="p-2 rounded-md bg-gray-500 hover:bg-gray-700"
+            className="p-2 rounded-md bg-blue-500 hover:bg-blue-700 dark:bg-gray-700 dark:hover:bg-gray-600"
             aria-label="Settings"
             onClick={() => navigate("/settings")}
           >
             <Settings />
           </button>
           <button
-            className="p-2 rounded-md bg-gray-500 hover:bg-gray-700"
+            className="p-2 rounded-md bg-blue-500 hover:bg-blue-700 dark:bg-gray-700 dark:hover:bg-gray-600"
             aria-label="Search"
             onClick={() => navigate("/search")}
           >
             <Search />
           </button>
           <button
-            className={`p-2 rounded-md bg-gray-500 hover:bg-gray-700 ${
-              user?.notifications?.length !== 0 ? "ring-2 ring-red-500" : ""
+            className={`p-2 rounded-md bg-blue-500 hover:bg-blue-700 dark:bg-gray-700 dark:hover:bg-gray-600 ${
+              user?.notifications?.length !== 0 ? "ring-2 ring-white" : ""
             }`}
             aria-label="Notifications"
             onClick={() => navigate("/notifications")}
@@ -427,7 +431,7 @@ export default function HomePage() {
           </button>
         </div>
         <button
-          className="p-2 rounded-md bg-gray-500 hover:bg-gray-700"
+          className="p-2 rounded-md bg-blue-500 hover:bg-blue-700 dark:bg-gray-700 dark:hover:bg-gray-600"
           aria-label="Logout"
           onClick={() => {
             localStorage.clear();
@@ -440,17 +444,17 @@ export default function HomePage() {
       </aside>
 
       {/* Group and Direct Messages Sidebar */}
-      <aside className="w-64  border-r hidden md:block">
+      <aside className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 hidden md:block">
         <ScrollArea className="h-full">
           <SidebarContent />
         </ScrollArea>
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col">
-        <header className="border-b p-4">
+      <main className="flex-1 flex flex-col bg-white dark:bg-gray-800">
+        <header className="border-b border-gray-200 dark:border-gray-700 p-4">
           <div className="flex justify-between items-center">
-            <h1 className="text-xl font-semibold">
+            <h1 className="text-xl font-semibold text-blue-700 dark:text-blue-300">
               Messages to{" "}
               {(selectedFriend as MiniUser)?.username ||
                 (selectedFriend as MiniGroup)?.group_name}{" "}
@@ -462,9 +466,11 @@ export default function HomePage() {
                   Chats <ChevronDown className="ml-2 h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 ">
-                <DropdownMenuLabel>Chats</DropdownMenuLabel>
-                <DropdownMenuSeparator />
+              <DropdownMenuContent className="w-56 bg-white dark:bg-gray-800">
+                <DropdownMenuLabel className="text-blue-700 dark:text-blue-300">
+                  Chats
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
                 <ScrollArea className="h-[400px]">
                   <SidebarContent inDropdown={true} />
                 </ScrollArea>
@@ -475,7 +481,7 @@ export default function HomePage() {
         <ScrollArea className="flex-1 p-4">
           <div className="space-y-4">
             {friendChat?.length === 0 || selectedFriend === null ? (
-              <p>No messages</p>
+              <p className="text-gray-500 dark:text-gray-400">No messages</p>
             ) : (
               friendChat
                 ?.filter((msg) => !user?.blocked?.includes(msg.sender))
@@ -488,7 +494,7 @@ export default function HomePage() {
                     {msg.sender.user_uuid === user?.user_uuid ? (
                       <div className="flex-1 flex justify-end">
                         <div className="flex space-x-2">
-                          <div className="max-w-xs p-2 rounded-md bg-blue-400 text-white">
+                          <div className="max-w-xs p-2 rounded-md bg-blue-500 text-white">
                             <p className="text-xs font-semibold">
                               {user?.username}
                             </p>
@@ -511,7 +517,7 @@ export default function HomePage() {
                             {msg.sender.username[0]}
                           </AvatarFallback>
                         </Avatar>
-                        <div className="max-w-xs p-2 rounded-md  text-black">
+                        <div className="max-w-xs p-2 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                           <p className="text-xs font-semibold">
                             {(selectedFriend as MiniUser)?.username ||
                               (selectedFriend as MiniGroup)?.group_name}
@@ -527,23 +533,28 @@ export default function HomePage() {
           </div>
         </ScrollArea>
         {selectedFriend === null ? (
-          <p className="text-center p-4">
+          <p className="text-center p-4 text-gray-500 dark:text-gray-400">
             Select a friend or group to start chatting
           </p>
         ) : (
-          <footer className="bg-white border-t p-4">
+          <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4">
             <form className="flex space-x-2" onSubmit={sendMessage}>
               <Input
-                className="flex-1"
+                className="flex-1 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
                 placeholder="Type a message..."
                 id="msg"
               />
-              <Button type="submit" size="icon">
+              <Button
+                type="submit"
+                size="icon"
+                className="bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+              >
                 <Send className="h-4 w-4" />
               </Button>
             </form>
           </footer>
         )}
+
         <GroupCreationPopup
           isOpen={createGroup}
           onClose={() => {

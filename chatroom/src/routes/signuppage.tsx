@@ -83,57 +83,77 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="container mx-auto flex min-h-screen items-center justify-center px-4 py-8">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center sm:text-3xl">
+    <div className="container mx-auto flex min-h-screen items-center justify-center px-4 py-8 dark:from-gray-900 dark:to-gray-800">
+      <Card className="w-full max-w-md bg-white dark:bg-gray-800 shadow-lg">
+        <CardHeader className="space-y-1 bg-blue-50 dark:bg-gray-700 rounded-t-lg">
+          <CardTitle className="text-2xl font-bold text-center sm:text-3xl text-blue-700 dark:text-blue-300">
             Create an account
           </CardTitle>
-          <CardDescription className="text-center">
+          <CardDescription className="text-center text-gray-600 dark:text-gray-300">
             Enter your details below to create your account
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <Label
+                htmlFor="username"
+                className="text-gray-700 dark:text-gray-200"
+              >
+                Username
+              </Label>
               <Input
                 id="username"
                 placeholder="johndoe"
                 required
-                className="w-full"
+                className="w-full border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label
+                htmlFor="email"
+                className="text-gray-700 dark:text-gray-200"
+              >
+                Email
+              </Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="john@example.com"
                 required
-                className="w-full"
+                className="w-full border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label
+                htmlFor="password"
+                className="text-gray-700 dark:text-gray-200"
+              >
+                Password
+              </Label>
               <Input
                 id="password"
                 type="password"
                 required
-                className="w-full"
+                className="w-full border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmedpassword">Confirm Password</Label>
+              <Label
+                htmlFor="confirmedpassword"
+                className="text-gray-700 dark:text-gray-200"
+              >
+                Confirm Password
+              </Label>
               <Input
                 id="confirmedpassword"
                 type="password"
                 required
-                className="w-full"
+                className="w-full border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
               />
             </div>
             <Button
-              className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+              className="w-full bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
               type="submit"
               disabled={isLoading}
             >
@@ -148,14 +168,20 @@ export default function SignUpPage() {
             </Button>
           </form>
         </CardContent>
-        <CardFooter>
-          <p className="text-sm text-muted-foreground text-center w-full px-4 sm:px-0">
+        <CardFooter className="bg-gray-50 dark:bg-gray-700 rounded-b-lg">
+          <p className="text-sm text-gray-600 dark:text-gray-300 text-center w-full px-4 sm:px-0">
             By clicking Sign Up, you agree to our{" "}
-            <a href="#" className="underline hover:text-primary">
+            <a
+              href="#"
+              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
+            >
               Terms of Service
             </a>{" "}
             and{" "}
-            <a href="#" className="underline hover:text-primary">
+            <a
+              href="#"
+              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
+            >
               Privacy Policy
             </a>
             .

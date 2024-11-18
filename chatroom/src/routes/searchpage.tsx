@@ -136,7 +136,7 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8 min-h-screen  dark:from-gray-900 dark:to-gray-800">
       <div className="absolute top-4 right-4">
         <Button
           variant="outline"
@@ -145,24 +145,32 @@ export default function SearchPage() {
             navigate("/home");
           }}
           aria-label="Go to homepage"
+          className="bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700"
         >
           <Home className="h-4 w-4" />
         </Button>
       </div>
-      <Card className="w-full max-w-3xl mx-auto">
-        <CardHeader>
-          <CardTitle className="text-2xl sm:text-3xl">Search</CardTitle>
-          <CardDescription>Find people and groups</CardDescription>
+      <Card className="w-full max-w-3xl mx-auto bg-white dark:bg-gray-800 shadow-lg">
+        <CardHeader className=" dark:bg-gray-700 rounded-t-lg">
+          <CardTitle className="text-2xl sm:text-3xl text-blue-700 dark:text-blue-300">
+            Search
+          </CardTitle>
+          <CardDescription className="text-gray-600 dark:text-gray-300">
+            Find people and groups
+          </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mb-6">
             <Input
               placeholder="Search for people or groups..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-grow"
+              className="flex-grow border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
             />
-            <Button onClick={handleSearch} className="w-full sm:w-auto">
+            <Button
+              onClick={handleSearch}
+              className="w-full sm:w-auto bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
+            >
               <Search className="mr-2 h-4 w-4" /> Search
             </Button>
           </div>
@@ -172,18 +180,20 @@ export default function SearchPage() {
               <TabsTrigger
                 value="people"
                 onClick={() => setCollection("users")}
+                className="data-[state=active]:bg-white data-[state=inactive]:bg-gray-200 dark:data-[state=active]:bg-gray-200 data-[state=active]:text-blue-700 dark:data-[state=active]:text-blue-300"
               >
                 People
               </TabsTrigger>
               <TabsTrigger
                 value="groups"
                 onClick={() => setCollection("groups")}
+                className="data-[state=active]:bg-white data-[state=inactive]:bg-gray-200 dark:data-[state=active]:bg-gray-200 data-[state=active]:text-blue-700 dark:data-[state=active]:text-blue-300"
               >
                 Groups
               </TabsTrigger>
             </TabsList>
             <TabsContent value="people">
-              <ScrollArea className="h-[300px] sm:h-[400px] w-full rounded-md border p-4">
+              <ScrollArea className="h-[300px] sm:h-[400px] w-full rounded-md border border-gray-200 dark:border-gray-700 p-4">
                 {searchResults.people.length > 0 ? (
                   searchResults.people.map((user, index) => (
                     <div
@@ -195,30 +205,32 @@ export default function SearchPage() {
                           src={user.user_profile}
                           alt={user.username}
                         />
-                        <AvatarFallback>{user.username[0]}</AvatarFallback>
+                        <AvatarFallback className="bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300">
+                          {user.username[0]}
+                        </AvatarFallback>
                       </Avatar>
                       <div
                         onClick={() => handleClick(user)}
                         className="cursor-pointer"
                       >
-                        <p className="text-sm font-medium leading-none">
+                        <p className="text-sm font-medium leading-none text-gray-900 dark:text-gray-100">
                           {user.username}
                         </p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
                           @{user.user_uuid.slice(0, 9)}
                         </p>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <p className="text-center text-muted-foreground">
+                  <p className="text-center text-gray-500 dark:text-gray-400">
                     No users found
                   </p>
                 )}
               </ScrollArea>
             </TabsContent>
             <TabsContent value="groups">
-              <ScrollArea className="h-[300px] sm:h-[400px] w-full rounded-md border p-4">
+              <ScrollArea className="h-[300px] sm:h-[400px] w-full rounded-md border border-gray-200 dark:border-gray-700 p-4">
                 {searchResults.groups.length > 0 ? (
                   searchResults.groups.map((group) => (
                     <div
@@ -231,17 +243,19 @@ export default function SearchPage() {
                           src={group.group_profile}
                           alt={group.group_name}
                         />
-                        <AvatarFallback>{group.group_name[0]}</AvatarFallback>
+                        <AvatarFallback className="bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300">
+                          {group.group_name[0]}
+                        </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="text-sm font-medium leading-none">
+                        <p className="text-sm font-medium leading-none text-gray-900 dark:text-gray-100">
                           {group.group_name}
                         </p>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <p className="text-center text-muted-foreground">
+                  <p className="text-center text-gray-500 dark:text-gray-400">
                     {searchResults.groups.length === 0
                       ? "No Groups found"
                       : "Loading"}

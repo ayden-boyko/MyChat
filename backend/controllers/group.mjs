@@ -73,7 +73,7 @@ groupController.post("/create/:group_name", async (req, res) => {
       members: [groupMaker],
       owner: groupMaker,
       group_profile:
-        req.body.group_profile !== null ? req.body.group_profile : "None",
+        req.body.group_avatar !== null ? req.body.group_avatar : "None",
       chat: [],
     });
     const result = await newGroup.save();
