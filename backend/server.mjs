@@ -84,8 +84,6 @@ app.use("/api/groups", groupController);
 // Use the session controller
 app.use("/api/session", SessionController);
 
-// TODO SERVE LOGIN PAGE
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
