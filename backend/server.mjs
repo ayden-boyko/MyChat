@@ -22,13 +22,8 @@ import { Server } from "socket.io";
 import { createServer } from "http";
 import { configDotenv } from "dotenv";
 import crypto from "crypto";
-
-// TODO HAVE BACKEND SEND FRONTEND FILES
-/*
-app.get('/', (req, res) => {
-  res.sendFile(join(__dirname, 'index.html'));
-});
-*/
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
 
 configDotenv();
 
@@ -90,14 +85,19 @@ app.use("/api/groups", groupController);
 app.use("/api/session", SessionController);
 
 // TODO SERVE LOGIN PAGE
-app.get("/", async (req, res) => {
-  try {
-    // serve reirect to login page
-    res.json(result);
-  } catch (error) {
-    // Handle any errors and send appropriate response
-    res.status(500).json({ error: "An error occurred" });
-  }
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Correctly point to the 'dist' folder after build
+const frontendPath = join(__dirname, "../chatroom/dist"); // Adjust path if your output folder is different
+
+// Serve static files from the 'dist' folder (built files)
+app.use(express.static(frontendPath));
+
+// Serve the index.html from the 'dist' folder (not the frontend source folder)
+app.get("/", (req, res) => {
+  res.sendFile(join(frontendPath, "index.html"));
 });
 
 // create socket io server for messages

@@ -1,5 +1,5 @@
 //external
-import React, { useState, useEffect, useRef, useContext } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { PlusCircle } from "lucide-react";
 //internal
 import { Button } from "../ui/button";

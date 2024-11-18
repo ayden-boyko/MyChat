@@ -14,8 +14,8 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import { Icons } from "../components/ui/icons.tsx";
-import { UserContext } from "../lib/UserContext.ts";
+import { Icons } from "../components/ui/icons";
+import { UserContext } from "../lib/UserContext";
 
 export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);

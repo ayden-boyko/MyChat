@@ -271,8 +271,8 @@ export default function NotificationPage() {
                     }
                     className={`w-full justify-start ${
                       activeFilter === option.value
-                        ? "bg-blue-600 text-white"
-                        : "text-gray-700 dark:text-gray-300"
+                        ? "bg-blue-600 text-white hover:text-gray-700 dark:hover:text-gray-300"
+                        : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-blue-50"
                     }`}
                     onClick={() => setActiveFilter(option.value)}
                   >
@@ -285,8 +285,8 @@ export default function NotificationPage() {
           </nav>
         </aside>
         <main className="flex-1 p-4 overflow-auto">
-          <Card className="w-full max-w-4xl mx-auto bg-white dark:bg-gray-800 shadow-lg">
-            <CardHeader className="bg-blue-50 dark:bg-gray-700 rounded-t-lg">
+          <Card className="w-full max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded shadow-lg">
+            <CardHeader className="bg-blue-50 dark:bg-gray-700">
               <CardDescription className="text-xl sm:text-2xl font-bold text-blue-700 dark:text-blue-300">
                 Stay updated with your latest activities
               </CardDescription>

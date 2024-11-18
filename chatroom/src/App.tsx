@@ -5,22 +5,22 @@ import { Socket } from "socket.io-client";
 
 //internal
 import "./output.css";
-import { FriendContext } from "./lib/FriendContext.ts";
-import { UserContext } from "./lib/UserContext.ts";
-import { DarkContext } from "./lib/DarkContext.ts";
+import { FriendContext } from "./lib/FriendContext";
+import { UserContext } from "./lib/UserContext";
+import { DarkContext } from "./lib/DarkContext";
 
 //routes
-import HomePage from "./routes/homepage.tsx";
-import LoginPage from "./routes/loginpage.tsx";
-import SettingsPage from "./routes/settingspage.tsx";
-import SignUpPage from "./routes/signuppage.tsx";
-import SearchPage from "./routes/searchpage.tsx";
-import NotificationPage from "./routes/notificationpage.tsx";
+import HomePage from "./routes/homepage";
+import LoginPage from "./routes/loginpage";
+import SettingsPage from "./routes/settingspage";
+import SignUpPage from "./routes/signuppage";
+import SearchPage from "./routes/searchpage";
+import NotificationPage from "./routes/notificationpage";
 
 //interfaces
-import { User } from "./interfaces/userinterface.ts";
-import { MiniUser } from "./interfaces/miniuser.ts";
-import { MiniGroup } from "./interfaces/minigroup.ts";
+import { User } from "./interfaces/userinterface";
+import { MiniUser } from "./interfaces/miniuser";
+import { MiniGroup } from "./interfaces/minigroup";
 
 //reset local session data (i.e pages, ect)
 window.addEventListener("beforeunload", function () {
