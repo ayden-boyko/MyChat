@@ -147,7 +147,7 @@ export default function FriendProfilePopup({
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-2 top-2 bg-gray-400 text-gray-700 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" // TODO CHANGE STYLING FOR FIREFOX
+            className="absolute right-2 top-2 bg-gray-400 text-gray-700 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             onClick={onClose}
             aria-label="Close profile"
           >

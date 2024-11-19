@@ -170,7 +170,7 @@ export default function SettingsPage() {
                 type="file"
                 accept="image/*"
                 onChange={handleAvatarChange}
-                className="w-full sm:w-auto border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 dark:text-gray-300 texy-gray-700"
+                className="w-full text-gray-500 sm:w-auto border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 dark:text-gray-300 texy-gray-700"
               />
             </div>
           </div>
@@ -184,7 +184,7 @@ export default function SettingsPage() {
             <Input
               id="username"
               defaultValue={user?.username}
-              className="w-full border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 dark:text-gray-300 texy-gray-700"
+              className="w-full text-gray-500 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 dark:text-gray-300 texy-gray-700"
             />
           </div>
           <div className="space-y-2 flex items-center gap-4 ">

@@ -10,7 +10,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
@@ -106,7 +105,7 @@ export default function SignUpPage() {
                 id="username"
                 placeholder="johndoe"
                 required
-                className="w-full border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
+                className="w-full text-gray-400 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
               />
             </div>
             <div className="space-y-2">
@@ -121,7 +120,7 @@ export default function SignUpPage() {
                 type="email"
                 placeholder="john@example.com"
                 required
-                className="w-full border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
+                className="w-full text-gray-400 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
               />
             </div>
             <div className="space-y-2">
@@ -135,7 +134,7 @@ export default function SignUpPage() {
                 id="password"
                 type="password"
                 required
-                className="w-full border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
+                className="w-full text-gray-400 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
               />
             </div>
             <div className="space-y-2">
@@ -149,7 +148,7 @@ export default function SignUpPage() {
                 id="confirmedpassword"
                 type="password"
                 required
-                className="w-full border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
+                className="w-full text-gray-400 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
               />
             </div>
             <Button
@@ -168,25 +167,6 @@ export default function SignUpPage() {
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="bg-gray-50 dark:bg-gray-700 rounded-b-lg">
-          <p className="text-sm text-gray-600 dark:text-gray-300 text-center w-full px-4 sm:px-0">
-            By clicking Sign Up, you agree to our{" "}
-            <a
-              href="#"
-              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
-            >
-              Terms of Service
-            </a>{" "}
-            and{" "}
-            <a
-              href="#"
-              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
-            >
-              Privacy Policy
-            </a>
-            .
-          </p>
-        </CardFooter>
       </Card>
     </div>
   );

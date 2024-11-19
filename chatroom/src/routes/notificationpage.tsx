@@ -261,28 +261,24 @@ export default function NotificationPage() {
       </header>
       <div className="flex flex-1 overflow-hidden">
         <aside className="hidden md:block w-64 p-4 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-y-auto">
-          <nav>
-            <ul className="space-y-2">
-              {filterOptions.map((option) => (
-                <li key={option.value}>
-                  <Button
-                    variant={
-                      activeFilter === option.value ? "default" : "ghost"
-                    }
-                    className={`w-full justify-start ${
-                      activeFilter === option.value
-                        ? "bg-blue-600 text-white hover:text-gray-700 dark:hover:text-gray-300"
-                        : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-blue-50"
-                    }`}
-                    onClick={() => setActiveFilter(option.value)}
-                  >
-                    <option.icon className="mr-2 h-4 w-4" />
-                    {option.label}
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          <ul className="space-y-2">
+            {filterOptions.map((option) => (
+              <li key={option.value}>
+                <Button
+                  variant={activeFilter === option.value ? "default" : "ghost"}
+                  className={`w-full justify-start ${
+                    activeFilter === option.value
+                      ? "bg-blue-600 text-white hover:text-gray-700 dark:hover:text-gray-300"
+                      : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-blue-50 hover:text-gray-500"
+                  }`}
+                  onClick={() => setActiveFilter(option.value)}
+                >
+                  <option.icon className="mr-2 h-4 w-4" />
+                  {option.label}
+                </Button>
+              </li>
+            ))}
+          </ul>
         </aside>
         <main className="flex-1 p-4 overflow-auto">
           <Card className="w-full max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded shadow-lg">
