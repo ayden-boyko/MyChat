@@ -136,7 +136,7 @@ export default function LoginPage() {
                   className="w-full pr-10 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 text-gray-700 dark:text-gray-200"
                 />
                 <img
-                  src="/assets/eye_closed.svg"
+                  src="./eye_closed.svg"
                   alt="Toggle password visibility"
                   className="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer h-5 w-5 text-gray-500 dark:text-gray-400"
                   id="toggle-password"
@@ -147,11 +147,11 @@ export default function LoginPage() {
                     const passwordInput =
                       icon.parentElement?.querySelector("input");
                     if (icon.src.includes("closed")) {
-                      icon.src = "/assets/eye_open.svg";
+                      icon.src = "./eye_open.svg";
                       icon.alt = "Hide password";
                       passwordInput?.setAttribute("type", "text");
                     } else {
-                      icon.src = "/assets/eye_closed.svg";
+                      icon.src = "./eye_closed.svg";
                       icon.alt = "Show password";
                       passwordInput?.setAttribute("type", "password");
                     }
@@ -172,7 +172,7 @@ export default function LoginPage() {
           <p className="text-sm text-center text-gray-600 dark:text-gray-300">
             Don't have an account?{" "}
             <a
-              href="/sign_up"
+              onClick={() => navigate("/sign_up")}
               className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
             >
               Sign up

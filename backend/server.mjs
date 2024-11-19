@@ -83,11 +83,8 @@ app.use("/api/groups", groupController);
 // Use the session controller
 app.use("/api/session", SessionController);
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
 // Correctly point to the 'dist' folder after build
-const frontendPath = join(__dirname, "../chatroom/dist"); // Adjust path if your output folder is different
+const frontendPath = "/chatroom/dist"; // Adjust path if your output folder is different
 
 // Serve static files from the 'dist' folder (built files)
 app.use(express.static(frontendPath));

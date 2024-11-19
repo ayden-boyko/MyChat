@@ -7,6 +7,8 @@ services:
       - backend
     env_file:
       - ./chatroom/.env
+    volumes:
+      - ./chatroom/dist:/chatroom/dist
     networks:
       - app-network
 
@@ -14,6 +16,8 @@ services:
     build: ./backend
     ports:
       - "8000:8000"
+    volumes:
+      - ./chatroom/dist:/chatroom/dist
     networks:
       - app-network
 

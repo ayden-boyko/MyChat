@@ -192,7 +192,7 @@ export default function SettingsPage() {
               variant="outline"
               size="icon"
               onClick={() => setDarkMode(!darkMode)}
-              className="bg-white hover:bg-gray-100 "
+              className="bg-white hover:bg-gray-100 " // TODO change color to fit firefox
             >
               {darkMode ? (
                 <Sun className="h-4 w-4" />

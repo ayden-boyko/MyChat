@@ -42,7 +42,7 @@ export default function NotificationPage() {
   const context = useContext(UserContext);
   const friendContext = useContext(FriendContext);
   const navigate = useNavigate();
-  const [activeFilter, setActiveFilter] = useState<number | "all">("all");
+  const [activeFilter, setActiveFilter] = useState<number>(0);
 
   if (!context) {
     throw new Error("UserContext is not available");
@@ -199,7 +199,7 @@ export default function NotificationPage() {
   };
 
   const filteredNotifications =
-    activeFilter === "all"
+    activeFilter === 0
       ? user?.notifications
       : user?.notifications?.filter(
           (notification) => notification.catagory === activeFilter
