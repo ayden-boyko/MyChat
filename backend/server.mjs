@@ -90,7 +90,7 @@ const frontendPath = "/chatroom/dist"; // Adjust path if your output folder is d
 app.use(express.static(frontendPath));
 
 // Serve the index.html from the 'dist' folder (not the frontend source folder)
-app.get("/", (req, res) => {
+app.get("/*", (req, res) => {
   res.sendFile(join(frontendPath, "index.html"));
 });
 
