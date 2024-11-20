@@ -187,7 +187,7 @@ export default function SearchPage() {
               <TabsTrigger
                 value="groups"
                 onClick={() => setCollection("groups")}
-                className="data-[state=active]:bg-white data-[state=inactive]:bg-gray-200 dark:data-[state=inactive]:bg-gray-700 dark:data-[state=active]:bg-gray-200 data-[state=active]:text-blue-700 dark:data-[state=active]:text-blue-700"
+                className="data-[state=active]:bg-white data-[state=inactive]:bg-gray-300 dark:data-[state=inactive]:bg-gray-700 dark:data-[state=active]:bg-gray-200 data-[state=active]:text-blue-700 dark:data-[state=active]:text-blue-700"
               >
                 Groups
               </TabsTrigger>

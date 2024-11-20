@@ -329,7 +329,7 @@ export default function HomePage() {
               <li key={index}>
                 <Button
                   variant="ghost"
-                  className="w-full justify-start text-gray-700 dark:text-gray-300 bg-blue-100 hover:bg-blue-200 dark:hover:bg-blue-900 "
+                  className="w-full justify-start text-gray-700 dark:text-gray-700 dark:hover:text-gray-300 bg-blue-100 hover:bg-blue-200 dark:hover:bg-blue-900 "
                   onClick={() => {
                     if (selectedFriend === group) {
                       setViewProfile(true);
@@ -540,7 +540,7 @@ export default function HomePage() {
           <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4">
             <form className="flex space-x-2" onSubmit={sendMessage}>
               <Input
-                className="flex-1 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
+                className="flex-1 text-gray-500 focus:text-gray-800 dark:focus:text-gray-300 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
                 placeholder="Type a message..."
                 id="msg"
               />

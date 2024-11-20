@@ -419,9 +419,7 @@ const notificationExecuterHandler = async (userId, notificationData, next) => {
           { user_uuid: notificationInstructions.sender.user_uuid },
           {
             $addToSet: {
-              groups: {
-                newGroup,
-              },
+              groups: newGroup,
             },
           }
         );
