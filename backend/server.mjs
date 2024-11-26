@@ -39,7 +39,6 @@ app.use(express.json());
 app.use(cors(corsOptions));
 
 // Express session setup
-console.log("creating sessions!");
 app.use(
   session({
     genid: (req) => crypto.randomBytes(16).toString("hex"),

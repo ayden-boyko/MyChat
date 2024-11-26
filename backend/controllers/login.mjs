@@ -79,11 +79,6 @@ loginController.post("/password", (req, res, next) => {
         .collection("users")
         .findOne({ email: user.email }, { projection: { chat: 0 } });
 
-      // console.log(
-      //   "login.mjs - 81 -pulled user from login credentials",
-      //   returnedUser
-      // );
-
       await User.updateOne(
         { user_uuid: returnedUser.user_uuid },
         { $set: { online: true } }

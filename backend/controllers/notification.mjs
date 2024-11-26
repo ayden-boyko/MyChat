@@ -77,7 +77,6 @@ NotificationController.put(
 
 NotificationController.put("/decline/:user_uuid", async (req, res) => {
   try {
-    console.log("decline notification", req.body.notification);
     const result = await User.updateOne(
       { user_uuid: req.params.user_uuid },
       { $pull: { notifications: req.body.notification } }

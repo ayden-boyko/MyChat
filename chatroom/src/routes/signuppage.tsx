@@ -65,11 +65,8 @@ export default function SignUpPage() {
       }
     );
 
-    console.log("signuppage.tsx - 69 - sent!");
-
     const data = await result.json();
     if (result.ok && data.email && data.username) {
-      console.log("signuppage.tsx - 73 -", data); // Log user data for debugging
       setUser({ ...user, ...data });
       navigate("/home"); // Redirect to HomePage on success
     }

@@ -50,13 +50,10 @@ export default function LoginPage() {
 
       if (response.ok) {
         const result = await response.json();
-        console.log("LOGIN RESULT", result);
         // Redirect to the home page upon successful login
         setUser(result.pulledUser);
         //set JWT for authorization in local storage
         localStorage.setItem("token", result.token);
-
-        console.log("loginpage.tsx - 51- LOGIN success", result);
 
         navigate("/home");
       } else {

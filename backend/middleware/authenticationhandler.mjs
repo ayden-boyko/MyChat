@@ -11,7 +11,6 @@ export default async function checkRights(req, res, next) {
     const header = JSON.parse(
       Buffer.from(token.split(".")[0], "base64").toString()
     );
-    console.log("JWT Header:", header);
 
     if (!token) {
       return res.status(403).json({ message: "Access denied invalid token" });

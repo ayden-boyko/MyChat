@@ -40,7 +40,7 @@ userController.get("/get/name/:username", async (req, res) => {
         },
       ])
       .toArray();
-    //console.log("users", user);
+
     res.json(user);
   } catch (error) {
     res.status(500).json({ error: "An error while getting user by USERNAME" });
@@ -68,7 +68,6 @@ userController.get("/get/mini/:user_uuid", async (req, res) => {
         { user_uuid: req.params.user_uuid },
         { projection: { username: 1, user_uuid: 1, user_profile: 1 } }
       );
-    console.log("retrieved", user);
     res.json(user);
   } catch (error) {
     res.status(500).json({ error: "An error while getting MiniuUser by ID" });
@@ -77,10 +76,7 @@ userController.get("/get/mini/:user_uuid", async (req, res) => {
 
 // POST create new users
 userController.post("/create", async (req, res) => {
-  console.log("account.mjs - 94 -starting");
   try {
-    //console.log("body", req.body); // Log the user data
-
     const { email, username, password } = req.body;
 
     // Check if user already exists
@@ -117,7 +113,6 @@ userController.post("/create", async (req, res) => {
 
         // Save the user to the database
         await newUser.save();
-        //console.log(`User created: ${newUser}`);
         res.status(201).json(newUser);
       }
     );
@@ -142,10 +137,7 @@ userController.delete("/delete/:user_uuid", checkRights, async (req, res) => {
 // PUT update username/profile (may have parameters change after JWT is implemented)
 userController.put("/update/:user_uuid", checkRights, async (req, res) => {
   // * empty values assume no change to that field
-  console.log(
-    "account.mjs - 161 - Received PUT request with params:",
-    req.params
-  ); // Log parameters
+
   try {
     const updateObj = {};
     if (req.body.username !== "") {
@@ -154,12 +146,9 @@ userController.put("/update/:user_uuid", checkRights, async (req, res) => {
     if (req.body.user_profile !== "") {
       updateObj.user_profile = req.body.user_profile;
     }
-    //console.log("to be updated", updateObj);
     const result = await db
       .collection("users")
       .updateOne({ user_uuid: req.params.user_uuid }, { $set: updateObj });
-
-    console.log("user updated!");
 
     // update friends of user to house the changes too
     const user = await db.collection("users").findOne({
@@ -170,7 +159,6 @@ userController.put("/update/:user_uuid", checkRights, async (req, res) => {
       // Iterate over each friend
       for (const friend of user.friends) {
         // Update each friend's Miniuser object in their friends array
-        console.log("updating friend", friend);
         await db.collection("users").updateOne(
           { user_uuid: friend.user_uuid },
           {
@@ -195,7 +183,6 @@ userController.put("/update/:user_uuid", checkRights, async (req, res) => {
   }
 });
 
-// TODO reset mith email? theres gotta be a better way, checkrights needs to implement JWT
 // PUT update password
 userController.put(
   "/update/password/:user_uuid",

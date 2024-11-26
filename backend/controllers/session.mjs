@@ -6,7 +6,6 @@ const SessionController = express.Router();
 SessionController.get("/get", async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "http://localhost:5173"); // Explicitly allow frontend
   res.setHeader("Access-Control-Allow-Credentials", "true");
-  //console.log("session.mjs - 11 - req.session", req.session);
   if (!req.session) {
     return res.sendStatus(401);
   }

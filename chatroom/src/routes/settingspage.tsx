@@ -71,10 +71,6 @@ export default function SettingsPage() {
   };
 
   const handleSaveChanges = async () => {
-    console.log(
-      "settingspage.tsx - 61 - ",
-      (document.getElementById("username") as HTMLInputElement)?.value
-    );
     const result = await fetch(
       `${import.meta.env.VITE_BACKEND_API_URL}/api/users/update/${
         user?.user_uuid
@@ -95,7 +91,6 @@ export default function SettingsPage() {
     );
 
     if (result.ok) {
-      console.log(result);
       alert("Your changes have been saved.");
       setUser({
         ...user,

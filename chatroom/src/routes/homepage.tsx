@@ -84,14 +84,9 @@ export default function HomePage() {
   useEffect(() => {
     if (user?.socket) {
       if (selectedFriend && "user_uuid" in selectedFriend) {
-        console.log("user");
         startChatting(selectedFriend as MiniUser);
       } else if (selectedFriend && "group_uuid" in selectedFriend) {
-        console.log("group");
         startGroupChatting(selectedFriend as MiniGroup);
-      } else {
-        // there is no selected friend and no reason for the socket to join any namespace
-        console.log("no selected friend");
       }
     }
   }, [user?.socket, selectedFriend]);
@@ -129,7 +124,6 @@ export default function HomePage() {
 
   // pull data from database and update the user
   useEffect(() => {
-    console.log("updating user");
     const updateUser = async () => {
       if (!user?.user_uuid) return;
       const result = await fetch(
@@ -149,8 +143,6 @@ export default function HomePage() {
     };
     updateUser();
   }, []); // changed from [user] to [user?.user_uuid] to prevent re-running when user changes
-
-  //console.log("hompage.tsx - 100 - USER-HOME", user);
 
   const logout = async (user: User | null) => {
     try {
@@ -174,7 +166,6 @@ export default function HomePage() {
   };
 
   const startGroupChatting = async (group: MiniGroup) => {
-    console.log("homepage.tsx - 107 - GROUP", group);
     user?.socket.emit("group join", {
       user_uuid: user?.user_uuid,
       group_uuid: group.group_uuid,
@@ -195,11 +186,8 @@ export default function HomePage() {
     );
     const chatData = await chat.json();
 
-    console.log("homepage.tsx - 122 - GROUPCHATDATA", chatData);
-
     //if messages are null, make them empty
     if (chatData.chat.length === 0) {
-      console.log("set chata data to []");
       setFriendChat([]);
       return;
     }
@@ -212,13 +200,10 @@ export default function HomePage() {
   };
 
   const startChatting = async (friend: MiniUser) => {
-    console.log("178 home socket.io.uri", user?.socket?.io?.opts?.path);
-
     user?.socket.emit("join", {
       user_uuid: user?.user_uuid,
     });
 
-    console.log("homepage.tsx - 80 - FRIEND", friend);
     if (friend === null) {
       alert("Please select a friend to start chatting");
       return;
@@ -235,7 +220,6 @@ export default function HomePage() {
       }
     );
     const chatData = await chat.json();
-    console.log("homepage.tsx - 103 - CHATDATA", chatData);
 
     //if messages are null, make them empty
     if (chatData === null) {
@@ -253,10 +237,8 @@ export default function HomePage() {
   };
 
   const sendMessage = async (event: React.FormEvent<HTMLFormElement>) => {
-    console.log("sending message");
     event?.preventDefault();
     const message = document.getElementById("msg") as HTMLInputElement;
-    console.log("homepage.tsx - 104 - MESSAGE", message.value);
 
     //if the selected friend is MiniUser, then call the code
     if (selectedFriend && "user_uuid" in selectedFriend) {
@@ -300,7 +282,6 @@ export default function HomePage() {
         ? "message"
         : "group message";
 
-    console.log("message sent to - 276- ", reciever);
     user?.socket.emit(message_type, {
       sendee: reciever,
       message: message.value,

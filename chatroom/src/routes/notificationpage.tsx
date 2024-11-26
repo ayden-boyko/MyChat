@@ -88,7 +88,6 @@ export default function NotificationPage() {
   ) => {
     let result;
     if (action === "accept") {
-      //console.log("accepting", notification);
       result = await fetch(
         `${import.meta.env.VITE_BACKEND_API_URL}/api/notification/accept/${
           user?.user_uuid
@@ -100,7 +99,6 @@ export default function NotificationPage() {
         }
       );
     } else if (action === "decline") {
-      console.log("declining", notification);
       result = await fetch(
         `${import.meta.env.VITE_BACKEND_API_URL}/api/notification/decline/${
           user?.user_uuid
@@ -120,7 +118,6 @@ export default function NotificationPage() {
         notifications: user?.notifications?.filter((n) => n !== notification),
       } as User);
       // then redirect to chat with said user/group
-      console.log("notification", notification);
       if (
         (action === "accept" && notification.catagory === 1) ||
         notification.catagory === 2 ||
@@ -169,8 +166,6 @@ export default function NotificationPage() {
                 (group) => group.group_uuid === notification.sender.user_uuid
               ) ?? null
         );
-
-        console.log("notification viewed: ", notification);
 
         navigate("/home");
       }

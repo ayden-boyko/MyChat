@@ -7,11 +7,6 @@ import Chats from "../schemas/Chats.mjs";
 const chatController = express.Router();
 
 chatController.get("/between/:user_uuid/:friend_uuid", async (req, res) => {
-  console.log(
-    "between received - 11 -",
-    req.params.user_uuid,
-    req.params.friend_uuid
-  );
   try {
     const chat = await db.collection("chats").findOne({
       between: {
@@ -28,7 +23,6 @@ chatController.get("/between/:user_uuid/:friend_uuid", async (req, res) => {
 
 chatController.get("/:group_uuid", async (req, res) => {
   try {
-    console.log("group received - 31 -", req.params.group_uuid);
     //find chat between users
     const chat = await Group.findOne(
       { group_uuid: req.params.group_uuid },

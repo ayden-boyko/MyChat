@@ -28,7 +28,6 @@ export default class UserNamespace {
           console.log("THIS IS A GROUP ID, WRONG NAMESPACE");
           return;
         }
-        console.log("usernamespace - 27 - data", data);
         //check the user to see if they are online
         const online = usersOnline[sendee];
         if (online) {
@@ -37,9 +36,6 @@ export default class UserNamespace {
           );
           socket.to(usersOnline[sendee]).emit("message", data);
         } else {
-          console.log(
-            `usernamespace - 36 - ${data.sender.username} could not send: ${data.message} to ${sendee} as they are offline`
-          );
           const notificationData = {
             sender: {
               user_uuid: data.sender.user_uuid,
@@ -51,12 +47,9 @@ export default class UserNamespace {
             date: new Date(),
             seen: false,
           };
-          console.log("notificationData", notificationData);
+
           await addNotification(sendee, notificationData);
         }
-        //upsert creates the chat if it doesnt exist
-        console.log("updating || creating chat - 52 -", data.message);
-        console.log("sender", data.sender, "sendee", sendee);
         try {
           let result;
           //check if the chat already exists
@@ -81,8 +74,6 @@ export default class UserNamespace {
             });
             result = await chat.save();
           }
-
-          console.log("result", result);
         } catch (error) {
           console.log(
             `usernamespace - 84 - failed to update chat between ${sendee} and ${data.sender.user_uuid}, caused error: `,
@@ -99,9 +90,7 @@ export default class UserNamespace {
         if (userId) {
           delete usersOnline[userId];
         }
-        console.log(
-          `usernamespace - 95 - ${socket.id} disconnected from user namespace`
-        );
+
         // mark them as offline
         User.updateOne(
           { user_uuid: socket.id },

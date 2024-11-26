@@ -14,7 +14,6 @@ async function connectToDatabase() {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    console.log("conn.mjs - 17 - Connected to MongoDB successfully");
 
     // Optionally, you can access the default connection
     const db = mongoose.connection;

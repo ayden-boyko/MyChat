@@ -7,7 +7,6 @@ const usersOnline = {};
 
 const getOfflineGroupMembers = (group_uuid) => {
   //gets all members that are offline
-  console.log(group_uuid);
   return Group.findOne({ group_uuid }).then((group) => {
     return group.members.filter((member) => {
       return !usersOnline[member.user_uuid];
@@ -34,11 +33,8 @@ export default class GroupNamespace {
   // the most recent notification takes precedence over the older ones
 
   initialize() {
-    console.log("initializing group namespace");
-
     this.namespace.on("connection", (socket) => {
       socket.on("group join", (data) => {
-        console.log("user socket id:", socket.id);
         usersOnline[data.user_uuid] = socket.id;
         socket.join(data.group_uuid);
         console.log(
@@ -88,9 +84,6 @@ export default class GroupNamespace {
           { group_uuid: sendee },
           { _id: 1, group_uuid: 1, group_name: 1, group_profile: 1 }
         );
-
-        console.log("minigroup", minigroup);
-
         // sender is the group, this is needed for notifications page routing to work
         const notificationData = {
           sender: {
@@ -104,7 +97,6 @@ export default class GroupNamespace {
           seen: false,
         };
 
-        console.log("notificationData to be sent", notificationData);
         // notify all offline members of the group
         setImmediate(() => {
           const offline = getOfflineGroupMembers(sendee);
@@ -118,7 +110,6 @@ export default class GroupNamespace {
 
         //update chat if it exists, else create it
         try {
-          console.log("updating || creating chat - 55 -", sendee, data.message);
           const group = await Group.findOne({ group_uuid: sendee });
           if (group) {
             group.chat.push({
@@ -141,9 +132,7 @@ export default class GroupNamespace {
 
       socket.on("disconnect", () => {
         delete usersOnline[socket.id]; // remove useres form the online array
-        console.log(
-          `usernamespace - 95 - ${socket.id} disconnected from user namespace`
-        );
+
         // mark them as offline
         User.updateOne(
           { user_uuid: socket.id },

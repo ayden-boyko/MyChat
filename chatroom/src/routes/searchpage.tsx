@@ -54,8 +54,6 @@ export default function SearchPage() {
   const handleSearch = async () => {
     if (!searchQuery) alert("Please enter a search query");
 
-    console.log("searchpage.tsx - 53 - preparing search", searchQuery);
-
     const result = await fetch(
       `${
         import.meta.env.VITE_BACKEND_API_URL
@@ -83,12 +81,9 @@ export default function SearchPage() {
   };
 
   const handleClick = (user: MiniGroup | MiniUser) => {
-    console.log("searchpage.tsx - 84 -user", user);
     if ("username" in user) {
-      console.log("searchpage.tsx - 86 -group", user);
       setSelectedUser(user);
     } else if ("group_name" in user) {
-      console.log("searchpage.tsx - 89 -group", user);
       setSelectedGroup(user);
     }
   };
@@ -100,7 +95,6 @@ export default function SearchPage() {
 
   const handleSendFriendRequest = async () => {
     try {
-      console.log("searchpage.tsx - 86 -sender", user);
       const result = await fetch(
         `${import.meta.env.VITE_BACKEND_API_URL}/api/friend/request/${
           selectedUser?.user_uuid
@@ -119,7 +113,6 @@ export default function SearchPage() {
       );
       const message = await result.json();
 
-      console.log("searchpage.tsx - 105 -friend result", message);
       if (
         message.message === "You're already friends with this person" ||
         message.message ===

@@ -81,7 +81,6 @@ export default function GroupCreationPopup({
 
       const groupData = await result.json();
 
-      console.log("groupCreationPopup.tsx - 71 - result", groupData);
       setGroupName("");
       setGroupAvatar("");
       setUser({

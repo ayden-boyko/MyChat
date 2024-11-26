@@ -71,9 +71,7 @@ const prenotifCheck = async (userId, notificationData) => {
 
   if (resultType) {
     //removes the notification if its already been sent, regardless of type
-    console.log(
-      "notificationHandler.mjs - 28 - removing notification that was added"
-    );
+
     await User.updateOne(
       { user_uuid: userId },
       {
@@ -106,9 +104,7 @@ const prenotifCheck = async (userId, notificationData) => {
 
   if (resultAlreadySent) {
     //removes the notification if its already been sent
-    console.log(
-      "notificationHandler.mjs - 61 - removing notification that was added"
-    );
+
     await User.updateOne(
       { user_uuid: userId },
       {
@@ -129,9 +125,7 @@ const prenotifCheck = async (userId, notificationData) => {
   // dont let the user send a friend request to themself
   if (userId === notificationData.sender.user_uuid) {
     //removes the notification if its already been sent
-    console.log(
-      "notificationHandler.mjs - 84 - removing notification that was added"
-    );
+
     await User.updateOne(
       { user_uuid: userId },
       {
@@ -155,7 +149,6 @@ const prenotifCheck = async (userId, notificationData) => {
 const addNotification = async (userId, notificationData) => {
   try {
     const postAdd = await prenotifCheck(userId, notificationData);
-    console.log("notificationData post add", postAdd);
     if (postAdd) {
       console.log(
         `notificationHandler.mjs - 114 - Notification already sent to for offline user: ${userId}`
@@ -180,9 +173,6 @@ const addNotification = async (userId, notificationData) => {
 const addnotificationHandler = (eventType) => {
   return async (req, res, next) => {
     try {
-      console.log("notificaionHandler.mjs - 137 - Received request");
-      // console.log("recipient", req.params.user_uuid);
-
       /* notification text that will be shown to the user
 
         types 5: messages from user (1) or group (2), group invite (3), friend request(4), group join request(5), NULL (0) = autofail
@@ -226,11 +216,6 @@ const addnotificationHandler = (eventType) => {
         seen: false,
       };
 
-      console.log(
-        "notificationHandler.mjs - 180 - notificationData pre add",
-        notificationData
-      );
-
       //check that request isnt from a user within the blocked users list of the user
       if (eventType !== 5) {
         const blockedUser = await User.findOne({
@@ -246,7 +231,6 @@ const addnotificationHandler = (eventType) => {
         //get group id from the notification payload
         const slicedPayload = notificationData.payload.split(",");
         const groupId = slicedPayload[1].slice(1, -1);
-        console.log("groupId", groupId);
         // check who the owner of the group is
         const owner = await Group.findOne(
           { group_uuid: groupId },
@@ -254,7 +238,6 @@ const addnotificationHandler = (eventType) => {
             owner: 1,
           }
         );
-        console.log("owner", owner.owner);
         // make sure the sender uuid isnt blocked by the owner
         const blockedUser = await User.findOne({
           user_uuid: owner.owner.user_uuid,
@@ -283,7 +266,6 @@ const notificationExecuterHandler = async (userId, notificationData, next) => {
   try {
     const notificationInstructions = notificationData;
     let result;
-    console.log("notificationhandler - 232 - ", notificationData);
     switch (notificationInstructions.catagory) {
       case 1: //message
         // redirect to the correct user chatroom
@@ -301,11 +283,6 @@ const notificationExecuterHandler = async (userId, notificationData, next) => {
         const miniUserInfo = await User.findOne(
           { user_uuid: userId },
           { user_uuid: 1, username: 1, user_profile: 1 }
-        );
-
-        console.log(
-          "notificatn handler: user to be added to group - 247 - ",
-          miniUserInfo
         );
 
         const newMember = {
@@ -407,7 +384,6 @@ const notificationExecuterHandler = async (userId, notificationData, next) => {
 
         //create a minigroup based off of the group id
         const group = await Group.findOne({ group_uuid: group_uuid });
-        console.log("group", group);
         const newGroup = {
           group_uuid: group.group_uuid,
           group_name: group.group_name,
@@ -428,7 +404,6 @@ const notificationExecuterHandler = async (userId, notificationData, next) => {
       default:
         throw new Error("Invalid notification type");
     }
-    console.log("notificationhandler - 275 - notification executed", result);
     // Proceed to the next middleware or route handler
     next();
   } catch (error) {

@@ -15,8 +15,6 @@ friendController.put(
   addnotificationHandler(4),
   async (req, res) => {
     try {
-      console.log("friend.mjs - 18 -recieved", req.body);
-
       const blockedUser = await User.findOne({
         user_uuid: req.params.user_uuid,
         blocked: { $in: [req.body.user_uuid] },

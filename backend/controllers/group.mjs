@@ -1,6 +1,3 @@
-// TODO WHEN SERVING GROUP'S MEMEBERS AND CHAT HISTORY USE DATA COMPRESSSION MAY BE ABLE TO SEND MORE MESSAGES IN HISTORY
-// https://www.npmjs.com/package/compression
-
 import express from "express";
 import User from "../schemas/User.mjs"; // Import the User schema
 import Group from "../schemas/Group.mjs";
@@ -59,9 +56,6 @@ groupController.get("/membercount/:group_uuid", async (req, res) => {
 // create group
 groupController.post("/create/:group_name", async (req, res) => {
   try {
-    console.log(
-      `create group: name: ${req.params.group_name} body: ${req.body}`
-    );
     const groupMaker = {
       user_uuid: req.body.creator.user_uuid,
       username: req.body.creator.username,
@@ -77,7 +71,6 @@ groupController.post("/create/:group_name", async (req, res) => {
       chat: [],
     });
     const result = await newGroup.save();
-    console.log("group created!", result);
     //save group id to creator's group field
     await User.updateOne(
       { user_uuid: req.body.creator.user_uuid },
@@ -92,7 +85,6 @@ groupController.post("/create/:group_name", async (req, res) => {
       }
     );
 
-    console.log("group created! user updated!", result);
     res.status(201).json(result);
   } catch (error) {
     res.status(500).json({
@@ -101,7 +93,6 @@ groupController.post("/create/:group_name", async (req, res) => {
   }
 });
 
-// TODO, requires auth
 // delete group
 groupController.delete("/delete/:group_num", async (req, res) => {
   try {
@@ -118,7 +109,6 @@ groupController.delete("/delete/:group_num", async (req, res) => {
   }
 });
 
-// TODO, requires auth
 // update group (for changing group name, profile)
 groupController.put("/update/:group_num", async (req, res) => {
   try {
@@ -174,7 +164,6 @@ groupController.put("/leave/:group_num", async (req, res) => {
   }
 });
 
-// TODO, requires auth
 // remove user from group
 groupController.delete("/remove/:group_num/:user_uuid", async (req, res) => {
   try {
@@ -211,7 +200,6 @@ groupController.put(
   }
 );
 
-// TODO, requires auth? probably should, maybe requires the uuid of a user already in it? something with a jwt token?
 // add user to group
 groupController.put("/add/:group_num/:user_uuid", async (req, res) => {
   try {
