@@ -20,4 +20,36 @@ Additionally, I utilized **Docker** for both development and production environm
 3. Start the application:
    ```bash
    npm start
+   
+---
 
+## Using Docker
+### Starting the Application
+Navigate to the root directory (Mychat).
+Run the following commands:
+   ```bash
+   docker-compose down
+   docker-compose up
+
+```
+
+## Rebuilding the Containers (Optional)
+If changes have been made to the application:
+Stop the containers and rebuild them:
+```bash
+docker-compose down --build
+```
+# Diagnostics
+To view running containers:
+```bash
+docker-compose ps
+```
+Viewing Logs
+Backend logs:
+```bash
+docker-compose logs backend
+```
+Frontend logs:
+```bash
+docker-compose logs frontend
+```
