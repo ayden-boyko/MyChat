@@ -1,14 +1,23 @@
-To run the app in a venv create one, install dependencies and type npm start, this will start the front and backends
-#FOR STARTING DOCKER
+# Full-Stack Chat Room Application
 
-To run the docker container:
-navigate to root directory (Mychat) and write:
-~ docker-compose down
-~ docker compose up
+## Overview
+My experience spans both front-end and back-end development. Notably, I built a full-stack chat room application using:
+- **MongoDB**  
+- **Node.js**  
+- **Express**  
+- **React**  
+- **WebSockets** for real-time communication  
 
-OPTIONAL: after changes have been made
-~ docker-compose down --build
+Additionally, I utilized **Docker** for both development and production environments, deploying the application on **Google Cloud Platform (GCP)** to enable scalability for both the front-end and back-end.
 
-for diagnostics:
-~ docker-compose ps LISTS RUNNING CONTAINERS
-~ docker-compose logs backend or frontend
+---
+
+## Running the Application
+
+### Using a Virtual Environment
+1. Create a virtual environment (`venv`).
+2. Install the necessary dependencies.
+3. Start the application:
+   ```bash
+   npm start
+
