@@ -8,6 +8,7 @@ This full-stack chat room application was developed using a combination of **Mon
 - Send messages in real-time through WebSockets.
 - Join multiple chat rooms or directly message other users.
 - View message history.
+- View notifications.
 
 The project was designed with scalability in mind. I utilized **Docker** to create a consistent development and production environment, ensuring smooth deployments and ease of scaling. The application was deployed on **Google Cloud Platform (GCP)** to handle traffic efficiently and ensure that both the front-end and back-end can scale as needed.
 
